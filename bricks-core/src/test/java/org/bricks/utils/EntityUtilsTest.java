@@ -16,17 +16,36 @@
 
 package org.bricks.utils;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static org.bricks.utils.EntityUtils.SERIAL_VERSION_UID;
+import static org.bricks.utils.EntityUtils.addEntityToMap;
+import static org.bricks.utils.EntityUtils.convertData;
+import static org.bricks.utils.EntityUtils.copy;
+import static org.bricks.utils.EntityUtils.getDeclaredField;
+import static org.bricks.utils.EntityUtils.getDeclaredFields;
 import static org.bricks.utils.EntityUtils.getDeclaredMethod;
+import static org.bricks.utils.EntityUtils.getFieldValue;
 import static org.bricks.utils.EntityUtils.invokeMethod;
+import static org.bricks.utils.EntityUtils.setFieldValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class EntityUtilsTest {
 
@@ -47,8 +66,77 @@ public class EntityUtilsTest {
         assertEquals("abc", child.getSurname());
     }
 
+    @Test
+    public void testGetDeclaredFieldNull() {
+    	assertNull(getDeclaredField(null, null));
+    }
+
+    @Test
+    public void testGetDeclaredFieldObject() {
+    	assertNull(getDeclaredField(Object.class, null));
+    }
+
+    @Test
+    public void testGetDeclaredFieldsStatic() {
+    	List<Field> list = newArrayList();
+        getDeclaredFields(Child.class, list, true);
+        assertTrue(list.stream().anyMatch(field -> SERIAL_VERSION_UID.equals(field.getName())));
+    }
+
+    @Test
+    public void testGetFieldValue() {
+        assertEquals("abc", getFieldValue(new Child().setSurname("abc"), "surname"));
+    }
+
+    @Test
+    public void testSetFieldValue() {
+    	Child child = new Child();
+        setFieldValue(child, "surname", "abc");
+        assertEquals("abc", child.getSurname());
+    }
+
+    @Test
+    public void testCopy() {
+    	Child dest = new Child();
+    	copy(new Child().setSurname("abc"), dest);
+        assertEquals("abc", dest.getSurname());
+    }
+
+    @Test
+    public void testConvertData() {
+        List<Child> list = convertData(Child.class, newArrayList(ImmutableMap.of("surname", "abc")));
+        assertNotNull(list);
+        assertEquals("abc", list.get(0).getSurname());
+    }
+
+    @Test
+    public void testConvertDataEmpty() {
+    	List<Child> list = convertData(Child.class, newArrayList());
+    	assertNull(list);
+    }
+
+    @Test
+    public void testAddEntityToMap() {
+        Child child = new Child();
+        child.setSurname("a").setName("b").setAge(1);
+        Map<String, Object> map = newHashMap();
+        addEntityToMap(child, map);
+        assertFalse(map.isEmpty());
+    }
+
+    @Test
+    public void testAddEntityToMapExlude() {
+        Child child = new Child();
+        child.setSurname("a").setName("b").setAge(1);
+        Map<String, Object> map = newHashMap();
+        addEntityToMap(child, map, "surname");
+        assertNull(map.get("surname"));
+        assertNotNull(map.get("name"));
+    }
+
     @Setter
     @Getter
+    @Accessors(chain = true)
     private static class Parent implements Serializable {
 
 		private static final long serialVersionUID = 1L;

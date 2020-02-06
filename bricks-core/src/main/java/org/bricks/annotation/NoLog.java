@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 /**
  * 不打日志注解
  *
- * @author fuzhiying
+ * @author fuzy
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

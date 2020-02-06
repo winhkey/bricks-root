@@ -53,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 public class EntityUtils {
 
-    private static final String SERIAL_VERSION_UID = "serialVersionUID";
+    public static final String SERIAL_VERSION_UID = "serialVersionUID";
 
     /**
      * 获取对象的 DeclaredMethod
@@ -65,7 +65,7 @@ public class EntityUtils {
      */
     public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         return ofNullable(clazz).filter(c -> c != Object.class)
-                .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes), c -> getDeclaredMethod(c.getSuperclass(), methodName, parameterTypes), log, null))
+                .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes), c -> getDeclaredMethod(c.getSuperclass(), methodName, parameterTypes), null, null))
                 .orElse(null);
     }
 
@@ -96,25 +96,26 @@ public class EntityUtils {
      */
     public static Field getDeclaredField(Class<?> clazz, String fieldName) {
         return ofNullable(clazz).filter(c -> c != Object.class)
-                .map(apply(c -> c.getDeclaredField(fieldName), c -> getDeclaredField(c.getSuperclass(), fieldName), log, null))
+                .map(apply(c -> c.getDeclaredField(fieldName), c -> getDeclaredField(c.getSuperclass(), fieldName), null, null))
                 .orElse(null);
     }
 
     /**
      * 获取对象的 DeclaredField列表
      *
-     * @param clazz 子类
-     * @param list  列表
+     * @param clazz          子类
+     * @param list           列表
+     * @param containsStatic 是否包含静态字段
      */
-    public static void getDeclaredFields(Class<?> clazz, List<Field> list) {
+    public static void getDeclaredFields(Class<?> clazz, List<Field> list, boolean containsStatic) {
         ofNullable(clazz).filter(c -> c != Object.class).ifPresent(c -> {
-            list.addAll(of(c.getDeclaredFields()).filter(field -> !isStatic(field.getModifiers())).collect(toList()));
-            getDeclaredFields(c.getSuperclass(), list);
+            list.addAll(of(c.getDeclaredFields()).filter(field -> containsStatic || !isStatic(field.getModifiers())).collect(toList()));
+            getDeclaredFields(c.getSuperclass(), list, containsStatic);
         });
     }
 
     /**
-     * 直接读取对象的属性值, 忽略 private/protected 修饰符, 也不经过 getter
+     * 直接读取对象的属性值
      *
      * @param object    子类对象
      * @param fieldName 父类中的属性名
@@ -151,13 +152,11 @@ public class EntityUtils {
      */
     public static void copy(Object src, Object dest) {
         List<Field> fieldList = newArrayList();
-        getDeclaredFields(src.getClass(), fieldList);
-        fieldList.stream()
-                .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
-                .forEach(field -> {
-                    String name = field.getName();
-                    ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
-                });
+        getDeclaredFields(src.getClass(), fieldList, false);
+        fieldList.forEach(field -> {
+            String name = field.getName();
+            ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
+        });
     }
 
     /**
@@ -183,14 +182,13 @@ public class EntityUtils {
     public static <T extends Serializable> T addEntity(Class<T> clazz, Map<String, Object> dataMap) {
         T t = instantiateClass(clazz);
         List<Field> list = newArrayList();
-        getDeclaredFields(clazz, list);
-        list.stream().filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
-                .forEach(field -> {
-                    String fieldName = field.getName();
-                    if (dataMap.containsKey(fieldName)) {
-                        setFieldValue(t, fieldName, dataMap.get(fieldName));
-                    }
-                });
+        getDeclaredFields(clazz, list, false);
+        list.forEach(field -> {
+            String fieldName = field.getName();
+            if (dataMap.containsKey(fieldName)) {
+                setFieldValue(t, fieldName, dataMap.get(fieldName));
+            }
+        });
         return t;
     }
 
@@ -204,10 +202,9 @@ public class EntityUtils {
     public static void addEntityToMap(Object object, Map<String, Object> dataMap, String... excludes) {
         ofNullable(object).ifPresent(o -> {
             List<Field> list = newArrayList();
-            getDeclaredFields(o.getClass(), list);
+            getDeclaredFields(o.getClass(), list, false);
             list.stream()
                     .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
-                    .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
                     .forEach(accept(field -> {
                         field.setAccessible(true);
                         ofNullable(field.get(o)).ifPresent(value -> dataMap.put(field.getName(), value));
