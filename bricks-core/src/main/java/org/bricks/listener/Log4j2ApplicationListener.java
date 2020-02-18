@@ -17,6 +17,7 @@
 package org.bricks.listener;
 
 import static java.text.MessageFormat.format;
+import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.net.InetAddress;
@@ -70,14 +71,7 @@ public class Log4j2ApplicationListener implements GenericApplicationListener {
     }
 
     private boolean isAssignableFrom(Class<?> type, Class<?>... supportedTypes) {
-        if (type != null) {
-            for (Class<?> supportedType : supportedTypes) {
-                if (supportedType.isAssignableFrom(type)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return of(supportedTypes).anyMatch(supportedType -> supportedType.isAssignableFrom(type));
     }
 
     private String getIp(Environment environment) {

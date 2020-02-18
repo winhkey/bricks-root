@@ -39,7 +39,7 @@
         <jsoup-version>1.11.3</jsoup-version>
         <java-version>1.8</java-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <checkstyle.version>[8.29,)</checkstyle.version>
+        <checkstyle.version>8.29</checkstyle.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
         <maven-source.version>3.2.0</maven-source.version>
         <maven-jar.version>3.2.0</maven-jar.version>
@@ -50,6 +50,7 @@
         <maven-pmd.version>3.12.0</maven-pmd.version>
         <maven-findbugs.version>3.0.5</maven-findbugs.version>
         <maven-jxr.version>3.0.0</maven-jxr.version>
+        <argLine>-Dfile.encoding=UTF-8</argLine>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -84,11 +85,12 @@
             <dependency>
                 <groupId>org.bricks</groupId>
                 <artifactId>bricks-test</artifactId>
-                <version>${project.version}</version>
+                <version>1.0-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -100,6 +102,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -196,28 +199,91 @@
                             <version>${checkstyle.version}</version>
                         </dependency>
                         <dependency>
-                            <groupId>com.wgc.brick</groupId>
-                            <artifactId>brick-build</artifactId>
+                            <groupId>org.bricks</groupId>
+                            <artifactId>bricks-build</artifactId>
                             <version>1.0-SNAPSHOT</version>
                         </dependency>
                     </dependencies>
+                    <configuration>
+                        <configLocation>checkstyle.xml</configLocation>
+                        <failsOnError>true</failsOnError>
+                        <violationSeverity>error</violationSeverity>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
                     <version>${maven-pmd.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.bricks</groupId>
+                            <artifactId>bricks-build</artifactId>
+                            <version>1.0-SNAPSHOT</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
                         <rulesets>
                             <ruleset>pmd.xml</ruleset>
                         </rulesets>
+                        <failOnViolation>true</failOnViolation>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.wgc.brick</groupId>
-                            <artifactId>brick-build</artifactId>
-                            <version>1.0-SNAPSHOT</version>
-                        </dependency>
-                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${maven-findbugs.version}</version>
+                    <configuration>
+                        <excludeFilterFile>${project.build.directory}/classes/findbugs-exclude.xml</excludeFilterFile>
+                        <failOnError>true</failOnError>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.5</version>
+                    <configuration>
+                        <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                        <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+                        <output>file</output>
+                        <append>true</append>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>pre-unit-test</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <propertyName>surefireArgLine</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>post-unit-test</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report-aggregate</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -234,16 +300,11 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>${maven-site.verison}</version>
                 <configuration>
                     <locales>zh_CN</locales>
-                    <outputEncoding>UTF-8</outputEncoding>
+                    <outputEncoding>${project.build.sourceEncoding}</outputEncoding>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -272,18 +333,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
-                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${maven-findbugs.version}</version>
-                <configuration>
-                    <excludeFilterFile>${project.build.directory}/maven-shared-archive-resources/findbugs-exclude.xml</excludeFilterFile>
-                    <failOnError>false</failOnError>
-                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
@@ -291,11 +352,15 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <show>public</show>
-                </configuration>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -304,30 +369,22 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${maven-checkstyle.version}</version>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
                 <configuration>
-                    <configLocation>checkstyle.xml</configLocation>
+                    <show>private</show>
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none</additionalOption>
+                    </additionalOptions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${maven-pmd.version}</version>
-                <configuration>
-                    <rulesets>
-                        <ruleset>pmd.xml</ruleset>
-                    </rulesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${maven-findbugs.version}</version>
-                <configuration>
-                    <excludeFilterFile>${project.build.directory}/maven-shared-archive-resources/findbugs-exclude.xml</excludeFilterFile>
-                    <failOnError>false</failOnError>
-                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>aggregate-no-fork</report>
+                            <report>test-aggregate-no-fork</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
         </plugins>
     </reporting>

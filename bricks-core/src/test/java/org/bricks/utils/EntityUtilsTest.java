@@ -17,10 +17,8 @@
 package org.bricks.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-import static org.bricks.utils.EntityUtils.SERIAL_VERSION_UID;
-import static org.bricks.utils.EntityUtils.addEntityToMap;
 import static org.bricks.utils.EntityUtils.convertData;
+import static org.bricks.utils.EntityUtils.convertMapList;
 import static org.bricks.utils.EntityUtils.copy;
 import static org.bricks.utils.EntityUtils.getDeclaredField;
 import static org.bricks.utils.EntityUtils.getDeclaredFields;
@@ -80,7 +78,7 @@ public class EntityUtilsTest {
     public void testGetDeclaredFieldsStatic() {
     	List<Field> list = newArrayList();
         getDeclaredFields(Child.class, list, true);
-        assertTrue(list.stream().anyMatch(field -> SERIAL_VERSION_UID.equals(field.getName())));
+        assertTrue(list.stream().anyMatch(field -> "serialVersionUID".equals(field.getName())));
     }
 
     @Test
@@ -104,14 +102,14 @@ public class EntityUtilsTest {
 
     @Test
     public void testConvertData() {
-        List<Child> list = convertData(Child.class, newArrayList(ImmutableMap.of("surname", "abc")));
+        List<Child> list = convertMapList(newArrayList(ImmutableMap.of("surname", "abc")), Child.class);
         assertNotNull(list);
         assertEquals("abc", list.get(0).getSurname());
     }
 
     @Test
     public void testConvertDataEmpty() {
-    	List<Child> list = convertData(Child.class, newArrayList());
+    	List<Child> list = convertMapList(newArrayList(), Child.class);
     	assertNull(list);
     }
 
@@ -119,8 +117,7 @@ public class EntityUtilsTest {
     public void testAddEntityToMap() {
         Child child = new Child();
         child.setSurname("a").setName("b").setAge(1);
-        Map<String, Object> map = newHashMap();
-        addEntityToMap(child, map);
+        Map<String, Object> map = convertData(child);
         assertFalse(map.isEmpty());
     }
 
@@ -128,8 +125,7 @@ public class EntityUtilsTest {
     public void testAddEntityToMapExlude() {
         Child child = new Child();
         child.setSurname("a").setName("b").setAge(1);
-        Map<String, Object> map = newHashMap();
-        addEntityToMap(child, map, "surname");
+        Map<String, Object> map = convertData(child, "surname");
         assertNull(map.get("surname"));
         assertNotNull(map.get("name"));
     }

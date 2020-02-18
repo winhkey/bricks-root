@@ -17,6 +17,7 @@
 package org.bricks.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
 import static java.lang.reflect.Modifier.isStatic;
@@ -34,7 +35,6 @@ import static org.springframework.aop.support.AopUtils.isAopProxy;
 import static org.springframework.aop.support.AopUtils.isJdkDynamicProxy;
 import static org.springframework.beans.BeanUtils.instantiateClass;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -53,8 +53,6 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 public class EntityUtils {
 
-    public static final String SERIAL_VERSION_UID = "serialVersionUID";
-
     /**
      * 获取对象的 DeclaredMethod
      *
@@ -65,7 +63,7 @@ public class EntityUtils {
      */
     public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         return ofNullable(clazz).filter(c -> c != Object.class)
-                .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes), c -> getDeclaredMethod(c.getSuperclass(), methodName, parameterTypes), null, null))
+                .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes), c -> getDeclaredMethod(c.getSuperclass(), methodName, parameterTypes), log, null))
                 .orElse(null);
     }
 
@@ -79,12 +77,12 @@ public class EntityUtils {
      * @return 父类中方法的执行结果
      */
     public static Object invokeMethod(Object object, String methodName, Class<?>[] parameterTypes, Object[] parameters) {
-        return ofNullable(object)
-                .map(o -> getDeclaredMethod(o.getClass(), methodName, parameterTypes))
+        return ofNullable(object).map(o -> getDeclaredMethod(o.getClass(), methodName, parameterTypes))
                 .map(apply(method -> {
                     method.setAccessible(true);
                     return method.invoke(object, parameters);
-                }, null, log, null)).orElse(null);
+                }, null, log, null))
+                .orElse(null);
     }
 
     /**
@@ -108,10 +106,12 @@ public class EntityUtils {
      * @param containsStatic 是否包含静态字段
      */
     public static void getDeclaredFields(Class<?> clazz, List<Field> list, boolean containsStatic) {
-        ofNullable(clazz).filter(c -> c != Object.class).ifPresent(c -> {
-            list.addAll(of(c.getDeclaredFields()).filter(field -> containsStatic || !isStatic(field.getModifiers())).collect(toList()));
-            getDeclaredFields(c.getSuperclass(), list, containsStatic);
-        });
+        ofNullable(clazz).filter(c -> c != Object.class)
+                .ifPresent(c -> {
+                    list.addAll(of(c.getDeclaredFields()).filter(field -> containsStatic || !isStatic(field.getModifiers()))
+                            .collect(toList()));
+                    getDeclaredFields(c.getSuperclass(), list, containsStatic);
+                });
     }
 
     /**
@@ -127,7 +127,8 @@ public class EntityUtils {
         return ofNullable(getDeclaredField(object.getClass(), fieldName)).map(apply(field -> {
             field.setAccessible(true);
             return (T) field.get(object);
-        }, null, log, null)).orElse(null);
+        }, null, null, null))
+                .orElse(null);
     }
 
     /**
@@ -138,10 +139,11 @@ public class EntityUtils {
      * @param value     将要设置的值
      */
     public static void setFieldValue(Object object, String fieldName, Object value) {
-        ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName)).ifPresent(accept(field -> {
-            field.setAccessible(true);
-            field.set(object, value);
-        }, null, log, null));
+        ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName))
+                .ifPresent(accept(field -> {
+                    field.setAccessible(true);
+                    field.set(object, value);
+                }, null, log, null));
     }
 
     /**
@@ -162,24 +164,26 @@ public class EntityUtils {
     /**
      * 将map数据转换成对应的实体类对象
      *
-     * @param <T>      实体类
-     * @param clazz    实体类
      * @param dataList 数据
+     * @param clazz    实体类
+     * @param <T>      实体类
      * @return 对象
      */
-    public static <T extends Serializable> List<T> convertData(Class<T> clazz, List<Map<String, Object>> dataList) {
-        return isNotEmpty(dataList) ? dataList.stream().map(dataMap -> addEntity(clazz, dataMap)).collect(toList()) : null;
+    public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz) {
+        return isNotEmpty(dataList) ? dataList.stream()
+                .map(dataMap -> convertMap(dataMap, clazz))
+                .collect(toList()) : null;
     }
 
     /**
      * 将map中的值赋给对象
      *
-     * @param <T>     实体类
-     * @param clazz   实体类
      * @param dataMap 数据
+     * @param clazz 实体类
+     * @param <T> 实体类
      * @return 对象
      */
-    public static <T extends Serializable> T addEntity(Class<T> clazz, Map<String, Object> dataMap) {
+    public static <T> T convertMap(Map<String, Object> dataMap, Class<T> clazz) {
         T t = instantiateClass(clazz);
         List<Field> list = newArrayList();
         getDeclaredFields(clazz, list, false);
@@ -193,23 +197,27 @@ public class EntityUtils {
     }
 
     /**
-     * 将对象字段放入map
+     * 对象转map
      *
      * @param object   对象
-     * @param dataMap  map
      * @param excludes 排除字段
+     * @return map
      */
-    public static void addEntityToMap(Object object, Map<String, Object> dataMap, String... excludes) {
-        ofNullable(object).ifPresent(o -> {
-            List<Field> list = newArrayList();
-            getDeclaredFields(o.getClass(), list, false);
-            list.stream()
-                    .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
-                    .forEach(accept(field -> {
-                        field.setAccessible(true);
-                        ofNullable(field.get(o)).ifPresent(value -> dataMap.put(field.getName(), value));
-                    }, null, log, null));
-        });
+    public static Map<String, Object> convertData(Object object, String... excludes) {
+        return ofNullable(object)
+                .map(o -> {
+                    Map<String, Object> dataMap = newHashMap();
+                    List<Field> list = newArrayList();
+                    getDeclaredFields(o.getClass(), list, false);
+                    list.stream()
+                            .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
+                            .forEach(accept(field -> {
+                                field.setAccessible(true);
+                                ofNullable(field.get(o)).ifPresent(value -> dataMap.put(field.getName(), value));
+                            }, null, log, null));
+                    return dataMap;
+                })
+                .orElse(null);
     }
 
     /**
@@ -242,7 +250,8 @@ public class EntityUtils {
         if (isNotEmpty(map)) {
             builder.append('{');
             map.forEach((key, value) -> {
-                builder.append(key).append('=');
+                builder.append(key)
+                        .append('=');
                 buildValue(builder, value);
             });
             builder.delete(builder.lastIndexOf(", "), builder.length());
@@ -293,10 +302,10 @@ public class EntityUtils {
      */
     @SuppressWarnings("unchecked")
     public static Object getEnumValue(Class<?> clazz, Object value) {
-        Stream<?> stream = ValueEnum.class.isAssignableFrom(clazz) ? of(((Class<ValueEnum<?>>) clazz).getEnumConstants())
-                .filter(v -> v.getValue().equals(value)) : of(clazz.getEnumConstants())
-                .filter(v -> v.equals(value));
-        return stream.findAny().orElse(null);
+        Stream<?> stream = ValueEnum.class.isAssignableFrom(clazz) ? of(((Class<ValueEnum<?>>) clazz).getEnumConstants()).filter(v -> v.getValue()
+                .equals(value)) : of(clazz.getEnumConstants()).filter(v -> v.equals(value));
+        return stream.findAny()
+                .orElse(null);
     }
 
     private void buildValue(StringBuilder builder, Object value) {
@@ -319,8 +328,11 @@ public class EntityUtils {
      * @return 泛型参数类型列表
      */
     public static List<Class<?>> getComponentClassList(Class<?> selfClass, Class<?> superClass, int count) {
-        ResolvableType resolvableType = ResolvableType.forClass(selfClass).as(superClass);
-        return range(0, count).mapToObj(i -> resolvableType.getGeneric(i).resolve()).collect(toList());
+        ResolvableType resolvableType = ResolvableType.forClass(selfClass)
+                .as(superClass);
+        return range(0, count).mapToObj(i -> resolvableType.getGeneric(i)
+                .resolve())
+                .collect(toList());
     }
 
     /**
@@ -349,12 +361,15 @@ public class EntityUtils {
     private static Object getProxyTargetObject(Object proxy, String proxyField) {
         Object target = null;
         try {
-            Field h = proxy.getClass().getDeclaredField(proxyField);
+            Field h = proxy.getClass()
+                    .getDeclaredField(proxyField);
             h.setAccessible(true);
             Object obj = h.get(proxy);
-            Field advised = obj.getClass().getDeclaredField("advised");
+            Field advised = obj.getClass()
+                    .getDeclaredField("advised");
             advised.setAccessible(true);
-            target = ((AdvisedSupport) advised.get(obj)).getTargetSource().getTarget();
+            target = ((AdvisedSupport) advised.get(obj)).getTargetSource()
+                    .getTarget();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
