@@ -95,29 +95,6 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar.version}</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                                <classpathPrefix>lib/</classpathPrefix>
-                                <useUniqueVersions>false</useUniqueVersions>
-                            </manifest>
-                            <manifestEntries>
-                                <Class-Path>/config</Class-Path>
-                            </manifestEntries>
-                        </archive>
-                        <excludes>
-                            <exclude>checkstyle.xml</exclude>
-                            <exclude>pmd.xml</exclude>
-                            <exclude>findbugs-exclude.xml</exclude>
-                        </excludes>
-                        <outputDirectory>${project.build.directory}/dist</outputDirectory>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <executions>
                         <execution>
