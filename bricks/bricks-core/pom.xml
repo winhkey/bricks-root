@@ -49,9 +49,5 @@
             <artifactId>commons-collections4</artifactId>
             <version>${apache-collections4.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.bricks</groupId>
-            <artifactId>bricks-test</artifactId>
-        </dependency>
     </dependencies>
 </project>
