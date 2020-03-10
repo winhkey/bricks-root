@@ -25,19 +25,19 @@
         <apache-exec.version>1.3</apache-exec.version>
         <apache-upload.version>1.3.3</apache-upload.version>
         <google-guava.version>28.1-jre</google-guava.version>
-        <kaptcha-version>2.3.2</kaptcha-version>
-        <swagger2-version>2.9.2</swagger2-version>
-        <jfreechart-version>1.0.19</jfreechart-version>
-        <flowable-version>6.4.1</flowable-version>
-        <druid-version>1.1.10</druid-version>
-        <mybatis-plus-version>3.1.1</mybatis-plus-version>
-        <powermock-version>2.0.4</powermock-version>
-        <shiro-version>1.4.0</shiro-version>
-        <beetl-version>1.1.75.RELEASE</beetl-version>
-        <poi-version>4.1.0</poi-version>
-        <antlr-version>4.7.2</antlr-version>
-        <jsoup-version>1.11.3</jsoup-version>
-        <java-version>1.8</java-version>
+        <kaptcha.version>2.3.2</kaptcha.version>
+        <swagger2.version>2.9.2</swagger2.version>
+        <jfreechart.version>1.0.19</jfreechart.version>
+        <flowable.version>6.4.1</flowable.version>
+        <druid.version>1.1.10</druid.version>
+        <mybatis-plus.version>3.1.1</mybatis-plus.version>
+        <powermock.version>2.0.4</powermock.version>
+        <shiro.version>1.4.0</shiro.version>
+        <beetl.version>1.1.75.RELEASE</beetl.version>
+        <poi.version>4.1.0</poi.version>
+        <antlr.version>4.7.2</antlr.version>
+        <jsoup.version>1.11.3</jsoup.version>
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <checkstyle.version>8.29</checkstyle.version>
         <maven-compiler.version>3.8.1</maven-compiler.version>
@@ -154,8 +154,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler.version}</version>
                 <configuration>
-                    <source>${java-version}</source>
-                    <target>${java-version}</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>

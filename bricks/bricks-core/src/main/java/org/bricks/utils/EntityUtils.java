@@ -56,8 +56,8 @@ public class EntityUtils {
     /**
      * 获取对象的 DeclaredMethod
      *
-     * @param clazz          子类
-     * @param methodName     父类中的方法名
+     * @param clazz 子类
+     * @param methodName 父类中的方法名
      * @param parameterTypes 父类中的方法参数类型
      * @return 父类中的方法对象
      */
@@ -70,10 +70,10 @@ public class EntityUtils {
     /**
      * 调用对象方法
      *
-     * @param object         子类对象
-     * @param methodName     父类中的方法名
+     * @param object 子类对象
+     * @param methodName 父类中的方法名
      * @param parameterTypes 父类中的方法参数类型
-     * @param parameters     父类中的方法参数
+     * @param parameters 父类中的方法参数
      * @return 父类中方法的执行结果
      */
     public static Object invokeMethod(Object object, String methodName, Class<?>[] parameterTypes, Object[] parameters) {
@@ -88,7 +88,7 @@ public class EntityUtils {
     /**
      * 获取对象的 DeclaredField
      *
-     * @param clazz     子类
+     * @param clazz 子类
      * @param fieldName 父类中的属性名
      * @return 父类中的属性对象
      */
@@ -101,8 +101,8 @@ public class EntityUtils {
     /**
      * 获取对象的 DeclaredField列表
      *
-     * @param clazz          子类
-     * @param list           列表
+     * @param clazz 子类
+     * @param list 列表
      * @param containsStatic 是否包含静态字段
      */
     public static void getDeclaredFields(Class<?> clazz, List<Field> list, boolean containsStatic) {
@@ -117,9 +117,9 @@ public class EntityUtils {
     /**
      * 直接读取对象的属性值
      *
-     * @param object    子类对象
+     * @param object 子类对象
      * @param fieldName 父类中的属性名
-     * @param <T>       对象类型
+     * @param <T> 对象类型
      * @return 父类中的属性值
      */
     @SuppressWarnings("unchecked")
@@ -134,9 +134,9 @@ public class EntityUtils {
     /**
      * 设置对象属性值
      *
-     * @param object    子类对象
+     * @param object 子类对象
      * @param fieldName 父类中的属性名
-     * @param value     将要设置的值
+     * @param value 将要设置的值
      */
     public static void setFieldValue(Object object, String fieldName, Object value) {
         ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName))
@@ -149,7 +149,7 @@ public class EntityUtils {
     /**
      * 对象拷贝 数据对象空值不拷贝到目标对象
      *
-     * @param src  源对象
+     * @param src 源对象
      * @param dest 目标对象
      */
     public static void copy(Object src, Object dest) {
@@ -165,8 +165,8 @@ public class EntityUtils {
      * 将map数据转换成对应的实体类对象
      *
      * @param dataList 数据
-     * @param clazz    实体类
-     * @param <T>      实体类
+     * @param clazz 实体类
+     * @param <T> 实体类
      * @return 对象
      */
     public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz) {
@@ -199,24 +199,23 @@ public class EntityUtils {
     /**
      * 对象转map
      *
-     * @param object   对象
+     * @param object 对象
      * @param excludes 排除字段
      * @return map
      */
     public static Map<String, Object> convertData(Object object, String... excludes) {
-        return ofNullable(object)
-                .map(o -> {
-                    Map<String, Object> dataMap = newHashMap();
-                    List<Field> list = newArrayList();
-                    getDeclaredFields(o.getClass(), list, false);
-                    list.stream()
-                            .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
-                            .forEach(accept(field -> {
-                                field.setAccessible(true);
-                                ofNullable(field.get(o)).ifPresent(value -> dataMap.put(field.getName(), value));
-                            }, null, log, null));
-                    return dataMap;
-                })
+        return ofNullable(object).map(o -> {
+            Map<String, Object> dataMap = newHashMap();
+            List<Field> list = newArrayList();
+            getDeclaredFields(o.getClass(), list, false);
+            list.stream()
+                    .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
+                    .forEach(accept(field -> {
+                        field.setAccessible(true);
+                        ofNullable(field.get(o)).ifPresent(value -> dataMap.put(field.getName(), value));
+                    }, null, log, null));
+            return dataMap;
+        })
                 .orElse(null);
     }
 
@@ -224,8 +223,8 @@ public class EntityUtils {
      * 集合toString
      *
      * @param builder StringBuilder
-     * @param col     集合
-     * @param <T>     任意类型
+     * @param col 集合
+     * @param <T> 任意类型
      */
     public static <T> void buildString(StringBuilder builder, Collection<T> col) {
         if (isNotEmpty(col)) {
@@ -242,9 +241,9 @@ public class EntityUtils {
      * map toString
      *
      * @param builder StringBuilder
-     * @param map     Map
-     * @param <K>     key
-     * @param <V>     value
+     * @param map Map
+     * @param <K> key
+     * @param <V> value
      */
     public static <K, V> void buildString(StringBuilder builder, Map<K, V> map) {
         if (isNotEmpty(map)) {
@@ -265,7 +264,7 @@ public class EntityUtils {
      * toString
      *
      * @param builder StringBuilder
-     * @param object  对象
+     * @param object 对象
      */
     public static void buildString(StringBuilder builder, Object object) {
         if (object == null) {
@@ -283,10 +282,6 @@ public class EntityUtils {
                     builder.delete(builder.lastIndexOf(", "), builder.length());
                 }
                 builder.append(']');
-            } else if (object instanceof Collection) {
-                buildString(builder, (Collection<?>) object);
-            } else if (object instanceof Map) {
-                buildString(builder, (Map<?, ?>) object);
             } else {
                 builder.append(object);
             }
@@ -311,7 +306,8 @@ public class EntityUtils {
     private void buildValue(StringBuilder builder, Object value) {
         if (value instanceof Collection) {
             buildString(builder, (Collection<?>) value);
-        } else if (value instanceof Map) {
+        }
+        else if (value instanceof Map) {
             buildString(builder, (Map<?, ?>) value);
         } else {
             buildString(builder, value);
@@ -322,30 +318,38 @@ public class EntityUtils {
     /**
      * 获取泛型参数类型列表
      *
-     * @param selfClass  自身class
+     * @param selfClass 自身class
      * @param superClass 父class
-     * @param count      泛型参数个数
      * @return 泛型参数类型列表
      */
-    public static List<Class<?>> getComponentClassList(Class<?> selfClass, Class<?> superClass, int count) {
-        ResolvableType resolvableType = ResolvableType.forClass(selfClass)
-                .as(superClass);
-        return range(0, count).mapToObj(i -> resolvableType.getGeneric(i)
-                .resolve())
+    public static List<Class<?>> getComponentClassList(Class<?> selfClass, Class<?> superClass) {
+        return of(getResolvableType(selfClass, superClass).getGenerics()).map(ResolvableType::resolve)
                 .collect(toList());
     }
 
     /**
      * 获取泛型参数类型
      *
-     * @param selfClass  自身class
+     * @param selfClass 自身class
      * @param superClass 父class
-     * @param index      泛型参数索引
+     * @param index 泛型参数索引
      * @return 泛型参数类型
      */
     public static Class<?> getComponentClass(Class<?> selfClass, Class<?> superClass, int index) {
-        ResolvableType resolvableType = ResolvableType.forClass(selfClass).as(superClass);
-        return resolvableType.getGeneric(index).resolve();
+        return getResolvableType(selfClass, superClass).getGeneric(index)
+                .resolve();
+    }
+
+    /**
+     * 获取ResolvableType
+     *
+     * @param selfClass 自身class
+     * @param superClass 父class
+     * @return ResolvableType
+     */
+    public ResolvableType getResolvableType(Class<?> selfClass, Class<?> superClass) {
+        return ResolvableType.forClass(selfClass)
+                .as(superClass);
     }
 
     /**
