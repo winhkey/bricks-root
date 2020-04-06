@@ -8,7 +8,7 @@
         <artifactId>bricks-root</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>bricks</artifactId>
+    <artifactId>bricks-framework</artifactId>
     <packaging>pom</packaging>
     <dependencies>
         <dependency>
