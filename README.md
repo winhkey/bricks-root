@@ -1,1 +1,1 @@
-based on spring cloud framework likes bricks.
+build rules, junit, etc.
