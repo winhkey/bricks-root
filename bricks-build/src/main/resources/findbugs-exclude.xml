@@ -3,6 +3,6 @@
         <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,SE_BAD_FIELD,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"></Bug>
     </Match>
     <Match>
-        <Package name="org.bricks.test"></Package>
+        <Package name="org.bricks.test"/>
     </Match>
 </FindBugsFilter>

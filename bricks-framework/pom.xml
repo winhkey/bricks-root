@@ -10,9 +10,6 @@
     </parent>
     <artifactId>bricks</artifactId>
     <packaging>pom</packaging>
-    <modules>
-        <module>bricks-core</module>
-    </modules>
     <dependencies>
         <dependency>
             <groupId>org.bricks</groupId>
@@ -41,7 +38,7 @@
                         </archive>
                         <excludes>
                             <exclude>checkstyle.xml</exclude>
-                            <exclude>pmd.xml</exclude>
+                            <exclude>pmd-ruleset.xml</exclude>
                             <exclude>findbugs-exclude.xml</exclude>
                         </excludes>
                         <outputDirectory>${project.build.directory}/dist</outputDirectory>
@@ -76,6 +73,16 @@
                     <version>${maven-pmd.version}</version>
                     <dependencies>
                         <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-core</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-java</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
                             <groupId>org.bricks</groupId>
                             <artifactId>bricks-build</artifactId>
                             <version>1.0-SNAPSHOT</version>
@@ -83,7 +90,7 @@
                     </dependencies>
                     <configuration>
                         <rulesets>
-                            <ruleset>pmd.xml</ruleset>
+                            <ruleset>pmd-ruleset.xml</ruleset>
                         </rulesets>
                         <failOnViolation>true</failOnViolation>
                     </configuration>
@@ -151,22 +158,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <version>1.6.0</version>
-                <configuration>
-                    <resourceBundles>
-                        <resourceBundle>org.bricks:bricks-build:1.0-SNAPSHOT</resourceBundle>
-                    </resourceBundles>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
