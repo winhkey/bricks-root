@@ -14,7 +14,7 @@
         <module>bricks-framework</module>
     </modules>
     <properties>
-        <spring-boot.version>2.2.4.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <alibaba-cloud.version>2.2.0.RELEASE</alibaba-cloud.version>
 
