@@ -17,7 +17,9 @@
 package org.bricks.utils;
 
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -40,6 +42,29 @@ import lombok.experimental.UtilityClass;
 public class FunctionUtils {
 
     /**
+     * 处理对象
+     *
+     * @param object 对象
+     * @param consumerMap 根据对象类型区分处理方法
+     */
+    public void accept(Object object, Map<Class<?>, Consumer<Object>> consumerMap)
+    {
+        if (isNotEmpty(consumerMap)) {
+            if (object == null) {
+                ofNullable(consumerMap.get(Void.class)).ifPresent(consumer -> consumer.accept(null));
+            } else if (object.getClass().isArray()) {
+                ofNullable(consumerMap.get(Object[].class)).ifPresent(consumer -> consumer.accept(null));
+            } else {
+                consumerMap.entrySet()
+                        .stream()
+                        .filter(entry -> entry.getKey().isInstance(object))
+                        .findFirst()
+                        .ifPresent(entry -> entry.getValue().accept(object));
+            }
+        }
+    }
+
+    /**
      * 处理异常的consumer
      *
      * @param throwableConsumer 抛异常的consumer
@@ -49,7 +74,7 @@ public class FunctionUtils {
      * @param <T>               入参
      * @return consumer
      */
-    public static <T> Consumer<T> accept(ThrowableConsumer<T, Throwable> throwableConsumer, Consumer<T> catchConsumer,
+    public <T> Consumer<T> accept(ThrowableConsumer<T, Throwable> throwableConsumer, Consumer<T> catchConsumer,
                                          Logger logger, Function<Throwable, RuntimeException> exceptionFunction) {
         return t -> {
             try {
@@ -70,7 +95,7 @@ public class FunctionUtils {
      * @param <T>               入参
      * @return Supplier
      */
-    public static <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Logger logger,
+    public <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Logger logger,
                                       Function<Throwable, RuntimeException> exceptionFunction) {
         return () -> {
             T t = null;
@@ -92,7 +117,7 @@ public class FunctionUtils {
      * @param <T>                入参
      * @return Predicate
      */
-    public static <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Logger logger,
+    public <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Logger logger,
                                         Function<Throwable, RuntimeException> exceptionFunction) {
         return t -> {
             boolean result = false;
@@ -116,7 +141,7 @@ public class FunctionUtils {
      * @param <R>               结果
      * @return Function
      */
-    public static <T, R> Function<T, R> apply(ThrowableFunction<T, R, Throwable> throwableFunction,
+    public <T, R> Function<T, R> apply(ThrowableFunction<T, R, Throwable> throwableFunction,
                                               Function<T, R> catchFunction, Logger logger, Function<Throwable, RuntimeException> exceptionFunction) {
         return t -> {
             R r;
@@ -130,7 +155,7 @@ public class FunctionUtils {
         };
     }
 
-    private static void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function) {
+    private void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function) {
         ofNullable(logger).ifPresent(log -> log.error(e.getMessage(), e));
         if (function != null) {
             throw function.apply(e);

@@ -17,12 +17,14 @@
 package org.bricks.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.bricks.utils.EntityUtils.buildString;
-import static org.bricks.utils.EntityUtils.getFieldValue;
+import static org.bricks.utils.ObjectUtils.buildString;
+import static org.bricks.utils.ObjectUtils.getFieldValue;
 
 import java.util.List;
+import java.util.Map;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -51,22 +53,39 @@ public class AopLoggerUtils {
     private static final String EXIT_LOG = "Exit {}(), return:{}, cost:{}ms";
 
     /**
+     * 日志缓存
+     */
+    private static final Map<Class<?>, Logger> LOGGER_MAP = newHashMap();
+
+    /**
      * 切面打印日志，环绕
      *
      * @param pjp 切入点
      * @return 返回对象
      * @throws Throwable Throwable
      */
-    public static Object around(ProceedingJoinPoint pjp) throws Throwable {
+    public Object around(ProceedingJoinPoint pjp) throws Throwable {
         Object obj = pjp.getTarget();
+        Signature signature = pjp.getSignature();
         List<Object> argList = newArrayList();
         List<Object> returnList = newArrayList();
         StringBuilder s = new StringBuilder();
-        String entryLog = null;
-        boolean doLog = false;
-        Logger log = getFieldValue(obj, "log");
-        if (log != null) {
-            Signature signature = pjp.getSignature();
+        String entryLog;
+        Class<?> clazz = obj.getClass();
+        Logger logger;
+        if (LOGGER_MAP.containsKey(clazz)) {
+            logger = LOGGER_MAP.get(clazz);
+        } else {
+            Object object = ofNullable(getFieldValue(obj, "log")).orElseGet(() -> getFieldValue(obj, "logger"));
+            logger = (Logger) ofNullable(object).filter(o -> o instanceof Logger)
+                    .orElse(null);
+            LOGGER_MAP.put(clazz, logger);
+        }
+        boolean doLog = ofNullable(logger).filter(log -> obj.getClass().getAnnotation(NoLog.class) == null)
+                .map(log -> ofNullable(((MethodSignature) signature).getMethod())
+                        .filter(method -> method.getAnnotation(NoLog.class) == null).isPresent())
+                .orElse(false);
+        if (doLog) {
             String methodName = signature.getName();
             argList.add(methodName);
             returnList.add(methodName);
@@ -83,12 +102,7 @@ public class AopLoggerUtils {
             } else {
                 entryLog = ENTER_LOG_TEMP.replace(", args::arg", "");
             }
-            doLog = ofNullable(((MethodSignature) signature).getMethod())
-                    .filter(method -> method.getAnnotation(NoLog.class) == null)
-                    .isPresent();
-        }
-        if (doLog) {
-            log.debug(entryLog, argList.toArray());
+            logger.debug(entryLog, argList.toArray());
         }
         long start = System.currentTimeMillis();
         Object returnObject = pjp.proceed();
@@ -97,7 +111,7 @@ public class AopLoggerUtils {
             buildString(s, returnObject);
             returnList.add(s.toString());
             returnList.add(end - start);
-            log.debug(EXIT_LOG, returnList.toArray());
+            logger.debug(EXIT_LOG, returnList.toArray());
         }
         return returnObject;
     }

@@ -41,7 +41,7 @@ public class ValidationUtils {
     /**
      * hibernate验证器
      */
-    private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+    private final Validator VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
 
     /**
      * 注解验证参数
@@ -49,7 +49,7 @@ public class ValidationUtils {
      * @param t   参数
      * @param <T> 参数类型
      */
-    public static <T> void validate(T t) {
+    public <T> void validate(T t) {
         Set<ConstraintViolation<T>> set = VALIDATOR.validate(t);
         check(set);
     }
@@ -60,7 +60,7 @@ public class ValidationUtils {
      * @param collection 参数集合
      * @param <T>        参数
      */
-    public static <T> void validate(Collection<T> collection) {
+    public <T> void validate(Collection<T> collection) {
         Set<ConstraintViolation<T>> set =
                 collection.stream().flatMap(t -> VALIDATOR.validate(t).stream()).collect(toSet());
         check(set);
@@ -73,7 +73,7 @@ public class ValidationUtils {
      * @param <T> 键类型
      * @param <V> 值类型
      */
-    public static <T, V> void validate(Map<T, V> map) {
+    public <T, V> void validate(Map<T, V> map) {
         Set<ConstraintViolation<V>> set =
                 map.entrySet().stream().flatMap(entry -> VALIDATOR.validate(entry.getValue()).stream()).collect(toSet());
         check(set);

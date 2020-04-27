@@ -100,7 +100,7 @@ public class Log4j2ApplicationListener implements GenericApplicationListener {
                 InetAddress address = InetAddress.getLocalHost();
                 ip = address.getHostAddress();
             } catch (UnknownHostException e) {
-                ip = null;
+                ip = "";
             }
         }
         return ip;
