@@ -47,7 +47,7 @@ public class FunctionUtils {
      * @param object 对象
      * @param consumerMap 根据对象类型区分处理方法
      */
-    public void accept(Object object, Map<Class<?>, Consumer<Object>> consumerMap)
+    public static void accept(Object object, Map<Class<?>, Consumer<Object>> consumerMap)
     {
         if (isNotEmpty(consumerMap)) {
             if (object == null) {
@@ -74,7 +74,7 @@ public class FunctionUtils {
      * @param <T>               入参
      * @return consumer
      */
-    public <T> Consumer<T> accept(ThrowableConsumer<T, Throwable> throwableConsumer, Consumer<T> catchConsumer,
+    public static <T> Consumer<T> accept(ThrowableConsumer<T, Throwable> throwableConsumer, Consumer<T> catchConsumer,
                                          Logger logger, Function<Throwable, RuntimeException> exceptionFunction) {
         return t -> {
             try {
@@ -95,7 +95,7 @@ public class FunctionUtils {
      * @param <T>               入参
      * @return Supplier
      */
-    public <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Logger logger,
+    public static <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Logger logger,
                                       Function<Throwable, RuntimeException> exceptionFunction) {
         return () -> {
             T t = null;
@@ -117,7 +117,7 @@ public class FunctionUtils {
      * @param <T>                入参
      * @return Predicate
      */
-    public <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Logger logger,
+    public static <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Logger logger,
                                         Function<Throwable, RuntimeException> exceptionFunction) {
         return t -> {
             boolean result = false;
@@ -141,7 +141,7 @@ public class FunctionUtils {
      * @param <R>               结果
      * @return Function
      */
-    public <T, R> Function<T, R> apply(ThrowableFunction<T, R, Throwable> throwableFunction,
+    public static <T, R> Function<T, R> apply(ThrowableFunction<T, R, Throwable> throwableFunction,
                                               Function<T, R> catchFunction, Logger logger, Function<Throwable, RuntimeException> exceptionFunction) {
         return t -> {
             R r;
@@ -155,7 +155,7 @@ public class FunctionUtils {
         };
     }
 
-    private void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function) {
+    private static void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function) {
         ofNullable(logger).ifPresent(log -> log.error(e.getMessage(), e));
         if (function != null) {
             throw function.apply(e);

@@ -64,7 +64,7 @@ public class AopLoggerUtils {
      * @return 返回对象
      * @throws Throwable Throwable
      */
-    public Object around(ProceedingJoinPoint pjp) throws Throwable {
+    public static Object around(ProceedingJoinPoint pjp) throws Throwable {
         Object obj = pjp.getTarget();
         Signature signature = pjp.getSignature();
         List<Object> argList = newArrayList();
