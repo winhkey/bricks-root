@@ -33,13 +33,6 @@ import org.springframework.stereotype.Component;
 public class CommonLogAspect {
 
     /**
-     * service切入点
-     */
-    @Pointcut("execution(* org.bricks..service..*.*(..))")
-    public void serviceLog() {
-    }
-
-    /**
      * commons切入点
      */
     @Pointcut("execution(* org.bricks..*.*(..))")
@@ -53,7 +46,7 @@ public class CommonLogAspect {
      * @return 返回对象
      * @throws Throwable Throwable
      */
-    @Around("serviceLog() || commonsLog()")
+    @Around("commonsLog()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         return AopLoggerUtils.around(pjp);
     }
