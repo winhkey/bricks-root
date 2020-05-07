@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package org.bricks.utils;
+package org.bricks.test.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static org.bricks.TestConstants.Child;
-import static org.bricks.TestConstants.Color;
+import static org.bricks.test.TestConstants.Child;
+import static org.bricks.test.TestConstants.Color;
 import static org.bricks.utils.ObjectUtils.buildString;
 import static org.bricks.utils.ObjectUtils.convertData;
 import static org.bricks.utils.ObjectUtils.convertMapList;

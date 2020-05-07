@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bricks;
+package org.bricks.test;
 
 import java.io.Serializable;
 import javax.validation.constraints.NotNull;

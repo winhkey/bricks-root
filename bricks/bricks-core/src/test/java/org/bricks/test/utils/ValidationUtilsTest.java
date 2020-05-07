@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.bricks.utils;
+package org.bricks.test.utils;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
-import static org.bricks.TestConstants.Child;
+import static org.bricks.test.TestConstants.Child;
 import static org.bricks.utils.ValidationUtils.validate;
 
 import org.bricks.exception.BaseException;
