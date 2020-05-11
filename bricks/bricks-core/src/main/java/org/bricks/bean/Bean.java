@@ -20,6 +20,7 @@ package org.bricks.bean;
  * 数据Bean接口
  *
  * @author fuzy
+ * 
  */
 public interface Bean {
 }

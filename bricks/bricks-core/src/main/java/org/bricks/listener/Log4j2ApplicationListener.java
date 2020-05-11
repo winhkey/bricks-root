@@ -42,7 +42,6 @@ import org.springframework.core.env.Environment;
  * 日志监听器
  *
  * @author fuzy
- *
  */
 public class Log4j2ApplicationListener implements GenericApplicationListener {
 

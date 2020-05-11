@@ -18,10 +18,11 @@ package org.bricks.function;
 
 /**
  * 抛异常的Consumer
+ * 
+ * @author fuzy
  *
  * @param <T> 参数
  * @param <E> 异常
- * @author fuzy
  */
 @FunctionalInterface
 public interface ThrowableConsumer<T, E extends Throwable> {

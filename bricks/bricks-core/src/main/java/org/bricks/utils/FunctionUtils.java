@@ -37,6 +37,7 @@ import lombok.experimental.UtilityClass;
  * 函数式处理工具
  *
  * @author fuzy
+ * 
  */
 @UtilityClass
 public class FunctionUtils {

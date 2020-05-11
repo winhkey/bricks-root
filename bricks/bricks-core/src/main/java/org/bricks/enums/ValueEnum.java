@@ -18,6 +18,8 @@ package org.bricks.enums;
 
 /**
  * 枚举接口
+ * 
+ * @author fuzy
  *
  * @param <T>
  */

@@ -19,9 +19,10 @@ package org.bricks.function;
 /**
  * 抛异常的Supplier
  *
+ * @author fuzy
+ * 
  * @param <T> 返回值
  * @param <E> 异常
- * @author fuzy
  */
 @FunctionalInterface
 public interface ThrowableSupplier<T, E extends Throwable> {

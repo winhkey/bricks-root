@@ -22,6 +22,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -34,6 +35,7 @@ import lombok.experimental.UtilityClass;
  * jsr参数校验
  *
  * @author fuzy
+ * 
  */
 @UtilityClass
 public class ValidationUtils {

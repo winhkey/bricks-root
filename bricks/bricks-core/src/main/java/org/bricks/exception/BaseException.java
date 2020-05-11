@@ -24,7 +24,7 @@ import lombok.Setter;
 /**
  * 封装基础异常
  *
- * @author fuzhiying
+ * @author fuzy
  */
 @Setter
 @Getter

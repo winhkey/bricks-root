@@ -23,6 +23,7 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  * 抽象数据Bean
  *
  * @author fuzy
+ * 
  */
 public class AbstractBean implements Bean {
 

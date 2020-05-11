@@ -19,9 +19,10 @@ package org.bricks.function;
 /**
  * 判断
  *
+ * @author fuzy
+ * 
  * @param <T> 入参
  * @param <E> 异常
- * @author fuzy
  */
 @FunctionalInterface
 public interface ThrowablePredicate<T, E extends Throwable> {

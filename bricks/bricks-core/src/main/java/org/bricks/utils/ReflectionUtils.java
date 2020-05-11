@@ -20,7 +20,7 @@ import static java.lang.reflect.Modifier.isStatic;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
-import static org.bricks.utils.FunctionUtils.*;
+import static org.bricks.utils.FunctionUtils.apply;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,6 +31,12 @@ import org.springframework.core.ResolvableType;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 反射工具类
+ * 
+ * @author fuzy
+ *
+ */
 @Slf4j
 @UtilityClass
 public class ReflectionUtils {
