@@ -45,6 +45,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.bricks.enums.ValueEnum;
+import org.bricks.service.AbstractConsumerService;
 import org.springframework.aop.framework.AdvisedSupport;
 
 import lombok.experimental.UtilityClass;
@@ -58,8 +59,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @UtilityClass
-public class ObjectUtils
-{
+public class ObjectUtils {
 
     /**
      * serialVersionUID字段名
@@ -75,10 +75,8 @@ public class ObjectUtils
      * @return 父类中的属性值
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getFieldValue(Object object, String fieldName)
-    {
-        return ofNullable(getDeclaredField(object.getClass(), fieldName)).map(apply(field ->
-        {
+    public static <T> T getFieldValue(Object object, String fieldName) {
+        return ofNullable(getDeclaredField(object.getClass(), fieldName)).map(apply(field -> {
             field.setAccessible(true);
             return (T) field.get(object);
         }, null, null, null))
@@ -92,11 +90,9 @@ public class ObjectUtils
      * @param fieldName 父类中的属性名
      * @param value 将要设置的值
      */
-    public static void setFieldValue(Object object, String fieldName, Object value)
-    {
+    public static void setFieldValue(Object object, String fieldName, Object value) {
         ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName))
-                .ifPresent(accept(field ->
-                {
+                .ifPresent(accept(field -> {
                     field.setAccessible(true);
                     field.set(object, value);
                 }, null, log, null));
@@ -108,14 +104,12 @@ public class ObjectUtils
      * @param src 源对象
      * @param dest 目标对象
      */
-    public static void copy(Object src, Object dest)
-    {
+    public static void copy(Object src, Object dest) {
         List<Field> fieldList = newArrayList();
         addDeclaredFields(src.getClass(), fieldList, false);
         fieldList.stream()
                 .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
-                .forEach(field ->
-                {
+                .forEach(field -> {
                     String name = field.getName();
                     ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
                 });
@@ -129,8 +123,7 @@ public class ObjectUtils
      * @param clazz 实体类
      * @return 对象
      */
-    public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz)
-    {
+    public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz) {
         return isNotEmpty(dataList) ? dataList.stream()
                 .map(dataMap -> convertMap(dataMap, clazz))
                 .collect(toList()) : null;
@@ -144,15 +137,13 @@ public class ObjectUtils
      * @param clazz 实体类
      * @return 对象
      */
-    public static <T> T convertMap(Map<String, Object> dataMap, Class<T> clazz)
-    {
+    public static <T> T convertMap(Map<String, Object> dataMap, Class<T> clazz) {
         T t = instantiateClass(clazz);
         List<Field> list = newArrayList();
         addDeclaredFields(clazz, list, false);
         list.stream()
                 .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
-                .forEach(field ->
-                {
+                .forEach(field -> {
                     String fieldName = field.getName();
                     setFieldValue(t, fieldName, dataMap.get(fieldName));
                 });
@@ -166,18 +157,15 @@ public class ObjectUtils
      * @param excludes 排除字段
      * @return map
      */
-    public static Map<String, Object> convertData(Object object, String... excludes)
-    {
-        return ofNullable(object).map(o ->
-        {
+    public static Map<String, Object> convertData(Object object, String... excludes) {
+        return ofNullable(object).map(o -> {
             Map<String, Object> map = newHashMap();
             List<Field> list = newArrayList();
             addDeclaredFields(o.getClass(), list, false);
             list.stream()
                     .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
                     .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
-                    .forEach(accept(field ->
-                    {
+                    .forEach(accept(field -> {
                         field.setAccessible(true);
                         ofNullable(field.get(o)).ifPresent(value -> map.put(field.getName(), value));
                     }, null, log, null));
@@ -192,54 +180,79 @@ public class ObjectUtils
      * @param builder StringBuilder
      * @param object 对象
      */
-    public static void buildString(StringBuilder builder, Object object)
-    {
-        Map<Class<?>, Consumer<Object>> consumerMap = newLinkedHashMap();
-        consumerMap.put(Void.class, o -> builder.append("null"));
-        consumerMap.put(Object[].class, o ->
-        {
-            builder.append('[');
-            int n = getLength(object);
-            if (n > 0)
-            {
-                range(0, n).forEach(i -> buildValue(builder, get(object, i)));
+    public static void buildString(StringBuilder builder, Object object) {
+        new AbstractConsumerService() {
+
+            @Override
+            public void arrayConsumer(Object object) {
+                builder.append('[');
+                super.arrayConsumer(object);
+                builder.append(']');
+            }
+
+            @Override
+            protected void arrayConsumer(int n, Object object) {
+                super.arrayConsumer(n, object);
                 builder.delete(builder.lastIndexOf(", "), builder.length());
             }
-            builder.append(']');
-        });
-        consumerMap.put(Collection.class, o ->
-        {
-            builder.append('[');
-            Collection<?> collection = (Collection<?>) o;
-            if (isNotEmpty(collection))
-            {
-                collection.forEach(t -> buildValue(builder, t));
+
+            @Override
+            protected void collectionConsumer(Collection<?> collection) {
+                super.collectionConsumer(collection);
                 builder.delete(builder.lastIndexOf(", "), builder.length());
             }
-            builder.append(']');
-        });
-        consumerMap.put(Map.class, o ->
-        {
-            builder.append('{');
-            Map<?, ?> map = (Map<?, ?>) o;
-            if (isNotEmpty(map))
-            {
-                map.forEach((key, value) ->
-                {
-                    builder.append(key)
-                            .append('=');
-                    buildValue(builder, value);
-                });
+
+            @Override
+            public void collectionConsumer(Object object) {
+                builder.append('[');
+                super.collectionConsumer(object);
+                builder.append(']');
+            }
+
+            @Override
+            protected void mapConsumer(Object object) {
+                builder.append('{');
+                super.mapConsumer(object);
+                builder.append('}');
+            }
+
+            @Override
+            protected void mapConsumer(Map<?, ?> map) {
+                super.mapConsumer(map);
                 builder.delete(builder.lastIndexOf(", "), builder.length());
             }
-            builder.append('}');
-        });
-        consumerMap.put(Object.class, builder::append);
-        accept(object, consumerMap);
+
+            @Override
+            protected void nullConsumer() {
+                builder.append("null");
+            }
+
+            @Override
+            protected void elementConsumer(Object object) {
+                buildValue(builder, object);
+            }
+
+            @Override
+            protected void elementConsumer(int i, Object object) {
+                buildValue(builder, object);
+            }
+
+            @Override
+            protected void entryConsumer(Object key, Object value) {
+                builder.append(key)
+                        .append('=');
+                buildValue(builder, value);
+            }
+
+            @Override
+            protected void otherConsumers(Map<Class<?>, Consumer<Object>> consumerMap) {
+                consumerMap.put(Object.class, builder::append);
+            }
+
+        }.consumer(object);
     }
 
-    private static void buildValue(StringBuilder builder, Object value)
-    {
+    private static void buildValue(StringBuilder builder, Object value) {
         buildString(builder, value);
         builder.append(", ");
     }
@@ -252,8 +265,7 @@ public class ObjectUtils
      * @return 枚举对象
      */
     @SuppressWarnings("unchecked")
-    public static Object getEnumValue(Class<?> clazz, Object value)
-    {
+    public static Object getEnumValue(Class<?> clazz, Object value) {
         Stream<?> stream = ValueEnum.class.isAssignableFrom(
                 clazz) ? of(((Class<ValueEnum<?>>) clazz).getEnumConstants()).filter(v -> v.getValue()
                         .equals(value)) : of(clazz.getEnumConstants()).filter(v -> v.equals(value));
@@ -267,17 +279,14 @@ public class ObjectUtils
      * @param proxy 代理对象
      * @return 真实对象
      */
-    public static Object getTarget(Object proxy)
-    {
+    public static Object getTarget(Object proxy) {
         return isAopProxy(proxy) ? getProxyTargetObject(proxy, isJdkDynamicProxy(proxy) ? "h" : "CGLIB$CALLBACK_0")
                 : proxy;
     }
 
-    private static Object getProxyTargetObject(Object proxy, String proxyField)
-    {
+    private static Object getProxyTargetObject(Object proxy, String proxyField) {
         Object target = null;
-        try
-        {
+        try {
             Field h = proxy.getClass()
                     .getDeclaredField(proxyField);
             h.setAccessible(true);
@@ -287,9 +296,7 @@ public class ObjectUtils
             advised.setAccessible(true);
             target = ((AdvisedSupport) advised.get(obj)).getTargetSource()
                     .getTarget();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
         return target;
