@@ -14,16 +14,30 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.data.xml;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import static org.bricks.data.utils.JacksonJsonUtils.createXmlMapper;
 
-public class FunctionUtilsTest {
+import javax.annotation.PostConstruct;
 
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
+import org.bricks.data.json.AbstractJacksonService;
+import org.springframework.stereotype.Service;
+
+/**
+ * xml转对象实现类(jackson)
+ *
+ * @author fuzy
+ *
+ */
+@Service("jacksonXmlService")
+public class JacksonXmlServiceImpl extends AbstractJacksonService implements XmlDataService {
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    public void init() {
+        objectMapper = createXmlMapper();
     }
 
 }

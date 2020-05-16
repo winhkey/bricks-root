@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.data.xml;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import org.bricks.data.DataService;
 
-public class FunctionUtilsTest {
-
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
-    }
+/**
+ * xml转对象接口
+ *
+ * @author fuzy
+ *
+ */
+public interface XmlDataService extends DataService {
 
 }

@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.data.json;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import static org.apache.commons.text.StringEscapeUtils.unescapeJson;
 
-public class FunctionUtilsTest {
+import org.bricks.data.AbstractDataService;
 
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
+/**
+ * json字符串转对象
+ *
+ * @author fuzy
+ * 
+ */
+public abstract class AbstractJsonDataService extends AbstractDataService {
+
+    /**
+     * 去除多余引号
+     *
+     * @param content json
+     * @return 结果
+     */
+    protected String trim(String content)
+    {
+        return unescapeJson(content).replaceAll("^\"|\"$", "");
     }
 
 }

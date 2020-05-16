@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.io;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import java.io.BufferedWriter;
+import java.io.Closeable;
 
-public class FunctionUtilsTest {
+import org.dom4j.io.OutputFormat;
 
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
+/**
+ * 封装dom4j的XMLWriter添加Closeable接口
+ * 
+ * @author fuzy
+ *
+ */
+public class XMLWriter extends org.dom4j.io.XMLWriter implements Closeable {
+
+    /**
+     * 构造方法
+     * 
+     * @param writer writer
+     * @param format format
+     */
+    public XMLWriter(BufferedWriter writer, OutputFormat format) {
+        super(writer, format);
     }
 
 }

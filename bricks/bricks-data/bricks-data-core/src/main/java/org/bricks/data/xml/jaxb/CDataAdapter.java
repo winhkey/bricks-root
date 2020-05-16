@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.data.xml.jaxb;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import static java.text.MessageFormat.format;
+import static java.util.Optional.ofNullable;
 
-public class FunctionUtilsTest {
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
+/**
+ * CDATA支持
+ *
+ * @author fuzy
+ *
+ */
+public class CDataAdapter extends XmlAdapter<String, String> {
+
+    @Override
+    public String unmarshal(String v) {
+        return v;
+    }
+
+    @Override
+    public String marshal(String v) {
+        return format("<![CDATA[{0}]]>", ofNullable(v).orElse(""));
     }
 
 }

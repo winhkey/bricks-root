@@ -161,9 +161,6 @@ public class ResponseWrapper<T> extends AbstractBean {
         return new ResponseWrapper<T>(code, message).setSuccess(success);
     }
 
-    public static void main(String[] args) {
-        ResponseWrapper<Void> r = ResponseWrapper.build("", "", true);
-    }
     /**
      * 构建
      *

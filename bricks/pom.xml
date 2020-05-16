@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>bricks-core</module>
+        <module>bricks-data</module>
     </modules>
     <dependencies>
         <dependency>

@@ -18,15 +18,10 @@ package org.bricks.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Maps.newLinkedHashMap;
-import static java.lang.reflect.Array.get;
-import static java.lang.reflect.Array.getLength;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.IntStream.range;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.bricks.utils.FunctionUtils.accept;

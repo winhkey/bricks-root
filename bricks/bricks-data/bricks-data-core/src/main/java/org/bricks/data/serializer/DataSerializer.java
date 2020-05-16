@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.data.serializer;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+/**
+ * 自定义序列化
+ *
+ * @author fuzy
+ *
+ * @param <D> 数据类
+ */
+public interface DataSerializer<D> {
 
-public class FunctionUtilsTest {
-
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
-    }
+    /**
+     * @return 序列化类型
+     */
+    Class<D> getClazz();
 
 }

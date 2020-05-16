@@ -14,16 +14,34 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.utils;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
-public class FunctionUtilsTest {
+/**
+ * xml命名空间
+ *
+ * @author fuzy
+ *
+ */
+@Setter
+@Getter
+@Accessors(chain = true)
+@AllArgsConstructor
+public class Namespace
+{
 
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
-    }
+    /**
+     * 前缀
+     */
+    private String prefix;
+
+    /**
+     * uri
+     */
+    private String uri;
 
 }

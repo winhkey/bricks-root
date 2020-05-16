@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-package org.bricks.test.utils;
+package org.bricks.data.json;
 
-import org.bricks.utils.FunctionUtils;
-import org.junit.Test;
+import static org.bricks.data.utils.JacksonJsonUtils.createJsonMapper;
 
-public class FunctionUtilsTest {
+import javax.annotation.PostConstruct;
 
-    @Test
-    public void testAcceptEmpty() {
-        FunctionUtils.accept(null, null);
+import org.springframework.stereotype.Service;
+
+/**
+ * json实现(jackson)
+ *
+ * @author fuzy
+ *
+ */
+@Service("jacksonJsonService")
+public class JacksonJsonServiceImpl extends AbstractJacksonService implements JsonDataService {
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    public void init() {
+        objectMapper = createJsonMapper();
     }
 
 }
