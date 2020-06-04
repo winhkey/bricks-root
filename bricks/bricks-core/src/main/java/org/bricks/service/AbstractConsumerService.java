@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 /**
  * 根据对象进行accept操作，抽象类
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public abstract class AbstractConsumerService {

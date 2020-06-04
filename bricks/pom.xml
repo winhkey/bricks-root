@@ -13,6 +13,8 @@
     <modules>
         <module>bricks-core</module>
         <module>bricks-data</module>
+        <module>bricks-async</module>
+        <module>bricks-repository</module>
     </modules>
     <dependencies>
         <dependency>
