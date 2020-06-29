@@ -142,6 +142,13 @@ public class ObjectUtilsTest {
     }
 
     @Test
+    public void testBuildStringCollectionEmpty() {
+        StringBuilder builder = new StringBuilder();
+        buildString(builder, newArrayList());
+        assertEquals("[]", builder.toString());
+    }
+
+    @Test
     public void testBuildStringCollection() {
         StringBuilder builder = new StringBuilder();
         buildString(builder, newArrayList(1));
@@ -174,6 +181,13 @@ public class ObjectUtilsTest {
     }
 
     @Test
+    public void testBuildStringMapEmpty() {
+        StringBuilder builder = new StringBuilder();
+        buildString(builder, newHashMap());
+        assertEquals("{}", builder.toString());
+    }
+
+    @Test
     public void testBuildStringMap() {
         StringBuilder builder = new StringBuilder();
         Map<String, Integer> map = newHashMap();
@@ -187,6 +201,14 @@ public class ObjectUtilsTest {
         StringBuilder builder = new StringBuilder();
         buildString(builder, (Integer[]) null);
         assertEquals("null", builder.toString());
+    }
+
+
+    @Test
+    public void testBuildStringArrayEmpty() {
+        StringBuilder builder = new StringBuilder();
+        buildString(builder, new int[0]);
+        assertEquals("[]", builder.toString());
     }
 
     @Test

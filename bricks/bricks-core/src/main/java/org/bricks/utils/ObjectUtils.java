@@ -57,11 +57,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ObjectUtils {
 
     /**
-     * serialVersionUID字段名
-     */
-    private static final String SERIAL_VERSION_UID = "serialVersionUID";
-
-    /**
      * 直接读取对象的属性值
      *
      * @param object 子类对象
@@ -103,7 +98,6 @@ public class ObjectUtils {
         List<Field> fieldList = newArrayList();
         addDeclaredFields(src.getClass(), fieldList, false);
         fieldList.stream()
-                .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
                 .forEach(field -> {
                     String name = field.getName();
                     ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
@@ -137,7 +131,6 @@ public class ObjectUtils {
         List<Field> list = newArrayList();
         addDeclaredFields(clazz, list, false);
         list.stream()
-                .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
                 .forEach(field -> {
                     String fieldName = field.getName();
                     setFieldValue(t, fieldName, dataMap.get(fieldName));
@@ -159,7 +152,6 @@ public class ObjectUtils {
             addDeclaredFields(o.getClass(), list, false);
             list.stream()
                     .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
-                    .filter(field -> !SERIAL_VERSION_UID.equals(field.getName()))
                     .forEach(accept(field -> {
                         field.setAccessible(true);
                         ofNullable(field.get(o)).ifPresent(value -> map.put(field.getName(), value));

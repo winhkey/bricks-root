@@ -54,7 +54,7 @@ public class FunctionUtils {
             if (object == null) {
                 ofNullable(consumerMap.get(Void.class)).ifPresent(consumer -> consumer.accept(null));
             } else if (object.getClass().isArray()) {
-                ofNullable(consumerMap.get(Object[].class)).ifPresent(consumer -> consumer.accept(null));
+                ofNullable(consumerMap.get(Object[].class)).ifPresent(consumer -> consumer.accept(object));
             } else {
                 consumerMap.entrySet()
                         .stream()
