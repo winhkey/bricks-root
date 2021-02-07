@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * @author fuzy
  *
  */
-public abstract class AbstractDataService implements DataService {
+public abstract class AbstractDataService implements DataService
+{
 
     /**
      * 日志
@@ -41,11 +42,16 @@ public abstract class AbstractDataService implements DataService {
 
     @NoLog
     @Override
-    public <T> T input(String content, Type... type) {
-        if (isNotBlank(content) && type != null) {
-            try {
+    public <T> T input(String content, Type... type)
+    {
+        if (isNotBlank(content) && type != null)
+        {
+            try
+            {
                 return readFrom(content, type);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 log.error(e.getMessage(), e);
             }
         }
@@ -54,11 +60,16 @@ public abstract class AbstractDataService implements DataService {
 
     @NoLog
     @Override
-    public <T> T input(File file, Type... type) {
-        if (file != null && file.exists() && file.isFile() && type != null) {
-            try {
+    public <T> T input(File file, Type... type)
+    {
+        if (file != null && file.exists() && file.isFile() && type != null)
+        {
+            try
+            {
                 return readFrom(file, type);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 log.error(e.getMessage(), e);
             }
         }
@@ -67,11 +78,16 @@ public abstract class AbstractDataService implements DataService {
 
     @NoLog
     @Override
-    public <T> T input(InputStream stream, Type... type) {
-        if (stream != null && type != null) {
-            try {
+    public <T> T input(InputStream stream, Type... type)
+    {
+        if (stream != null && type != null)
+        {
+            try
+            {
                 return readFrom(stream, type);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 log.error(e.getMessage(), e);
             }
         }
@@ -80,10 +96,14 @@ public abstract class AbstractDataService implements DataService {
 
     @NoLog
     @Override
-    public String output(Object object, Type... type) {
-        try {
+    public String output(Object object, Type... type)
+    {
+        try
+        {
             return toString(object, type);
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             log.error(e.getMessage(), e);
         }
         return null;
@@ -91,11 +111,16 @@ public abstract class AbstractDataService implements DataService {
 
     @NoLog
     @Override
-    public <T> T convert(Object object, Type... type) {
-        if (object != null) {
-            try {
+    public <T> T convert(Object object, Type... type)
+    {
+        if (object != null)
+        {
+            try
+            {
                 return convertFrom(object, type);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 log.error(e.getMessage(), e);
             }
         }
