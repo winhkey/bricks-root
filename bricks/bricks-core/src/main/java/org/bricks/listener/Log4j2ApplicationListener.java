@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.bricks.listener;
 
 import static java.text.MessageFormat.format;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -42,18 +43,22 @@ import org.springframework.core.env.Environment;
  * 日志监听器
  *
  * @author fuzy
+ *
  */
-public class Log4j2ApplicationListener implements GenericApplicationListener {
+public class Log4j2ApplicationListener implements GenericApplicationListener
+{
 
     /**
-     * 排序
+     * 默认优先级
      */
     public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
 
     /**
      * 事件类型数组
      */
-    private static final Class<?>[] EVENT_TYPES = {ApplicationStartingEvent.class, ApplicationEnvironmentPreparedEvent.class, ApplicationPreparedEvent.class, ContextClosedEvent.class, ApplicationFailedEvent.class};
+    private static final Class<?>[] EVENT_TYPES = {ApplicationStartingEvent.class,
+            ApplicationEnvironmentPreparedEvent.class, ApplicationPreparedEvent.class, ContextClosedEvent.class,
+            ApplicationFailedEvent.class};
 
     /**
      * 源类型数组
@@ -61,44 +66,53 @@ public class Log4j2ApplicationListener implements GenericApplicationListener {
     private static final Class<?>[] SOURCE_TYPES = {SpringApplication.class, ApplicationContext.class};
 
     @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ApplicationEnvironmentPreparedEvent) {
-            onApplicationEvent((ApplicationEnvironmentPreparedEvent) event);
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ApplicationEnvironmentPreparedEvent)
+        {
+            ConfigurableEnvironment environment = ((ApplicationEnvironmentPreparedEvent) event).getEnvironment();
+            String path = format("{0}/{1}/{2}", environment.getProperty("spring.application.name"), getIp(environment),
+                    environment.getProperty("server.port"));
+            MDC.put("app", path);
         }
     }
 
-    private void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-        ConfigurableEnvironment environment = event.getEnvironment();
-        String path = format("{0}/{1}/{2}", environment.getProperty("spring.application.name"), getIp(environment), environment.getProperty("server.port"));
-        MDC.put("app", path);
-    }
-
     @Override
-    public int getOrder() {
+    public int getOrder()
+    {
         return DEFAULT_ORDER;
     }
 
     @Override
-    public boolean supportsEventType(ResolvableType resolvableType) {
+    public boolean supportsEventType(ResolvableType resolvableType)
+    {
         return isAssignableFrom(resolvableType.getRawClass(), EVENT_TYPES);
     }
 
     @Override
-    public boolean supportsSourceType(Class<?> sourceType) {
+    public boolean supportsSourceType(Class<?> sourceType)
+    {
         return isAssignableFrom(sourceType, SOURCE_TYPES);
     }
 
-    private boolean isAssignableFrom(Class<?> type, Class<?>... supportedTypes) {
-        return of(supportedTypes).anyMatch(supportedType -> supportedType.isAssignableFrom(type));
+    private boolean isAssignableFrom(Class<?> type, Class<?>... supportedTypes)
+    {
+        return ofNullable(type).map(t -> of(supportedTypes).anyMatch(supportedType -> supportedType.isAssignableFrom(type)))
+            .orElse(false);
     }
 
-    private String getIp(Environment environment) {
+    private String getIp(Environment environment)
+    {
         String ip = environment.getProperty("eureka.local");
-        if (isBlank(ip)) {
-            try {
+        if (isBlank(ip))
+        {
+            try
+            {
                 InetAddress address = InetAddress.getLocalHost();
                 ip = address.getHostAddress();
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException e)
+            {
                 ip = "";
             }
         }

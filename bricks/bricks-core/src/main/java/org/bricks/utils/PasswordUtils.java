@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.bricks.utils;
 
+import static org.bricks.constants.Constants.NumberConstants.NUMBER_3;
+import static org.bricks.constants.Constants.NumberConstants.NUMBER_48;
 import static org.bricks.utils.MD5Utils.getMD5String;
 import static org.bricks.utils.RandomUtils.randomString;
 
@@ -28,7 +30,8 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class PasswordUtils {
+public class PasswordUtils
+{
 
     /**
      * 密码加密
@@ -36,7 +39,8 @@ public class PasswordUtils {
      * @param password 明文
      * @return 密文
      */
-    public static String encodePassword(String password) {
+    public static String encodePassword(String password)
+    {
         return encodePassword(password, randomString(16));
     }
 
@@ -47,10 +51,11 @@ public class PasswordUtils {
      * @param salt 盐
      * @return 密文
      */
-    public static String encodePassword(String password, String salt) {
+    public static String encodePassword(String password, String salt)
+    {
         String md5 = getMD5String(password.concat(salt));
         char[] cs = new char[48];
-        for (int i = 0; i < 48; i += 3)
+        for (int i = 0; i < NUMBER_48; i += NUMBER_3)
         {
             cs[i] = md5.charAt(i / 3 * 2);
             char c = salt.charAt(i / 3);
@@ -67,10 +72,11 @@ public class PasswordUtils {
      * @param storedPassword 存储的密码
      * @return 是否匹配
      */
-    public static boolean verify(String inputPassword, String storedPassword) {
+    public static boolean verify(String inputPassword, String storedPassword)
+    {
         char[] cs1 = new char[32];
         char[] cs2 = new char[16];
-        for (int i = 0; i < 48; i += 3)
+        for (int i = 0; i < NUMBER_48; i += NUMBER_3)
         {
             cs1[i / 3 * 2] = storedPassword.charAt(i);
             cs1[i / 3 * 2 + 1] = storedPassword.charAt(i + 2);

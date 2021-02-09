@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@ import java.util.Map;
  *
  * @param <T> 实体类型
  */
-public interface ExcelService<T> {
+public interface ExcelService<T>
+{
 
     /**
      * 从流导入excel

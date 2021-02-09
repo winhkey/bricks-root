@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ import org.springframework.context.ApplicationContext;
  *
  * @param <R> 任务接口
  */
-public abstract class AbstractBrickJob<R extends BrickJobService> implements BrickJob<R> {
+public abstract class AbstractBrickJob<R extends BrickJobService> implements BrickJob<R>
+{
 
     /**
      * 日志
@@ -56,13 +57,15 @@ public abstract class AbstractBrickJob<R extends BrickJobService> implements Bri
      * 构造方法
      */
     @SuppressWarnings("unchecked")
-    protected AbstractBrickJob() {
+    protected AbstractBrickJob()
+    {
         List<Class<?>> classList = getComponentClassList(getClass(), BrickJob.class);
         jobServiceClass = (Class<R>) classList.get(0);
     }
 
     @Override
-    public void execute() {
+    public void execute()
+    {
         execute(applicationContext);
     }
 
@@ -71,11 +74,15 @@ public abstract class AbstractBrickJob<R extends BrickJobService> implements Bri
      *
      * @param applicationContext spring环境
      */
-    protected void execute(ApplicationContext applicationContext) {
-        try {
+    protected void execute(ApplicationContext applicationContext)
+    {
+        try
+        {
             applicationContext.getBean(jobServiceClass)
                     .execute();
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             log.error(e.getMessage(), e);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,7 @@
 
 package org.bricks.entity;
 
-import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
-
-import java.io.Serializable;
-import java.lang.reflect.Field;
-
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bricks.bean.AbstractBean;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * 实体抽象类
@@ -34,40 +25,7 @@ import lombok.Setter;
  *
  * @param <I> ID类型
  */
-@Setter
-@Getter
-public abstract class AbstractEntity<I extends Serializable> extends AbstractBean implements Entity<I>
+public abstract class AbstractEntity<I> extends AbstractBean implements Entity<I>
 {
-
-    /**
-     * 序列化
-     */
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public String toString()
-    {
-        return new ReflectionToStringBuilder(this, SHORT_PREFIX_STYLE)
-        {
-
-            @Override
-            protected boolean accept(Field field)
-            {
-                return super.accept(field) && acceptField(field);
-            }
-
-        }.toString();
-    }
-
-    /**
-     * 接受字段
-     *
-     * @param field 字段
-     * @return 是否接受
-     */
-    protected boolean acceptField(Field field)
-    {
-        return true;
-    }
 
 }

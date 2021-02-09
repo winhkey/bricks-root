@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-public class TaskController {
+public class TaskController
+{
 
     @Resource
     private ApplicationContext applicationContext;
@@ -44,9 +45,12 @@ public class TaskController {
     private ThreadPoolTaskExecutor traceExecutor;
 
     @PostMapping("async/task")
-    public void task(@RequestBody TaskRequest request) {
-        if (isNotEmpty(request.getTasks())) {
-            request.getTasks().stream()
+    public void task(@RequestBody TaskRequest request)
+    {
+        if (isNotEmpty(request.getTasks()))
+        {
+            request.getTasks()
+                    .stream()
                     .map(taskId -> applicationContext.getBean(taskId, BrickTask.class))
                     .forEach(task -> traceExecutor.execute(() -> task.task(request.getParam())));
         }

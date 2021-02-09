@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package org.bricks.utils;
 
+import static org.bricks.constants.Constants.StringConstants.ALL_CHARS;
+import static org.bricks.constants.Constants.StringConstants.ALL_NUMBERS;
+import static org.bricks.constants.Constants.StringConstants.ENGLISH_CHARS;
 import static java.util.stream.IntStream.range;
 
 import java.util.Random;
@@ -29,7 +32,8 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class RandomUtils {
+public class RandomUtils
+{
 
     /**
      * 随机种子
@@ -37,27 +41,13 @@ public class RandomUtils {
     private static final Random DEFAULT_RANDOM = new Random();
 
     /**
-     * 数字字符串
-     */
-    private static final String ALL_NUMBERS = "0123456789";
-
-    /**
-     * 数字字母字符串
-     */
-    private static final String ALL_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-    /**
-     * 字母字符串
-     */
-    private static final String ENGLISH_CHARS = "abcdefghijklmnopqrstuvwxyz";
-
-    /**
      * 数字随机串
      *
      * @param length 长度
      * @return 随机串
      */
-    public static String randomNumber(int length) {
+    public static String randomNumber(int length)
+    {
         return random(ALL_NUMBERS, length);
     }
 
@@ -67,7 +57,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    public static String randomString(int length) {
+    public static String randomString(int length)
+    {
         return random(ALL_CHARS, length);
     }
 
@@ -77,7 +68,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    public static String randomLetter(int length) {
+    public static String randomLetter(int length)
+    {
         return random(ENGLISH_CHARS, length);
     }
 
@@ -88,7 +80,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    private static String random(String source, int length) {
+    private static String random(String source, int length)
+    {
         StringBuilder builder = new StringBuilder();
         range(0, length).forEach(i -> builder.append(source.charAt(DEFAULT_RANDOM.nextInt(source.length()))));
         return builder.toString();

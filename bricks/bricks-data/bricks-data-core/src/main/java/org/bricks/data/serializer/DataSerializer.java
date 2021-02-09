@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ package org.bricks.data.serializer;
  *
  * @param <D> 数据类
  */
-public interface DataSerializer<D> {
+public interface DataSerializer<D>
+{
 
     /**
      * @return 序列化类型

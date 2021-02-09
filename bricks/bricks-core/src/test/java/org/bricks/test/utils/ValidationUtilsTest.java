@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,36 +24,49 @@ import static org.bricks.utils.ValidationUtils.validate;
 import org.bricks.exception.BaseException;
 import org.junit.Test;
 
-public class ValidationUtilsTest {
+public class ValidationUtilsTest
+{
 
     @Test(expected = BaseException.class)
-    public void testValidateObjectException() {
+    public void testValidateObjectException()
+    {
         validate(new Child());
     }
 
     @Test
-    public void testValidateObject() {
-        validate(new Child().setName("name").setSurname("surname").setAge(1));
+    public void testValidateObject()
+    {
+        validate(new Child().setName("name")
+                .setSurname("surname")
+                .setAge(1));
     }
 
     @Test(expected = BaseException.class)
-    public void testValidateListException() {
+    public void testValidateListException()
+    {
         validate(newArrayList(new Child()));
     }
 
     @Test
-    public void testValidateList() {
-        validate(newArrayList(new Child().setName("name").setSurname("surname").setAge(1)));
+    public void testValidateList()
+    {
+        validate(newArrayList(new Child().setName("name")
+                .setSurname("surname")
+                .setAge(1)));
     }
 
     @Test(expected = BaseException.class)
-    public void testValidateMapException() {
+    public void testValidateMapException()
+    {
         validate(of("", new Child()));
     }
 
     @Test
-    public void testValidateMap() {
-        validate(of("", new Child().setName("name").setSurname("surname").setAge(1)));
+    public void testValidateMap()
+    {
+        validate(of("", new Child().setName("name")
+                .setSurname("surname")
+                .setAge(1)));
     }
 
 }

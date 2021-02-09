@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class RegexUtils {
+public class RegexUtils
+{
 
     /**
      * 正则捕获
@@ -46,7 +47,8 @@ public class RegexUtils {
      * @param input 目标字符串
      * @return 捕获字符串
      */
-    public static String regularGroup(String expression, int flag, CharSequence input) {
+    public static String regularGroup(String expression, int flag, CharSequence input)
+    {
         Pattern pattern = Pattern.compile(expression, flag);
         return regularGroup(pattern, input);
     }
@@ -58,7 +60,8 @@ public class RegexUtils {
      * @param input 目标字符串
      * @return 捕获字符串
      */
-    public static String regularGroup(Pattern pattern, CharSequence input) {
+    public static String regularGroup(Pattern pattern, CharSequence input)
+    {
         return regularGroup(pattern, input, 0);
     }
 
@@ -70,7 +73,8 @@ public class RegexUtils {
      * @param group 分组号
      * @return 捕获字符串
      */
-    public static String regularGroup(Pattern pattern, CharSequence input, int group) {
+    public static String regularGroup(Pattern pattern, CharSequence input, int group)
+    {
         List<String> list = regularGroups(pattern, input, group);
         return list.isEmpty() ? "" : list.get(0);
     }
@@ -82,7 +86,8 @@ public class RegexUtils {
      * @param input 目标字符串
      * @return 捕获列表
      */
-    public static List<String> regularGroups(Pattern pattern, CharSequence input) {
+    public static List<String> regularGroups(Pattern pattern, CharSequence input)
+    {
         return regularGroups(pattern, input, 0);
     }
 
@@ -94,7 +99,8 @@ public class RegexUtils {
      * @param group 分组
      * @return 捕获列表
      */
-    public static List<String> regularGroups(Pattern pattern, CharSequence input, int group) {
+    public static List<String> regularGroups(Pattern pattern, CharSequence input, int group)
+    {
         List<String> list = newArrayList();
         Matcher matcher = pattern.matcher(input);
         int groupCount = matcher.groupCount();
@@ -117,7 +123,8 @@ public class RegexUtils {
      * @param groups 分组号
      * @return 捕获列表
      */
-    public static Map<Integer, String> regularGroupMap(Pattern pattern, CharSequence input, int... groups) {
+    public static Map<Integer, String> regularGroupMap(Pattern pattern, CharSequence input, int... groups)
+    {
         List<Map<Integer, String>> list = regularGroupsMap(pattern, input, groups);
         return list.isEmpty() ? null : list.get(0);
     }
@@ -130,17 +137,22 @@ public class RegexUtils {
      * @param groups 分组号
      * @return 捕获列表
      */
-    public static List<Map<Integer, String>> regularGroupsMap(Pattern pattern, CharSequence input, int... groups) {
+    public static List<Map<Integer, String>> regularGroupsMap(Pattern pattern, CharSequence input, int... groups)
+    {
         List<Map<Integer, String>> list = newArrayList();
-        if (isNotEmpty(groups)) {
+        if (isNotEmpty(groups))
+        {
             Matcher matcher = pattern.matcher(input);
             int groupCount = matcher.groupCount();
-            while (matcher.find()) {
+            while (matcher.find())
+            {
                 Map<Integer, String> map = newHashMap();
                 stream(groups).forEach(i -> map.put(i, i <= groupCount ? matcher.group(i) : ""));
                 list.add(map);
             }
-        } else {
+        }
+        else
+        {
             Map<Integer, String> map = newLinkedHashMap();
             map.put(0, regularGroup(pattern, input));
             list.add(map);
@@ -155,7 +167,8 @@ public class RegexUtils {
      * @param input 目标字符串
      * @return boolean 验证结果
      */
-    public static boolean matches(Pattern pattern, CharSequence input) {
+    public static boolean matches(Pattern pattern, CharSequence input)
+    {
         Matcher m = pattern.matcher(input);
         return m.matches();
     }
@@ -168,7 +181,8 @@ public class RegexUtils {
      * @param target 替换字符串
      * @return 替换结果
      */
-    public static String replaceAll(Pattern pattern, String source, String target) {
+    public static String replaceAll(Pattern pattern, String source, String target)
+    {
         Matcher m = pattern.matcher(source);
         return m.replaceAll(target);
     }
@@ -181,7 +195,8 @@ public class RegexUtils {
      * @param target 替换字符串
      * @return 替换结果
      */
-    public static String replaceFirst(Pattern pattern, String source, String target) {
+    public static String replaceFirst(Pattern pattern, String source, String target)
+    {
         Matcher m = pattern.matcher(source);
         return m.replaceFirst(target);
     }
@@ -195,10 +210,12 @@ public class RegexUtils {
      * @param target 替换字符串
      * @return 替换结果
      */
-    public static String regularGroupReplaceAll(Pattern pattern, String content, String source, String target) {
+    public static String regularGroupReplaceAll(Pattern pattern, String content, String source, String target)
+    {
         Matcher matcher = pattern.matcher(content);
         StringBuffer result = new StringBuffer(content.length());
-        while (matcher.find()) {
+        while (matcher.find())
+        {
             matcher.appendReplacement(result, "");
             result.append(matcher.group()
                     .replaceAll(source, target));
@@ -214,7 +231,8 @@ public class RegexUtils {
      * @param content 源字符串
      * @return 分割后的数组
      */
-    public String[] split(Pattern pattern, String content) {
+    public String[] split(Pattern pattern, String content)
+    {
         return pattern.split(content);
     }
 
@@ -225,7 +243,8 @@ public class RegexUtils {
      * @param content 源字符串
      * @return 是否包含
      */
-    public static boolean contains(Pattern pattern, String content) {
+    public static boolean contains(Pattern pattern, String content)
+    {
         Matcher matcher = pattern.matcher(content);
         return matcher.find();
     }

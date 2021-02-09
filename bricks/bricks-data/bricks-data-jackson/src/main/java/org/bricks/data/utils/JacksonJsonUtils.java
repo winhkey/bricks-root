@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package org.bricks.data.utils;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.ALL;
-import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_SINGLE_QUOTES;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_SINGLE_QUOTES;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES;
+import static com.fasterxml.jackson.core.json.JsonWriteFeature.ESCAPE_NON_ASCII;
+import static com.fasterxml.jackson.core.json.JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS;
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
@@ -39,6 +40,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -58,24 +60,28 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class JacksonJsonUtils {
+public class JacksonJsonUtils
+{
 
     /**
      * @return ObjectMapper
      */
-    @SuppressWarnings("deprecation")
-    public static ObjectMapper createJsonMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public static ObjectMapper createJsonMapper()
+    {
+        JsonFactoryBuilder builder = new JsonFactoryBuilder();
+        // 允许转义
+        builder.enable(ESCAPE_NON_ASCII);
+        // 设置数字按字符串处理
+        builder.enable(WRITE_NUMBERS_AS_STRINGS);
+        // 非法转义字符
+        builder.enable(ALLOW_UNESCAPED_CONTROL_CHARS);
+        // 允许字段名不含双引号
+        builder.enable(ALLOW_UNQUOTED_FIELD_NAMES);
+        // 允许单引号
+        builder.enable(ALLOW_SINGLE_QUOTES);
+        ObjectMapper objectMapper = new ObjectMapper(builder.build());
         configure(objectMapper);
         objectMapper.setSerializationInclusion(NON_NULL);
-        // 设置数字按字符串处理
-        objectMapper.enable(WRITE_NUMBERS_AS_STRINGS);
-        // 允许字段名不含双引号
-        objectMapper.enable(ALLOW_UNQUOTED_FIELD_NAMES);
-        // 允许单引号
-        objectMapper.enable(ALLOW_SINGLE_QUOTES);
-        // 非法转义字符
-        objectMapper.enable(ALLOW_UNQUOTED_CONTROL_CHARS);
         objectMapper.disable(FAIL_ON_EMPTY_BEANS);
         objectMapper.setVisibility(ALL, ANY);
         return objectMapper;
@@ -86,13 +92,15 @@ public class JacksonJsonUtils {
      *
      * @return XmlMapper
      */
-    public static ObjectMapper createXmlMapper() {
+    public static ObjectMapper createXmlMapper()
+    {
         XmlMapper xmlMapper = new XmlMapper();
         configure(xmlMapper);
         return xmlMapper;
     }
 
-    private void configure(ObjectMapper objectMapper) {
+    private void configure(ObjectMapper objectMapper)
+    {
         objectMapper.disable(FAIL_ON_UNKNOWN_PROPERTIES);
         // json转换对象忽略找不到属性的对象
         objectMapper.enable(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);

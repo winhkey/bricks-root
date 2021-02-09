@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.bricks.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
@@ -50,11 +51,12 @@ import lombok.extern.slf4j.Slf4j;
  * 对象工具类
  *
  * @author fuzy
- * 
+ *
  */
 @Slf4j
 @UtilityClass
-public class ObjectUtils {
+public class ObjectUtils
+{
 
     /**
      * 直接读取对象的属性值
@@ -65,8 +67,10 @@ public class ObjectUtils {
      * @return 父类中的属性值
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getFieldValue(Object object, String fieldName) {
-        return ofNullable(getDeclaredField(object.getClass(), fieldName)).map(apply(field -> {
+    public static <T> T getFieldValue(Object object, String fieldName)
+    {
+        return ofNullable(getDeclaredField(object.getClass(), fieldName, true)).map(apply(field ->
+        {
             field.setAccessible(true);
             return (T) field.get(object);
         }, null, null, null))
@@ -80,9 +84,11 @@ public class ObjectUtils {
      * @param fieldName 父类中的属性名
      * @param value 将要设置的值
      */
-    public static void setFieldValue(Object object, String fieldName, Object value) {
-        ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName))
-                .ifPresent(accept(field -> {
+    public static void setFieldValue(Object object, String fieldName, Object value)
+    {
+        ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName, true))
+                .ifPresent(accept(field ->
+                {
                     field.setAccessible(true);
                     field.set(object, value);
                 }, null, log, null));
@@ -94,14 +100,45 @@ public class ObjectUtils {
      * @param src 源对象
      * @param dest 目标对象
      */
-    public static void copy(Object src, Object dest) {
+    public static void copy(Object src, Object dest)
+    {
         List<Field> fieldList = newArrayList();
-        addDeclaredFields(src.getClass(), fieldList, false);
-        fieldList.stream()
-                .forEach(field -> {
-                    String name = field.getName();
-                    ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
-                });
+        addDeclaredFields(src.getClass(), fieldList, true, false);
+        fieldList.forEach(field ->
+        {
+            String name = field.getName();
+            ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
+        });
+    }
+
+    /**
+     * 比较对象的属性
+     *
+     * @param oldObj 旧对象
+     * @param newObj 新对象
+     * @return 不同的属性
+     */
+    public static Map<String, String> diff(Object oldObj, Object newObj)
+    {
+        Map<String, String> diffMap = newHashMap();
+        Class<?> c1 = oldObj.getClass();
+        Class<?> c2 = newObj.getClass();
+        if (c1.equals(c2))
+        {
+            List<Field> fieldList = newArrayList();
+            addDeclaredFields(c1, fieldList, true, false);
+            fieldList.forEach(field ->
+            {
+                String name = field.getName();
+                Object oldValue = getFieldValue(oldObj, name);
+                Object newValue = getFieldValue(newObj, name);
+                if (oldValue == null && newValue != null || oldValue != null && !oldValue.equals(newValue))
+                {
+                    diffMap.put(name, format("from {0} to {1}", oldValue, newValue));
+                }
+            });
+        }
+        return diffMap;
     }
 
     /**
@@ -112,7 +149,8 @@ public class ObjectUtils {
      * @param clazz 实体类
      * @return 对象
      */
-    public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz) {
+    public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz)
+    {
         return isNotEmpty(dataList) ? dataList.stream()
                 .map(dataMap -> convertMap(dataMap, clazz))
                 .collect(toList()) : null;
@@ -126,15 +164,16 @@ public class ObjectUtils {
      * @param clazz 实体类
      * @return 对象
      */
-    public static <T> T convertMap(Map<String, Object> dataMap, Class<T> clazz) {
+    public static <T> T convertMap(Map<String, Object> dataMap, Class<T> clazz)
+    {
         T t = instantiateClass(clazz);
         List<Field> list = newArrayList();
-        addDeclaredFields(clazz, list, false);
-        list.stream()
-                .forEach(field -> {
-                    String fieldName = field.getName();
-                    setFieldValue(t, fieldName, dataMap.get(fieldName));
-                });
+        addDeclaredFields(clazz, list, true, false);
+        list.forEach(field ->
+        {
+            String fieldName = field.getName();
+            setFieldValue(t, fieldName, dataMap.get(fieldName));
+        });
         return t;
     }
 
@@ -145,14 +184,17 @@ public class ObjectUtils {
      * @param excludes 排除字段
      * @return map
      */
-    public static Map<String, Object> convertData(Object object, String... excludes) {
-        return ofNullable(object).map(o -> {
+    public static Map<String, Object> convertData(Object object, String... excludes)
+    {
+        return ofNullable(object).map(o ->
+        {
             Map<String, Object> map = newHashMap();
             List<Field> list = newArrayList();
-            addDeclaredFields(o.getClass(), list, false);
+            addDeclaredFields(o.getClass(), list, true, false);
             list.stream()
                     .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
-                    .forEach(accept(field -> {
+                    .forEach(accept(field ->
+                    {
                         field.setAccessible(true);
                         ofNullable(field.get(o)).ifPresent(value -> map.put(field.getName(), value));
                     }, null, log, null));
@@ -166,82 +208,91 @@ public class ObjectUtils {
      *
      * @param builder StringBuilder
      * @param object 对象
+     * @return builder
      */
-    public static void buildString(StringBuilder builder, Object object) {
-        new AbstractConsumerService() {
+    public static StringBuilder buildString(StringBuilder builder, Object object)
+    {
+        return new AbstractConsumerService<StringBuilder>()
+        {
 
             @Override
-            public void arrayConsumer(Object object) {
+            public StringBuilder arrayConsumer(StringBuilder builder, Object object)
+            {
                 builder.append('[');
-                super.arrayConsumer(object);
-                builder.append(']');
+                return super.arrayConsumer(builder, object).append(']');
             }
 
             @Override
-            protected void arrayConsumer(int n, Object object) {
-                super.arrayConsumer(n, object);
-                builder.delete(builder.lastIndexOf(", "), builder.length());
+            protected StringBuilder arrayConsumer(StringBuilder builder, int n, Object object)
+            {
+                return super.arrayConsumer(builder, n, object).delete(builder.lastIndexOf(", "), builder.length());
             }
 
             @Override
-            protected void collectionConsumer(Collection<?> collection) {
-                super.collectionConsumer(collection);
-                builder.delete(builder.lastIndexOf(", "), builder.length());
+            protected StringBuilder collectionConsumer(StringBuilder builder, Collection<?> collection)
+            {
+                return super.collectionConsumer(builder, collection).delete(builder.lastIndexOf(", "),
+                        builder.length());
             }
 
             @Override
-            public void collectionConsumer(Object object) {
+            public StringBuilder collectionConsumer(StringBuilder builder, Object object)
+            {
                 builder.append('[');
-                super.collectionConsumer(object);
-                builder.append(']');
+                return super.collectionConsumer(builder, object).append(']');
             }
 
             @Override
-            protected void mapConsumer(Object object) {
+            protected StringBuilder mapConsumer(StringBuilder builder, Object object)
+            {
                 builder.append('{');
-                super.mapConsumer(object);
-                builder.append('}');
+                return super.mapConsumer(builder, object).append('}');
             }
 
             @Override
-            protected void mapConsumer(Map<?, ?> map) {
-                super.mapConsumer(map);
-                builder.delete(builder.lastIndexOf(", "), builder.length());
+            protected StringBuilder mapConsumer(StringBuilder builder, Map<?, ?> map)
+            {
+                return super.mapConsumer(builder, map).delete(builder.lastIndexOf(", "), builder.length());
             }
 
             @Override
-            protected void nullConsumer() {
-                builder.append("null");
+            protected StringBuilder nullConsumer(StringBuilder builder)
+            {
+                return builder.append("null");
             }
 
             @Override
-            protected void elementConsumer(Object object) {
-                buildValue(builder, object);
+            protected StringBuilder elementConsumer(StringBuilder builder, Object object)
+            {
+                return buildValue(builder, object);
             }
 
             @Override
-            protected void elementConsumer(int i, Object object) {
-                buildValue(builder, object);
+            protected StringBuilder elementConsumer(StringBuilder builder, int i, Object object)
+            {
+                return buildValue(builder, object);
             }
 
             @Override
-            protected void entryConsumer(Object key, Object value) {
-                builder.append(key)
-                        .append('=');
-                buildValue(builder, value);
+            protected StringBuilder entryConsumer(StringBuilder builder, Object key, Object value)
+            {
+                buildValue(builder.append(key)
+                        .append('='), value);
+                return builder;
             }
 
             @Override
-            protected void otherConsumers(Map<Class<?>, Consumer<Object>> consumerMap) {
+            protected void otherConsumers(StringBuilder builder, Map<Class<?>, Consumer<Object>> consumerMap)
+            {
                 consumerMap.put(Object.class, builder::append);
             }
 
-        }.consumer(object);
+        }.consumer(builder, object);
     }
 
-    private static void buildValue(StringBuilder builder, Object value) {
-        buildString(builder, value);
-        builder.append(", ");
+    private StringBuilder buildValue(StringBuilder builder, Object value)
+    {
+        return buildString(builder, value).append(", ");
     }
 
     /**
@@ -252,7 +303,8 @@ public class ObjectUtils {
      * @return 枚举对象
      */
     @SuppressWarnings("unchecked")
-    public static Object getEnumValue(Class<?> clazz, Object value) {
+    public static Object getEnumValue(Class<?> clazz, Object value)
+    {
         Stream<?> stream = ValueEnum.class.isAssignableFrom(
                 clazz) ? of(((Class<ValueEnum<?>>) clazz).getEnumConstants()).filter(v -> v.getValue()
                         .equals(value)) : of(clazz.getEnumConstants()).filter(v -> v.equals(value));
@@ -266,14 +318,17 @@ public class ObjectUtils {
      * @param proxy 代理对象
      * @return 真实对象
      */
-    public static Object getTarget(Object proxy) {
+    public static Object getTarget(Object proxy)
+    {
         return isAopProxy(proxy) ? getProxyTargetObject(proxy, isJdkDynamicProxy(proxy) ? "h" : "CGLIB$CALLBACK_0")
                 : proxy;
     }
 
-    private static Object getProxyTargetObject(Object proxy, String proxyField) {
+    private static Object getProxyTargetObject(Object proxy, String proxyField)
+    {
         Object target = null;
-        try {
+        try
+        {
             Field h = proxy.getClass()
                     .getDeclaredField(proxyField);
             h.setAccessible(true);
@@ -283,7 +338,9 @@ public class ObjectUtils {
             advised.setAccessible(true);
             target = ((AdvisedSupport) advised.get(obj)).getTargetSource()
                     .getTarget();
-        } catch (Exception e) {
+        }
+        catch (Throwable e)
+        {
             log.error(e.getMessage(), e);
         }
         return target;

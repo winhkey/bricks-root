@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.bricks.test;
 
-import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 
+import org.bricks.bean.AbstractBean;
 import org.bricks.enums.ValueEnum;
 import org.hibernate.validator.constraints.Range;
 
@@ -29,14 +29,14 @@ import lombok.experimental.Accessors;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class TestConstants {
+public class TestConstants
+{
 
     @Setter
     @Getter
     @Accessors(chain = true)
-    public static class Parent implements Serializable {
-
-        private static final long serialVersionUID = 1L;
+    public static class Parent extends AbstractBean
+    {
 
         @NotNull
         protected String surname;
@@ -52,15 +52,15 @@ public class TestConstants {
 
     @Setter
     @Getter
-    public static class Child extends Parent {
-
-        private static final long serialVersionUID = 1L;
+    public static class Child extends Parent
+    {
 
     }
 
     @Getter
     @AllArgsConstructor
-    public enum Color implements ValueEnum<Integer> {
+    public enum Color implements ValueEnum<Integer>
+    {
 
         RED(0);
 

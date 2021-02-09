@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
-public class CommonLogAspect {
+public class CommonLogAspect
+{
 
     /**
      * commons切入点
      */
     @Pointcut("execution(* org.bricks..*.*(..))")
-    public void commonsLog() {
+    public void commonsLog()
+    {
     }
 
     /**
@@ -48,7 +50,8 @@ public class CommonLogAspect {
      * @throws Throwable Throwable
      */
     @Around("commonsLog()")
-    public Object around(ProceedingJoinPoint pjp) throws Throwable {
+    public Object around(ProceedingJoinPoint pjp) throws Throwable
+    {
         return AopLoggerUtils.around(pjp);
     }
 

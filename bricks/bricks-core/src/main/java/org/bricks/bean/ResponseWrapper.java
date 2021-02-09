@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,13 @@ import lombok.experimental.Accessors;
  *
  * @author fuzy
  *
- * @param <T> 数据
- *
+ * @param <D> 数据
  */
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ResponseWrapper<T> extends AbstractBean {
+public class ResponseWrapper<D> extends AbstractBean
+{
 
     /**
      * 返回码
@@ -50,7 +50,7 @@ public class ResponseWrapper<T> extends AbstractBean {
     /**
      * 业务数据
      */
-    private T data;
+    private D data;
 
     /**
      * 列表总数
@@ -65,7 +65,8 @@ public class ResponseWrapper<T> extends AbstractBean {
     /**
      * 默认构造方法
      */
-    public ResponseWrapper() {
+    public ResponseWrapper()
+    {
         super();
     }
 
@@ -75,7 +76,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param code 返回码
      * @param message 返回描述
      */
-    public ResponseWrapper(String code, String message) {
+    public ResponseWrapper(String code, String message)
+    {
         this();
         this.code = code;
         this.message = message;
@@ -85,7 +87,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @return message
      */
     @JsonProperty("msg")
-    public String getMsg() {
+    public String getMsg()
+    {
         return message;
     }
 
@@ -95,14 +98,16 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param message message
      */
     @JsonProperty("msg")
-    public void setMsg(String message) {
+    public void setMsg(String message)
+    {
         this.message = message;
     }
 
     /**
      * @return 无数据的成功结果
      */
-    public static ResponseWrapper<Void> ok() {
+    public static ResponseWrapper<Void> ok()
+    {
         return ok(Void.class);
     }
 
@@ -113,14 +118,16 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> ok(Class<T> clazz) {
+    public static <T> ResponseWrapper<T> ok(Class<T> clazz)
+    {
         return build("200", "success", true, clazz);
     }
 
     /**
      * @return 无数据的错误结果
      */
-    public static ResponseWrapper<Void> error() {
+    public static ResponseWrapper<Void> error()
+    {
         return error(Void.class);
     }
 
@@ -131,7 +138,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> error(Class<T> clazz) {
+    public static <T> ResponseWrapper<T> error(Class<T> clazz)
+    {
         return build("-1", "error", false, clazz);
     }
 
@@ -143,7 +151,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param success 是否成功
      * @return 结果
      */
-    public static ResponseWrapper<Void> build(String code, String message, Boolean success) {
+    public static ResponseWrapper<Void> build(String code, String message, Boolean success)
+    {
         return build(code, message, success, Void.class);
     }
 
@@ -157,7 +166,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> build(String code, String message, Boolean success, Class<T> clazz) {
+    public static <T> ResponseWrapper<T> build(String code, String message, Boolean success, Class<T> clazz)
+    {
         return new ResponseWrapper<T>(code, message).setSuccess(success);
     }
 
@@ -167,7 +177,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param messageEnum 消息枚举
      * @return 结果
      */
-    public static ResponseWrapper<Void> build(MessageEnum messageEnum) {
+    public static ResponseWrapper<Void> build(MessageEnum messageEnum)
+    {
         return build(messageEnum, Void.class);
     }
 
@@ -179,7 +190,8 @@ public class ResponseWrapper<T> extends AbstractBean {
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> build(MessageEnum messageEnum, Class<T> clazz) {
+    public static <T> ResponseWrapper<T> build(MessageEnum messageEnum, Class<T> clazz)
+    {
         return build(messageEnum.getCode(), messageEnum.getMessage(), false, clazz);
     }
 

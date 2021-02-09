@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import javax.annotation.PostConstruct;
  *
  * @param <D> 数据类
  */
-public class AbstractDataSerializer<D> implements DataSerializer<D> {
+public class AbstractDataSerializer<D> implements DataSerializer<D>
+{
 
     /**
      * 数据类型
@@ -41,13 +42,15 @@ public class AbstractDataSerializer<D> implements DataSerializer<D> {
      */
     @SuppressWarnings("unchecked")
     @PostConstruct
-    public void init() {
+    public void init()
+    {
         List<Class<?>> classList = getComponentClassList(getClass(), DataSerializer.class);
         clazz = (Class<D>) classList.get(0);
     }
 
     @Override
-    public Class<D> getClazz() {
+    public Class<D> getClazz()
+    {
         return clazz;
     }
 

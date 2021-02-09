@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ import java.util.Collection;
  * @param <T> 实体类型
  * @param <I> ID类型
  */
-public interface LogicDeleteEntityService<T, I> extends EntityService<T, I> {
+public interface LogicDeleteEntityService<T, I> extends EntityService<T, I>
+{
 
     /**
      * 逻辑删除

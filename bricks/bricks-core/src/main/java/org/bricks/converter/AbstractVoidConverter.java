@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,12 @@ package org.bricks.converter;
  * @param <M> 源对象
  * @param <N> 目标对象
  */
-public abstract class AbstractVoidConverter<M, N> extends AbstractConverter<M, N, Void> {
+public abstract class AbstractVoidConverter<M, N> extends AbstractConverter<M, N, Void>
+{
 
     @Override
-    protected N from(M m, Void v) {
+    protected N from(M m, Void v)
+    {
         return from(m);
     }
 

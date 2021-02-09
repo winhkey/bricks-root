@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import org.bricks.async.work.service.BrickJobService;
  *
  * @param <R> 任务接口
  */
-public interface BrickJob<R extends BrickJobService> {
+public interface BrickJob<R extends BrickJobService>
+{
 
     /**
      * 执行

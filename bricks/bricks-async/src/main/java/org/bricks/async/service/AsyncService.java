@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,18 @@ import org.bricks.service.Callback;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 异步调用
  *
  * @author fuzy
  *
  */
+@Slf4j
 @Service
-public class AsyncService {
+public class AsyncService
+{
 
     /**
      * 线程池
@@ -53,7 +57,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果列表
      */
-    public <T, V> List<V> asyncList(Collection<T> collection, Callback<T, V> callback) {
+    public <T, V> List<V> asyncList(Collection<T> collection, Callback<T, V> callback)
+    {
         return futureStream(collection, callback).map(CompletableFuture::join)
                 .collect(toList());
     }
@@ -67,7 +72,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果
      */
-    public <T, V> V async(T t, Callback<T, V> callback) {
+    public <T, V> V async(T t, Callback<T, V> callback)
+    {
         return future(t, callback).join();
     }
 
@@ -80,8 +86,14 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果
      */
-    public <T, V> CompletableFuture<V> future(T t, Callback<T, V> callback) {
-        return CompletableFuture.supplyAsync(() -> callback.call(t), executor);
+    public <T, V> CompletableFuture<V> future(T t, Callback<T, V> callback)
+    {
+        return CompletableFuture.supplyAsync(() -> callback.call(t), executor)
+                .exceptionally(e ->
+                {
+                    log.error(e.getMessage(), e);
+                    return null;
+                });
     }
 
     /**
@@ -93,7 +105,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果流
      */
-    public <T, V> Stream<CompletableFuture<V>> futureStream(Collection<T> collection, Callback<T, V> callback) {
+    public <T, V> Stream<CompletableFuture<V>> futureStream(Collection<T> collection, Callback<T, V> callback)
+    {
         return collection.stream()
                 .map(t -> future(t, callback))
                 .collect(toList())

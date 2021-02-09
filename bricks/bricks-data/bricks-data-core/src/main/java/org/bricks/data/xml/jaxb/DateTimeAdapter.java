@@ -13,15 +13,18 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @author fuzy
  *
  */
-public class DateTimeAdapter extends XmlAdapter<String, LocalDateTime> {
+public class DateTimeAdapter extends XmlAdapter<String, LocalDateTime>
+{
 
     @Override
-    public LocalDateTime unmarshal(String v) {
+    public LocalDateTime unmarshal(String v)
+    {
         return parse(v);
     }
 
     @Override
-    public String marshal(LocalDateTime v) {
+    public String marshal(LocalDateTime v)
+    {
         return format(v, null);
     }
 

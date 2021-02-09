@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,18 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * @author fuzy
  *
  */
-public class CDataAdapter extends XmlAdapter<String, String> {
+public class CDataAdapter extends XmlAdapter<String, String>
+{
 
     @Override
-    public String unmarshal(String v) {
+    public String unmarshal(String v)
+    {
         return v;
     }
 
     @Override
-    public String marshal(String v) {
+    public String marshal(String v)
+    {
         return format("<![CDATA[{0}]]>", ofNullable(v).orElse(""));
     }
 

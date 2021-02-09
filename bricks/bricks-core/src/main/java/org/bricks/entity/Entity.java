@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.bricks.entity;
 
-import java.io.Serializable;
-
 /**
  * 实体接口
  *
@@ -25,7 +23,8 @@ import java.io.Serializable;
  *
  * @param <I> ID类型
  */
-public interface Entity<I extends Serializable> extends Serializable {
+public interface Entity<I>
+{
 
     /**
      * 获取主键

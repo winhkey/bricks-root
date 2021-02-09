@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author fuzy
  *
  */
-public abstract class AbstractJacksonService extends AbstractJsonDataService {
+public abstract class AbstractJacksonService extends AbstractJsonDataService
+{
 
     /**
      * 转换器
@@ -46,47 +47,65 @@ public abstract class AbstractJacksonService extends AbstractJsonDataService {
     protected ObjectMapper objectMapper;
 
     @NoLog
-    public ObjectMapper getObjectMapper() {
+    public ObjectMapper getObjectMapper()
+    {
         return objectMapper;
     }
 
     @Override
-    protected <T> T readFrom(String json, Type... type) {
-        try {
+    protected <T> T readFrom(String json, Type... type)
+    {
+        try
+        {
             return objectMapper.readValue(trim(json), getJavaType(type));
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new BaseException(e);
         }
     }
 
     @Override
-    protected <T> T readFrom(File file, Type... type) {
-        try {
+    protected <T> T readFrom(File file, Type... type)
+    {
+        try
+        {
             return objectMapper.readValue(file, getJavaType(type));
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new BaseException(e);
         }
     }
 
     @Override
-    protected <T> T readFrom(InputStream stream, Type... type) {
-        try {
+    protected <T> T readFrom(InputStream stream, Type... type)
+    {
+        try
+        {
             return objectMapper.readValue(stream, getJavaType(type));
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new BaseException(e);
         }
     }
 
     @Override
-    protected <T> T convertFrom(Object object, Type... type) {
+    protected <T> T convertFrom(Object object, Type... type)
+    {
         return objectMapper.convertValue(object, getJavaType(type));
     }
 
     @Override
-    protected String toString(Object object, Type... type) {
-        try {
+    protected String toString(Object object, Type... type)
+    {
+        try
+        {
             return objectMapper.writeValueAsString(object);
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             throw new BaseException(e);
         }
     }
@@ -97,22 +116,28 @@ public abstract class AbstractJacksonService extends AbstractJsonDataService {
      * @param type java类型
      * @return JavaType
      */
-    protected JavaType getJavaType(Type... type) {
+    protected JavaType getJavaType(Type... type)
+    {
         JavaType javaType = null;
-        if (isNotEmpty(type)) {
-            if (type.length > NUMBER_1 && type[0] instanceof Class<?>) {
+        if (isNotEmpty(type))
+        {
+            if (type.length > NUMBER_1 && type[0] instanceof Class<?>)
+            {
                 javaType = getJavaType(javaType, (Class<?>) type[0]);
             }
-            if (javaType == null) {
+            if (javaType == null)
+            {
                 javaType = objectMapper.constructType(type[0]);
             }
         }
         return javaType;
     }
 
-    private JavaType getJavaType(JavaType javaType, Class<?> rawType) {
+    private JavaType getJavaType(JavaType javaType, Class<?> rawType)
+    {
         TypeVariable<?>[] vars = rawType.getTypeParameters();
-        if (isNotEmpty(vars)) {
+        if (isNotEmpty(vars))
+        {
             JavaType[] javaTypes = new JavaType[vars.length];
             IntStream.range(0, vars.length)
                     .forEach(i -> javaTypes[i] = objectMapper.constructType(vars[i]));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@ package org.bricks.enums;
  * 
  * @author fuzy
  *
- * @param <T>
+ * @param <T> 值类型
  */
-public interface ValueEnum<T> {
+public interface ValueEnum<T>
+{
 
     /**
      * @return 枚举值

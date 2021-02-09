@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author fuzy
  *
  */
-public abstract class AbstractBrickJobService implements BrickJobService {
+public abstract class AbstractBrickJobService implements BrickJobService
+{
 
     /**
      * 日志
@@ -51,7 +52,8 @@ public abstract class AbstractBrickJobService implements BrickJobService {
      * @param target 任务参数
      * @param <T> 任务参数
      */
-    protected <T> void syncExecuteTask(BrickTask<T> task, T target) {
+    protected <T> void syncExecuteTask(BrickTask<T> task, T target)
+    {
         ofNullable(task).ifPresent(t -> task.task(target));
     }
 
@@ -62,7 +64,8 @@ public abstract class AbstractBrickJobService implements BrickJobService {
      * @param target 任务参数
      * @param <T> 任务参数
      */
-    protected <T> void asyncExecuteTask(BrickTask<T> task, T target) {
+    protected <T> void asyncExecuteTask(BrickTask<T> task, T target)
+    {
         ofNullable(task).ifPresent(t -> executor.execute(() -> task.task(target)));
     }
 

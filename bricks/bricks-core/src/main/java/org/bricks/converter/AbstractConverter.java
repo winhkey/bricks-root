@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
  * @param <N> 目标对象
  * @param <P> 参数
  */
-public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
+public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
+{
 
     /**
      * 日志
@@ -64,7 +65,8 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
      * 构造方法
      */
     @SuppressWarnings("unchecked")
-    protected AbstractConverter() {
+    protected AbstractConverter()
+    {
         List<Class<?>> classList = getComponentClassList(getClass(), Converter.class);
         source = (Class<M>) classList.get(0);
         target = (Class<N>) classList.get(1);
@@ -73,37 +75,43 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
 
     @NoLog
     @Override
-    public Class<M> getSource() {
+    public Class<M> getSource()
+    {
         return source;
     }
 
     @NoLog
     @Override
-    public Class<N> getTarget() {
+    public Class<N> getTarget()
+    {
         return target;
     }
 
     @NoLog
     @Override
-    public N apply(M m) {
+    public N apply(M m)
+    {
         return convert(m);
     }
 
     @NoLog
     @Override
-    public N convert(@NotNull M m, @NotNull P p) {
+    public N convert(@NotNull M m, @NotNull P p)
+    {
         return check(m, p) ? from(m, p) : null;
     }
 
     @NoLog
     @Override
-    public List<N> convertList(Collection<M> mList) {
+    public List<N> convertList(Collection<M> mList)
+    {
         return convertList(mList, null);
     }
 
     @NoLog
     @Override
-    public List<N> convertList(Collection<M> mList, P p) {
+    public List<N> convertList(Collection<M> mList, P p)
+    {
         return mList.stream()
                 .filter(m -> check(m, p))
                 .map(m -> convert(m, p))
@@ -113,13 +121,15 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
 
     @NoLog
     @Override
-    public M reverseConvert(N n, P p) {
+    public M reverseConvert(N n, P p)
+    {
         return reverseCheck(n, p) ? reverseFrom(n, p) : null;
     }
 
     @NoLog
     @Override
-    public List<M> reverseConvertList(Collection<N> nList, P p) {
+    public List<M> reverseConvertList(Collection<N> nList, P p)
+    {
         return nList.stream()
                 .filter(n -> reverseCheck(n, p))
                 .map(n -> reverseFrom(n, p))
@@ -134,7 +144,8 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
      * @param p 参数
      * @return 是否转换
      */
-    protected boolean check(M m, P p) {
+    protected boolean check(M m, P p)
+    {
         return m != null && (p != null || param.equals(Void.class));
     }
 
@@ -145,7 +156,8 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
      * @param p 参数
      * @return 是否转换
      */
-    protected boolean reverseCheck(N n, P p) {
+    protected boolean reverseCheck(N n, P p)
+    {
         return n != null && (p != null || param.equals(Void.class));
     }
 
@@ -165,7 +177,8 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P> {
      * @param p 参数
      * @return N对象
      */
-    protected M reverseFrom(N n, P p) {
+    protected M reverseFrom(N n, P p)
+    {
         return null;
     }
 

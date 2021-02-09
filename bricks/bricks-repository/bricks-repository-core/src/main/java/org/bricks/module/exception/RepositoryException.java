@@ -8,7 +8,8 @@ import org.bricks.exception.BaseException;
  * @author fuzy
  *
  */
-public class RepositoryException extends BaseException {
+public class RepositoryException extends BaseException
+{
 
     /**
      * 序列化
@@ -20,7 +21,8 @@ public class RepositoryException extends BaseException {
      *
      * @param t 异常
      */
-    public RepositoryException(Throwable t) {
+    public RepositoryException(Throwable t)
+    {
         super(t);
     }
 
@@ -30,7 +32,8 @@ public class RepositoryException extends BaseException {
      * @param message 描述
      * @param t 异常
      */
-    public RepositoryException(String message, Throwable t) {
+    public RepositoryException(String message, Throwable t)
+    {
         super(message, t);
     }
 

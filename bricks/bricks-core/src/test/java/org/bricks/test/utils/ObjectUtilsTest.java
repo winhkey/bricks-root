@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package org.bricks.test.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static org.bricks.test.TestConstants.Child;
-import static org.bricks.test.TestConstants.Color;
 import static org.bricks.utils.ObjectUtils.buildString;
 import static org.bricks.utils.ObjectUtils.convertData;
 import static org.bricks.utils.ObjectUtils.convertMapList;
@@ -40,197 +38,252 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.bricks.enums.ValueEnum;
+import org.bricks.test.TestConstants.Child;
+import org.bricks.test.TestConstants.Color;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ObjectUtilsTest {
+public class ObjectUtilsTest
+{
 
     @Test
-    public void testGetDeclaredMethodNull() {
-        assertNull(getDeclaredMethod(null, null));
+    public void testGetDeclaredMethodNull()
+    {
+        assertNull(getDeclaredMethod(null, null, true));
     }
 
     @Test
-    public void testGetDeclaredMethodObject() {
-        assertNull(getDeclaredMethod(Object.class, null));
+    public void testGetDeclaredMethodObject()
+    {
+        assertNull(getDeclaredMethod(Object.class, null, true));
     }
 
     @Test
-    public void testInvokeMethod() {
+    public void testInvokeMethod()
+    {
         Child child = new Child();
-        invokeMethod(child, "setSurname", new Class<?>[]{String.class}, new Object[]{"abc"});
+        invokeMethod(child, "setSurname", true, new Class<?>[] {String.class}, "abc");
         assertEquals("abc", child.getSurname());
     }
 
     @Test
-    public void testGetDeclaredFieldNull() {
-        assertNull(getDeclaredField(null, null));
+    public void testGetDeclaredFieldNull()
+    {
+        assertNull(getDeclaredField(null, null, true));
     }
 
     @Test
-    public void testGetDeclaredFieldObject() {
-        assertNull(getDeclaredField(Object.class, null));
+    public void testGetDeclaredFieldObject()
+    {
+        assertNull(getDeclaredField(Object.class, null, true));
     }
 
     @Test
-    public void testGetDeclaredFieldsStatic() {
+    public void testGetDeclaredFieldsStatic()
+    {
         List<Field> list = newArrayList();
-        addDeclaredFields(Child.class, list, true);
-        assertTrue(list.stream().anyMatch(field -> "serialVersionUID".equals(field.getName())));
+        addDeclaredFields(Child.class, list, true, true);
+        assertTrue(list.stream()
+                .anyMatch(field -> "serialVersionUID".equals(field.getName())));
     }
 
     @Test
-    public void testGetFieldValue() {
+    public void testGetFieldValue()
+    {
         assertEquals("abc", getFieldValue(new Child().setSurname("abc"), "surname"));
     }
 
     @Test
-    public void testSetFieldValue() {
+    public void testSetFieldValue()
+    {
         Child child = new Child();
         setFieldValue(child, "surname", "abc");
         assertEquals("abc", child.getSurname());
     }
 
     @Test
-    public void testCopy() {
+    public void testCopy()
+    {
         Child dest = new Child();
         copy(new Child().setSurname("abc"), dest);
         assertEquals("abc", dest.getSurname());
     }
 
     @Test
-    public void testConvertData() {
+    public void testConvertData()
+    {
         List<Child> list = convertMapList(newArrayList(ImmutableMap.of("surname", "abc")), Child.class);
         assertNotNull(list);
-        assertEquals("abc", list.get(0).getSurname());
+        assertEquals("abc", list.get(0)
+                .getSurname());
     }
 
     @Test
-    public void testConvertDataEmpty() {
+    public void testConvertDataEmpty()
+    {
         List<Child> list = convertMapList(newArrayList(), Child.class);
         assertNull(list);
     }
 
     @Test
-    public void testAddEntityToMap() {
+    public void testAddEntityToMap()
+    {
         Child child = new Child();
-        child.setSurname("a").setName("b").setAge(1);
+        child.setSurname("a")
+                .setName("b")
+                .setAge(1);
         Map<String, Object> map = convertData(child);
         assertFalse(map.isEmpty());
     }
 
     @Test
-    public void testAddEntityToMapExlude() {
+    public void testAddEntityToMapExlude()
+    {
         Child child = new Child();
-        child.setSurname("a").setName("b").setAge(1);
+        child.setSurname("a")
+                .setName("b")
+                .setAge(1);
         Map<String, Object> map = convertData(child, "surname");
         assertNull(map.get("surname"));
         assertNotNull(map.get("name"));
     }
 
     @Test
-    public void testBuildStringCollectionNull() {
+    public void testBuildStringCollectionNull()
+    {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, (Collection<?>) null);
+        buildString(builder, null);
         assertEquals("null", builder.toString());
     }
 
     @Test
-    public void testBuildStringCollectionEmpty() {
+    public void testBuildStringCollectionEmpty()
+    {
         StringBuilder builder = new StringBuilder();
         buildString(builder, newArrayList());
         assertEquals("[]", builder.toString());
     }
 
     @Test
-    public void testBuildStringCollection() {
+    public void testBuildStringCollection()
+    {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, newArrayList(1));
-        assertEquals("[1]", builder.toString());
+        buildString(builder, newArrayList(new Child()));
+        assertEquals("[TestConstants.Child[surname=<null>,name=<null>,age=0]]", builder.toString());
     }
 
     @Test
-    public void testBuildStringCollection1() {
+    public void testBuildStringCollection1()
+    {
         StringBuilder builder = new StringBuilder();
-        List<List<Integer>> list = newArrayList();
-        list.add(newArrayList(1));
+        List<List<Child>> list = newArrayList();
+        list.add(newArrayList(new Child()));
         buildString(builder, list);
-        assertEquals("[[1]]", builder.toString());
+        assertEquals("[[TestConstants.Child[surname=<null>,name=<null>,age=0]]]", builder.toString());
     }
 
     @Test
-    public void testBuildStringCollection2() {
+    public void testBuildStringCollection2()
+    {
         StringBuilder builder = new StringBuilder();
-        List<Map<String, Integer>> list = newArrayList();
-        list.add(ImmutableMap.of("1", 1));
+        List<Map<String, Child>> list = newArrayList();
+        Map<String, Child> map = newHashMap();
+        map.put("1", new Child());
+        map.put("2", new Child());
+        list.add(map);
         buildString(builder, list);
-        assertEquals("[{1=1}]", builder.toString());
+        assertEquals("[{1=TestConstants.Child[surname=<null>,name=<null>,age=0], 2=TestConstants.Child[surname=<null>,name=<null>,age=0]}]", builder.toString());
     }
 
     @Test
-    public void testBuildStringMapNull() {
+    public void testBuildStringMapNull()
+    {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, (Map<?, ?>) null);
+        buildString(builder, null);
         assertEquals("null", builder.toString());
     }
 
     @Test
-    public void testBuildStringMapEmpty() {
+    public void testBuildStringMapEmpty()
+    {
         StringBuilder builder = new StringBuilder();
         buildString(builder, newHashMap());
         assertEquals("{}", builder.toString());
     }
 
     @Test
-    public void testBuildStringMap() {
+    public void testBuildStringMap()
+    {
         StringBuilder builder = new StringBuilder();
-        Map<String, Integer> map = newHashMap();
-        map.put("1", 1);
+        Map<String, Child> map = newHashMap();
+        map.put("1", new Child());
+        map.put("2", new Child());
         buildString(builder, map);
-        assertEquals("{1=1}", builder.toString());
+        assertEquals("{1=TestConstants.Child[surname=<null>,name=<null>,age=0], 2=TestConstants.Child[surname=<null>,name=<null>,age=0]}", builder.toString());
     }
 
     @Test
-    public void testBuildStringArrayNull() {
+    public void testBuildStringArrayNull()
+    {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, (Integer[]) null);
+        buildString(builder, null);
         assertEquals("null", builder.toString());
     }
 
-
     @Test
-    public void testBuildStringArrayEmpty() {
+    public void testBuildStringArrayEmpty()
+    {
         StringBuilder builder = new StringBuilder();
         buildString(builder, new int[0]);
         assertEquals("[]", builder.toString());
     }
 
     @Test
-    public void testBuildStringArray() {
+    public void testBuildStringArray()
+    {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, new int[]{1});
+        buildString(builder, new int[] {1});
         assertEquals("[1]", builder.toString());
     }
 
     @Test
-    public void testGetEnumValue() {
+    public void testGetEnumValue()
+    {
         assertEquals(Color.RED, getEnumValue(Color.class, 0));
     }
 
     @Test
-    public void testGetComponentClassList() {
+    public void testGetComponentClassList()
+    {
         assertEquals(1, getComponentClassList(Color.class, ValueEnum.class).size());
     }
 
     @Test
-    public void testGetComponentClass() {
+    public void testGetComponentClass()
+    {
         assertEquals(Integer.class, getComponentClass(Color.class, ValueEnum.class, 0));
     }
 
+    public static void main(String[] args)
+    {
+        List<Map<String, String>> list = newArrayList();
+        for (int i = 0; i < 5; i++)
+        {
+            Map<String, String> map = newHashMap();
+            map.put("a", "1");
+            map.put("b", "1");
+            map.put("c", "1");
+            map.put("d", "1");
+            map.put("e", "1");
+            list.add(map);
+        }
+        StringBuilder builder = new StringBuilder();
+        buildString(builder, list);
+        System.out.println(builder.toString());
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
 
 package org.bricks.bean;
 
-import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
+import java.lang.reflect.Field;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 抽象数据Bean
@@ -25,11 +30,33 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  * @author fuzy
  * 
  */
-public class AbstractBean implements Bean {
+public class AbstractBean implements Bean
+{
 
     @Override
-    public String toString() {
-        return reflectionToString(this, SHORT_PREFIX_STYLE);
+    public String toString()
+    {
+        return new ReflectionToStringBuilder(this, SHORT_PREFIX_STYLE)
+        {
+
+            @Override
+            protected boolean accept(Field field)
+            {
+                return super.accept(field) && acceptField(field);
+            }
+
+        }.toString();
+    }
+
+    /**
+     * 接受字段
+     *
+     * @param field 字段
+     * @return 是否接受
+     */
+    protected boolean acceptField(Field field)
+    {
+        return !field.isAnnotationPresent(JsonIgnore.class);
     }
 
 }

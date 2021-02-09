@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ import org.springframework.stereotype.Service;
  * @param <T> 类型
  */
 @Service
-public class TableConfigLoader<T> {
+public class TableConfigLoader<T>
+{
 
     /**
      * 缓存
@@ -55,13 +56,16 @@ public class TableConfigLoader<T> {
      * @param clazz 类
      * @return 表配置
      */
-    public TableConfig load(Class<T> clazz) {
-        if (CACHE.containsKey(clazz.getName())) {
+    public TableConfig load(Class<T> clazz)
+    {
+        if (CACHE.containsKey(clazz.getName()))
+        {
             return CACHE.get(clazz.getName());
         }
         List<Field> fieldList = newArrayList();
-        addDeclaredFields(clazz, fieldList, false);
-        if (isEmpty(fieldList)) {
+        addDeclaredFields(clazz, fieldList, true, false);
+        if (isEmpty(fieldList))
+        {
             return null;
         }
         List<String> fList = newArrayList();
@@ -69,12 +73,15 @@ public class TableConfigLoader<T> {
         Map<String, String> fieldTitleMap = newLinkedHashMap();
         Map<String, DataType> fieldDataTypeMap = newLinkedHashMap();
         ColumnConfig cfg = new ColumnConfig();
-        for (Field field : fieldList) {
+        for (Field field : fieldList)
+        {
             ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
-            if (excelColumn == null) {
+            if (excelColumn == null)
+            {
                 continue;
             }
-            if (excelColumn.column() > -1) {
+            if (excelColumn.column() > -1)
+            {
                 cfg.setColumn(excelColumn.column());
                 columnMap.put(cfg.getColumn(), cfg);
             }

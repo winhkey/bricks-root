@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,15 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service("jacksonXmlService")
-public class JacksonXmlServiceImpl extends AbstractJacksonService implements XmlDataService {
+public class JacksonXmlServiceImpl extends AbstractJacksonService implements XmlDataService
+{
 
     /**
      * 初始化
      */
     @PostConstruct
-    public void init() {
+    public void init()
+    {
         objectMapper = createXmlMapper();
     }
 

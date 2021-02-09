@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,5 +22,19 @@ package org.bricks.bean;
  * @author fuzy
  * 
  */
-public interface Bean {
+public interface Bean
+{
+
+    /**
+     * 返回自对象
+     * 
+     * @param <T> 自类型
+     * @return 自对象
+     */
+    @SuppressWarnings("unchecked")
+    default <T> T self()
+    {
+        return (T) this;
+    }
+
 }

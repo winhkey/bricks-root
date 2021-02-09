@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks)
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ import static org.bricks.utils.FunctionUtils.accept;
 
 import org.junit.Test;
 
-public class FunctionUtilsTest {
+public class FunctionUtilsTest
+{
 
     @Test
-    public void testAcceptEmpty() {
+    public void testAcceptEmpty()
+    {
         accept(null, null);
     }
 
