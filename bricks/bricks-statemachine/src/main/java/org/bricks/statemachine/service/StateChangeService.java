@@ -23,10 +23,9 @@ import java.util.Map;
  *
  * @author fuzy
  *
- * @param <S> 状态
  * @param <E> 事件
  */
-public interface StateChangeService<S, E>
+public interface StateChangeService<E>
 {
 
     /**

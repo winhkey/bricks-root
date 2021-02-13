@@ -41,7 +41,7 @@ import org.springframework.statemachine.region.Region;
  * @param <S> 状态
  * @param <E> 事件
  */
-public abstract class AbstractStateChangeService<S, E> implements StateChangeService<S, E>
+public abstract class AbstractStateChangeService<S, E> implements StateChangeService<E>
 {
 
     /**
