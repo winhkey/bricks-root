@@ -135,8 +135,8 @@ public class ReflectionUtils
      * @param annotationClass 注解类型
      * @return 注解对象
      */
-    public static Annotation getDeclaredAnnotation(AnnotatedElement element,
-            Class<? extends Annotation> annotationClass)
+    public static <T extends Annotation> T getDeclaredAnnotation(AnnotatedElement element,
+            Class<T> annotationClass)
     {
         return ofNullable(element).map(e -> e.getDeclaredAnnotation(annotationClass))
                 .orElse(null);

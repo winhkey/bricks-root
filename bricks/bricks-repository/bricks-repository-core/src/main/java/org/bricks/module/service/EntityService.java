@@ -38,7 +38,7 @@ import org.springframework.data.domain.Sort.Order;
  * @param <T> 实体类型
  * @param <I> ID类型
  */
-public interface EntityService<T, I>
+public interface EntityService<I, T>
 {
 
     /**

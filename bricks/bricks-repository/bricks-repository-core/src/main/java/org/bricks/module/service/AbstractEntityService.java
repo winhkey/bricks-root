@@ -52,7 +52,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @param <T> 实体类型
  * @param <I> ID类型
  */
-public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
+public abstract class AbstractEntityService<I, T> implements EntityService<I, T>
 {
 
     /**
