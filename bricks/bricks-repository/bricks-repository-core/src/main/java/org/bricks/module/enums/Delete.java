@@ -32,7 +32,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum Delete implements ValueEnum<String> {
+public enum Delete implements ValueEnum<String>
+{
 
     /**
      *

@@ -18,6 +18,7 @@ package org.bricks.utils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newInputStream;
+import static java.util.Locale.US;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,20 +44,22 @@ public class MD5Utils
      * 生成字符串的md5校验值
      *
      * @param s 字符串
+     * @param uppercase 大写
      * @return md5结果
      */
-    public static String getMD5String(String s)
+    public static String getMD5String(String s, boolean uppercase)
     {
-        return getMD5String(s.getBytes(UTF_8));
+        return getMD5String(s.getBytes(UTF_8), uppercase);
     }
 
     /**
      * 生成文件的md5校验值
      *
      * @param file 文件
+     * @param uppercase 大写
      * @return md5结果
      */
-    public static String getMD5String(File file)
+    public static String getMD5String(File file, boolean uppercase)
     {
         byte[] buffer = new byte[1024];
         try (InputStream fis = newInputStream(file.toPath()))
@@ -67,7 +70,7 @@ public class MD5Utils
             {
                 messagedigest.update(buffer, 0, numRead);
             }
-            return bufferToHex(messagedigest.digest());
+            return bufferToHex(messagedigest.digest(), uppercase);
         }
         catch (IOException | NoSuchAlgorithmException e)
         {
@@ -79,14 +82,15 @@ public class MD5Utils
      * 生成字节数组的md5校验值
      *
      * @param bytes 字节数组
+     * @param uppercase 大写
      * @return md5结果
      */
-    public static String getMD5String(byte[] bytes)
+    public static String getMD5String(byte[] bytes, boolean uppercase)
     {
         try
         {
             MessageDigest messagedigest = MessageDigest.getInstance("MD5");
-            return bufferToHex(messagedigest.digest(bytes));
+            return bufferToHex(messagedigest.digest(bytes), uppercase);
         }
         catch (NoSuchAlgorithmException e)
         {
@@ -98,11 +102,13 @@ public class MD5Utils
      * 将字节数组转成16进制字符串
      *
      * @param bytes 字节数组
+     * @param uppercase 大写
      * @return 16进制字符串
      */
-    private static String bufferToHex(byte[] bytes)
+    private static String bufferToHex(byte[] bytes, boolean uppercase)
     {
-        return new String(new Hex().encode(bytes), UTF_8);
+        String result = new String(new Hex().encode(bytes), UTF_8);
+        return uppercase ? result.toUpperCase(US) : result;
     }
 
 }

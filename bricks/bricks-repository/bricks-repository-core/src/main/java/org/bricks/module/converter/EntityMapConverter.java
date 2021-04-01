@@ -42,10 +42,12 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String, Object>> {
+public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String, Object>>
+{
 
     @Override
-    protected Map<String, Object> from(Object m) {
+    protected Map<String, Object> from(Object m)
+    {
         Map<String, Object> conditionMap = newHashMap();
         buildCondition(m, "", conditionMap);
         return conditionMap;
@@ -58,41 +60,56 @@ public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String
      * @param root root
      * @param conditionMap 条件map
      */
-    protected void buildCondition(Object object, String root, Map<String, Object> conditionMap) {
-        ofNullable(object).ifPresent(o -> {
+    protected void buildCondition(Object object, String root, Map<String, Object> conditionMap)
+    {
+        ofNullable(object).ifPresent(o ->
+        {
             List<Field> fieldList = newArrayList();
             addDeclaredFields(object.getClass(), fieldList, false);
-            fieldList.forEach(accept(field -> {
+            fieldList.forEach(accept(field ->
+            {
                 field.setAccessible(true);
                 String name = field.getName();
-                if (isNotBlank(root)) {
+                if (isNotBlank(root))
+                {
                     name = format("{0}.{1}", root, name);
                 }
                 final String n = name;
-                ofNullable(field.get(object)).ifPresent(value -> {
-                    if (value instanceof String) {
-                        if (isNotBlank((String) value)) {
+                ofNullable(field.get(object)).ifPresent(value ->
+                {
+                    if (value instanceof String)
+                    {
+                        if (isNotBlank((String) value))
+                        {
                             conditionMap.put(n, value);
                         }
                     }
-                    else if (value instanceof Collection && isNotEmpty((Collection<?>) value)) {
+                    else if (value instanceof Collection && isNotEmpty((Collection<?>) value))
+                    {
                         conditionMap.put(n, value);
                     }
-                    else if (value instanceof Map && isNotEmpty((Map<?, ?>) value)) {
+                    else if (value instanceof Map && isNotEmpty((Map<?, ?>) value))
+                    {
                         conditionMap.put(n, value);
                     }
-                    else if (value instanceof Enum) {
+                    else if (value instanceof Enum)
+                    {
                         conditionMap.put(n, ((Enum<?>) value).ordinal());
                     }
-                    else if (value instanceof Entity) {
+                    else if (value instanceof Entity)
+                    {
                         Entity<?> entity = (Entity<?>) value;
-                        if (entity.getId() == null) {
+                        if (entity.getId() == null)
+                        {
                             buildCondition(entity, n, conditionMap);
                         }
-                        else {
+                        else
+                        {
                             conditionMap.put(format("{0}.id", n), entity.getId());
                         }
-                    } else {
+                    }
+                    else
+                    {
                         conditionMap.put(n, value);
                     }
                 });

@@ -39,7 +39,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class TableConfig extends AbstractBean {
+public class TableConfig extends AbstractBean
+{
 
     /**
      * 实体类
@@ -82,7 +83,8 @@ public class TableConfig extends AbstractBean {
      * @param fields 字段列表
      * @return 标题列表
      */
-    public List<String> getTitles(String... fields) {
+    public List<String> getTitles(String... fields)
+    {
         return getList(fieldTitleMap, fields);
     }
 
@@ -92,7 +94,8 @@ public class TableConfig extends AbstractBean {
      * @param fields 自选字段
      * @return 字段列表
      */
-    public List<String> getFields(String... fields) {
+    public List<String> getFields(String... fields)
+    {
         return isNotEmpty(fields) ? newArrayList(fields) : fieldList;
     }
 
@@ -107,11 +110,15 @@ public class TableConfig extends AbstractBean {
         return getList(fieldDataTypeMap, fields);
     }
 
-    private <T> List<T> getList(Map<String, T> map, String... fields) {
+    private <T> List<T> getList(Map<String, T> map, String... fields)
+    {
         List<T> list = newArrayList();
-        if (isNotEmpty(fields)) {
+        if (isNotEmpty(fields))
+        {
             of(fields).forEach(field -> list.add(map.get(field)));
-        } else {
+        }
+        else
+        {
             list.addAll(map.values());
         }
         return list;

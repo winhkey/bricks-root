@@ -29,7 +29,8 @@ import java.util.function.Function;
  * @param <N> 目标对象
  * @param <P> 参数
  */
-public interface Converter<M, N, P> extends Function<M, N> {
+public interface Converter<M, N, P> extends Function<M, N>
+{
 
     /**
      * M转为N
@@ -46,7 +47,8 @@ public interface Converter<M, N, P> extends Function<M, N> {
      * @param m 源对象
      * @return 目标对象
      */
-    default N convert(M m) {
+    default N convert(M m)
+    {
         return convert(m, null);
     }
 
@@ -65,7 +67,8 @@ public interface Converter<M, N, P> extends Function<M, N> {
      * @param mList m列表
      * @return n列表
      */
-    default List<N> convertList(Collection<M> mList) {
+    default List<N> convertList(Collection<M> mList)
+    {
         return convertList(mList, null);
     }
 
@@ -84,7 +87,8 @@ public interface Converter<M, N, P> extends Function<M, N> {
      * @param n n对象
      * @return m对象
      */
-    default M reverseConvert(N n) {
+    default M reverseConvert(N n)
+    {
         return reverseConvert(n, null);
     }
 
@@ -103,7 +107,8 @@ public interface Converter<M, N, P> extends Function<M, N> {
      * @param nList n列表
      * @return m列表
      */
-    default List<M> reverseConvertList(Collection<N> nList) {
+    default List<M> reverseConvertList(Collection<N> nList)
+    {
         return reverseConvertList(nList, null);
     }
 

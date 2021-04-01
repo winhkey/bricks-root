@@ -39,7 +39,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @UtilityClass
-public class ReflectionUtils {
+public class ReflectionUtils
+{
 
     /**
      * 获取对象的 DeclaredMethod
@@ -49,7 +50,8 @@ public class ReflectionUtils {
      * @param parameterTypes 父类中的方法参数类型
      * @return 父类中的方法对象
      */
-    public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+    public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes)
+    {
         return ofNullable(clazz).filter(c -> c != Object.class)
                 .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes),
                         c -> getDeclaredMethod(c.getSuperclass(), methodName, parameterTypes), log, null))
@@ -65,9 +67,11 @@ public class ReflectionUtils {
      * @param parameters 父类中的方法参数
      * @return 父类中方法的执行结果
      */
-    public static Object invokeMethod(Object object, String methodName, Class<?>[] parameterTypes, Object... parameters) {
+    public static Object invokeMethod(Object object, String methodName, Class<?>[] parameterTypes, Object... parameters)
+    {
         return ofNullable(object).map(o -> getDeclaredMethod(o.getClass(), methodName, parameterTypes))
-                .map(apply(method -> {
+                .map(apply(method ->
+                {
                     method.setAccessible(true);
                     return method.invoke(object, parameters);
                 }, null, log, null))
@@ -81,7 +85,8 @@ public class ReflectionUtils {
      * @param fieldName 父类中的属性名
      * @return 父类中的属性对象
      */
-    public static Field getDeclaredField(Class<?> clazz, String fieldName) {
+    public static Field getDeclaredField(Class<?> clazz, String fieldName)
+    {
         return ofNullable(clazz).filter(c -> c != Object.class)
                 .map(apply(c -> c.getDeclaredField(fieldName), c -> getDeclaredField(c.getSuperclass(), fieldName),
                         null, null))
@@ -95,9 +100,11 @@ public class ReflectionUtils {
      * @param list 列表
      * @param containsStatic 是否包含静态字段
      */
-    public static void addDeclaredFields(Class<?> clazz, List<Field> list, boolean containsStatic) {
+    public static void addDeclaredFields(Class<?> clazz, List<Field> list, boolean containsStatic)
+    {
         ofNullable(clazz).filter(c -> c != Object.class)
-                .ifPresent(c -> {
+                .ifPresent(c ->
+                {
                     list.addAll(
                             of(c.getDeclaredFields()).filter(field -> containsStatic || !isStatic(field.getModifiers()))
                                     .collect(toList()));
@@ -112,7 +119,8 @@ public class ReflectionUtils {
      * @param superClass 父class
      * @return 泛型参数类型列表
      */
-    public static List<Class<?>> getComponentClassList(Class<?> selfClass, Class<?> superClass) {
+    public static List<Class<?>> getComponentClassList(Class<?> selfClass, Class<?> superClass)
+    {
         return of(getResolvableType(selfClass, superClass).getGenerics()).map(ResolvableType::resolve)
                 .collect(toList());
     }
@@ -125,7 +133,8 @@ public class ReflectionUtils {
      * @param index 泛型参数索引
      * @return 泛型参数类型
      */
-    public static Class<?> getComponentClass(Class<?> selfClass, Class<?> superClass, int index) {
+    public static Class<?> getComponentClass(Class<?> selfClass, Class<?> superClass, int index)
+    {
         return getResolvableType(selfClass, superClass).getGeneric(index)
                 .resolve();
     }
@@ -137,7 +146,8 @@ public class ReflectionUtils {
      * @param superClass 父class
      * @return ResolvableType
      */
-    public static ResolvableType getResolvableType(Class<?> selfClass, Class<?> superClass) {
+    public static ResolvableType getResolvableType(Class<?> selfClass, Class<?> superClass)
+    {
         return ResolvableType.forClass(selfClass)
                 .as(superClass);
     }

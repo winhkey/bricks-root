@@ -31,7 +31,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class SchedulerConfigItem extends AbstractAsyncConfigItem {
+public class SchedulerConfigItem extends AbstractAsyncConfigItem
+{
 
     /**
      * 销毁等待时间

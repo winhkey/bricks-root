@@ -52,7 +52,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @param <T> 实体类型
  * @param <I> ID类型
  */
-public abstract class AbstractEntityService<T, I> implements EntityService<T, I> {
+public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
+{
 
     /**
      * 日志
@@ -91,28 +92,36 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
      * 构造方法
      */
     @SuppressWarnings("unchecked")
-    public AbstractEntityService() {
+    public AbstractEntityService()
+    {
         List<Class<?>> classList = getComponentClassList(getClass(), EntityService.class);
         entityClass = (Class<T>) classList.get(0);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ResultData importFile(InputStream inputStream) {
+    public ResultData importFile(InputStream inputStream)
+    {
         ResultData data = new ResultData();
         List<Map<Integer, String>> errorList = newArrayList();
-        try {
+        try
+        {
             List<T> excelList = excelService.importExcel(inputStream, 0, errorList);
-            if (isNotEmpty(excelList)) {
+            if (isNotEmpty(excelList))
+            {
                 List<T> list = excelList.stream()
                         .filter(this::beforeImport)
                         .collect(toList());
                 saveBatch(list);
                 data.setSuccessSize(list.size());
-            } else {
+            }
+            else
+            {
                 data.setSuccessSize(0);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error(e.getMessage(), e);
         }
         data.setError(errorList);
@@ -125,7 +134,8 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
      * @param t 实体对象
      * @return 校验结果
      */
-    protected boolean beforeImport(T t) {
+    protected boolean beforeImport(T t)
+    {
         return true;
     }
 
@@ -135,16 +145,22 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
      * @param t 实体对象
      * @return 校验结果
      */
-    public String beforeImportValidate(T t) {
+    public String beforeImportValidate(T t)
+    {
         return "";
     }
 
     @Override
-    public void export(List<List<T>> list, OutputStream outputStream, boolean chart, List<String[]> fields) {
-        if (isNotEmpty(list)) {
-            try {
+    public void export(List<List<T>> list, OutputStream outputStream, boolean chart, List<String[]> fields)
+    {
+        if (isNotEmpty(list))
+        {
+            try
+            {
                 excelService.export(list, outputStream, chart, fields);
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 log.error(e.getMessage(), e);
             }
         }
@@ -152,83 +168,98 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public T save(T t) {
+    public T save(T t)
+    {
         return null;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public T update(T t) {
+    public T update(T t)
+    {
         return null;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveBatch(Collection<T> list) {
+    public void saveBatch(Collection<T> list)
+    {
 
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void delete(I id) {
+    public void delete(I id)
+    {
 
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteEntity(T t) {
+    public void deleteEntity(T t)
+    {
 
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteBatch(Collection<I> ids) {
+    public void deleteBatch(Collection<I> ids)
+    {
 
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteList(Collection<T> list) {
+    public void deleteList(Collection<T> list)
+    {
 
     }
 
     @Override
-    public T findOne(I id) {
+    public T findOne(I id)
+    {
         return null;
     }
 
     @Override
-    public T findOne(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders) {
+    public T findOne(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders)
+    {
         return null;
     }
 
     @Override
-    public List<T> findByIds(Collection<I> ids) {
+    public List<T> findByIds(Collection<I> ids)
+    {
         return null;
     }
 
     @Override
-    public List<T> findAll(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders) {
+    public List<T> findAll(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders)
+    {
         return null;
     }
 
     @Override
-    public Page<T> findPage(Map<String, Object> condition, boolean clear, List<String> fieldList, Pageable pageable) {
+    public Page<T> findPage(Map<String, Object> condition, boolean clear, List<String> fieldList, Pageable pageable)
+    {
         return null;
     }
 
     @Override
-    public int deleteAll(Map<String, Object> condition, boolean clear) {
+    public int deleteAll(Map<String, Object> condition, boolean clear)
+    {
         return 0;
     }
 
     @Override
-    public int updateAll(T t, Map<String, Object> condition, boolean clear) {
+    public int updateAll(T t, Map<String, Object> condition, boolean clear)
+    {
         return 0;
     }
 
     @Override
-    public long count(Map<String, Object> condition, boolean clear) {
+    public long count(Map<String, Object> condition, boolean clear)
+    {
         return 0;
     }
 
@@ -242,8 +273,10 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
      * @param appendSql sql
      */
     protected void appendCondition(StringBuilder builder, Map<String, Object> condition, String key, Object argument,
-            String appendSql) {
-        ofNullable(argument).ifPresent(arg -> {
+            String appendSql)
+    {
+        ofNullable(argument).ifPresent(arg ->
+        {
             condition.put(key, arg);
             ofNullable(appendSql).ifPresent(builder::append);
         });
@@ -259,8 +292,10 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
      * @param appendSql sql
      */
     protected void appendCondition(StringBuilder builder, Map<String, Object> condition, String key, String argument,
-            String appendSql) {
-        if (isNotBlank(argument)) {
+            String appendSql)
+    {
+        if (isNotBlank(argument))
+        {
             condition.put(key, argument);
             ofNullable(appendSql).ifPresent(builder::append);
         }
@@ -272,8 +307,10 @@ public abstract class AbstractEntityService<T, I> implements EntityService<T, I>
      * @param condition 条件map
      * @param clear 是否清除
      */
-    protected void clearCondition(Map<String, Object> condition, boolean clear) {
-        if (clear && isNotEmpty(condition)) {
+    protected void clearCondition(Map<String, Object> condition, boolean clear)
+    {
+        if (clear && isNotEmpty(condition))
+        {
             condition.clear();
         }
     }

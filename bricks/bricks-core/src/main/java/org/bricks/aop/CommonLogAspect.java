@@ -31,13 +31,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
-public class CommonLogAspect {
+public class CommonLogAspect
+{
 
     /**
      * commons切入点
      */
     @Pointcut("execution(* org.bricks..*.*(..))")
-    public void commonsLog() {
+    public void commonsLog()
+    {
     }
 
     /**
@@ -48,7 +50,8 @@ public class CommonLogAspect {
      * @throws Throwable Throwable
      */
     @Around("commonsLog()")
-    public Object around(ProceedingJoinPoint pjp) throws Throwable {
+    public Object around(ProceedingJoinPoint pjp) throws Throwable
+    {
         return AopLoggerUtils.around(pjp);
     }
 

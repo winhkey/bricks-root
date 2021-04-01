@@ -25,7 +25,8 @@ package org.bricks.function;
  * @param <E> 异常
  */
 @FunctionalInterface
-public interface ThrowablePredicate<T, E extends Throwable> {
+public interface ThrowablePredicate<T, E extends Throwable>
+{
 
     /**
      * 判断

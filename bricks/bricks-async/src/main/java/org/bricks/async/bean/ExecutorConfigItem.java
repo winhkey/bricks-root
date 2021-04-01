@@ -31,7 +31,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ExecutorConfigItem extends AbstractAsyncConfigItem {
+public class ExecutorConfigItem extends AbstractAsyncConfigItem
+{
 
     /**
      * 线程池初始化个数

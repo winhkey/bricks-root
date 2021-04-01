@@ -22,7 +22,8 @@ package org.bricks.async.work.service;
  * @author fuzy
  *
  */
-public interface BrickJobService {
+public interface BrickJobService
+{
 
     /**
      * 执行

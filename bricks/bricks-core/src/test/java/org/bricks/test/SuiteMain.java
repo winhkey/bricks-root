@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ObjectUtilsTest.class, ValidationUtilsTest.class, FunctionUtilsTest.class})
-public class SuiteMain {
+public class SuiteMain
+{
 
 }

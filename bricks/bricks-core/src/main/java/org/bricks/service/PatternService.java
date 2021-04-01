@@ -40,7 +40,8 @@ import lombok.Setter;
 @Getter
 @Service
 @ConfigurationProperties(prefix = "bricks.pattern")
-public class PatternService {
+public class PatternService
+{
 
     /**
      * 正则缓存
@@ -56,8 +57,10 @@ public class PatternService {
      * 初始化加载配置
      */
     @PostConstruct
-    public void init() {
-        if (isNotEmpty(patternMap)) {
+    public void init()
+    {
+        if (isNotEmpty(patternMap))
+        {
             patternMap.forEach((key, value) -> PATTERN_MAP.put(key, Pattern.compile(value)));
         }
     }
@@ -68,7 +71,8 @@ public class PatternService {
      * @param id id
      * @return 正则对象
      */
-    public Pattern loadPatternById(String id) {
+    public Pattern loadPatternById(String id)
+    {
         return PATTERN_MAP.get(id);
     }
 

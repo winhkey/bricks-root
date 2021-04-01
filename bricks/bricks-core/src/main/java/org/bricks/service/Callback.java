@@ -25,7 +25,8 @@ package org.bricks.service;
  * @param <R> 响应
  */
 @FunctionalInterface
-public interface Callback<P, R> {
+public interface Callback<P, R>
+{
 
     /**
      * 回调

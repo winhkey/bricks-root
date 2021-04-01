@@ -28,7 +28,8 @@ import java.util.Map;
  *
  * @param <T> 实体类型
  */
-public interface ExcelService<T> {
+public interface ExcelService<T>
+{
 
     /**
      * 从流导入excel

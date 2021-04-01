@@ -33,7 +33,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class TaskRequest extends AbstractBean {
+public class TaskRequest extends AbstractBean
+{
 
     /**
      * task列表（bean Id）

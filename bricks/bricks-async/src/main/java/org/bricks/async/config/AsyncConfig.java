@@ -44,7 +44,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @Configuration
 @EnableAsync
 @EnableScheduling
-public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingConfigurer {
+public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingConfigurer
+{
 
     /**
      * 异步配置加载
@@ -56,14 +57,16 @@ public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingCon
      * @return 线程池
      */
     @Bean(destroyMethod = "shutdown")
-    public ThreadPoolTaskExecutor executor() {
+    public ThreadPoolTaskExecutor executor()
+    {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         ExecutorConfigItem item = asyncItemService.getExecutor();
         executor.setCorePoolSize(item.getCorePoolSize());
         executor.setMaxPoolSize(item.getMaxPoolSize());
         executor.setQueueCapacity(item.getQueueCapacity());
         String threadNamePrefix = item.getThreadNamePrefix();
-        if (isNotBlank(threadNamePrefix)) {
+        if (isNotBlank(threadNamePrefix))
+        {
             executor.setThreadNamePrefix(threadNamePrefix.concat("-"));
         }
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
@@ -75,12 +78,14 @@ public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingCon
      * @return 任务池
      */
     @Bean(destroyMethod = "shutdown")
-    public ThreadPoolTaskScheduler scheduler() {
+    public ThreadPoolTaskScheduler scheduler()
+    {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         SchedulerConfigItem item = asyncItemService.getScheduler();
         scheduler.setPoolSize(item.getMaxPoolSize());
         String taskNamePrefix = item.getThreadNamePrefix();
-        if (isNotBlank(taskNamePrefix)) {
+        if (isNotBlank(taskNamePrefix))
+        {
             scheduler.setThreadNamePrefix(taskNamePrefix.concat("-"));
         }
         scheduler.setAwaitTerminationSeconds(item.getAwaitTerminationSeconds());
@@ -91,7 +96,8 @@ public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingCon
     }
 
     @Override
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar)
+    {
         taskRegistrar.setScheduler(scheduler());
     }
 

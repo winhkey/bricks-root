@@ -16,7 +16,7 @@
 
 package org.bricks.data.json;
 
-import static org.bricks.data.utils.JacksonJsonUtils.createJsonMapper;
+import static org.bricks.data.utils.JacksonUtils.createJsonMapper;
 
 import javax.annotation.PostConstruct;
 
@@ -29,13 +29,15 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service("jacksonJsonService")
-public class JacksonJsonServiceImpl extends AbstractJacksonService implements JsonDataService {
+public class JacksonJsonServiceImpl extends AbstractJacksonService implements JsonDataService
+{
 
     /**
      * 初始化
      */
     @PostConstruct
-    public void init() {
+    public void init()
+    {
         objectMapper = createJsonMapper();
     }
 

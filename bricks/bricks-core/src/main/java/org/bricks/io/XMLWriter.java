@@ -27,7 +27,8 @@ import org.dom4j.io.OutputFormat;
  * @author fuzy
  *
  */
-public class XMLWriter extends org.dom4j.io.XMLWriter implements Closeable {
+public class XMLWriter extends org.dom4j.io.XMLWriter implements Closeable
+{
 
     /**
      * 构造方法
@@ -35,7 +36,8 @@ public class XMLWriter extends org.dom4j.io.XMLWriter implements Closeable {
      * @param writer writer
      * @param format format
      */
-    public XMLWriter(BufferedWriter writer, OutputFormat format) {
+    public XMLWriter(BufferedWriter writer, OutputFormat format)
+    {
         super(writer, format);
     }
 

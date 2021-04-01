@@ -23,7 +23,8 @@ package org.bricks.async.work.task;
  *
  * @param <T> 任务参数
  */
-public interface BrickTask<T> {
+public interface BrickTask<T>
+{
 
     /**
      * 业务

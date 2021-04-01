@@ -17,12 +17,12 @@
 package org.bricks.service;
 
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static org.bricks.utils.FunctionUtils.accept;
 import static java.lang.reflect.Array.get;
 import static java.lang.reflect.Array.getLength;
 import static java.util.stream.IntStream.range;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.bricks.utils.FunctionUtils.accept;
 
 import java.util.Collection;
 import java.util.Map;
@@ -34,14 +34,16 @@ import java.util.function.Consumer;
  * @author fuzy
  *
  */
-public abstract class AbstractConsumerService {
+public abstract class AbstractConsumerService
+{
 
     /**
      * 根据不同类型构造消费者map再调用accept方法, 默认包含null 数组 集合 map接口
      *
      * @param object 对象
      */
-    public void consumer(Object object) {
+    public void consumer(Object object)
+    {
         Map<Class<?>, Consumer<Object>> consumerMap = newLinkedHashMap();
         consumerMap.put(Void.class, o -> nullConsumer());
         consumerMap.put(Object[].class, this::arrayConsumer);
@@ -56,7 +58,8 @@ public abstract class AbstractConsumerService {
      *
      * @param object 数组对象
      */
-    protected void arrayConsumer(Object object) {
+    protected void arrayConsumer(Object object)
+    {
         int n = getLength(object);
         if (n > 0)
         {
@@ -70,7 +73,8 @@ public abstract class AbstractConsumerService {
      * @param n 数组个数
      * @param object 数组对象
      */
-    protected void arrayConsumer(int n, Object object) {
+    protected void arrayConsumer(int n, Object object)
+    {
         range(0, n).forEach(i -> elementConsumer(i, get(object, i)));
     }
 
@@ -79,9 +83,11 @@ public abstract class AbstractConsumerService {
      *
      * @param object 集合对象
      */
-    protected void collectionConsumer(Object object) {
+    protected void collectionConsumer(Object object)
+    {
         Collection<?> collection = (Collection<?>) object;
-        if (isNotEmpty(collection)) {
+        if (isNotEmpty(collection))
+        {
             collectionConsumer(collection);
         }
     }
@@ -91,7 +97,8 @@ public abstract class AbstractConsumerService {
      *
      * @param collection 集合
      */
-    protected void collectionConsumer(Collection<?> collection) {
+    protected void collectionConsumer(Collection<?> collection)
+    {
         collection.forEach(this::elementConsumer);
     }
 
@@ -100,9 +107,11 @@ public abstract class AbstractConsumerService {
      *
      * @param object map对象
      */
-    protected void mapConsumer(Object object) {
+    protected void mapConsumer(Object object)
+    {
         Map<?, ?> map = (Map<?, ?>) object;
-        if (isNotEmpty(map)) {
+        if (isNotEmpty(map))
+        {
             mapConsumer(map);
         }
     }
@@ -112,7 +121,8 @@ public abstract class AbstractConsumerService {
      *
      * @param map map
      */
-    protected void mapConsumer(Map<?, ?> map) {
+    protected void mapConsumer(Map<?, ?> map)
+    {
         map.forEach(this::entryConsumer);
     }
 

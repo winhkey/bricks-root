@@ -22,7 +22,8 @@ package org.bricks.module.enums;
  * @author fuzy
  *
  */
-public enum DataType {
+public enum DataType
+{
 
     /**
      * boolean

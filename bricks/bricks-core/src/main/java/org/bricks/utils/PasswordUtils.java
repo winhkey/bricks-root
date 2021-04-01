@@ -28,7 +28,8 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class PasswordUtils {
+public class PasswordUtils
+{
 
     /**
      * 密码加密
@@ -36,7 +37,8 @@ public class PasswordUtils {
      * @param password 明文
      * @return 密文
      */
-    public static String encodePassword(String password) {
+    public static String encodePassword(String password)
+    {
         return encodePassword(password, randomString(16));
     }
 
@@ -47,8 +49,9 @@ public class PasswordUtils {
      * @param salt 盐
      * @return 密文
      */
-    public static String encodePassword(String password, String salt) {
-        String md5 = getMD5String(password.concat(salt));
+    public static String encodePassword(String password, String salt)
+    {
+        String md5 = getMD5String(password.concat(salt), false);
         char[] cs = new char[48];
         for (int i = 0; i < 48; i += 3)
         {
@@ -67,7 +70,8 @@ public class PasswordUtils {
      * @param storedPassword 存储的密码
      * @return 是否匹配
      */
-    public static boolean verify(String inputPassword, String storedPassword) {
+    public static boolean verify(String inputPassword, String storedPassword)
+    {
         char[] cs1 = new char[32];
         char[] cs2 = new char[16];
         for (int i = 0; i < 48; i += 3)
@@ -77,7 +81,7 @@ public class PasswordUtils {
             cs2[i / 3] = storedPassword.charAt(i + 1);
         }
         String salt = new String(cs2);
-        return getMD5String(inputPassword.concat(salt)).equals(new String(cs1));
+        return getMD5String(inputPassword.concat(salt), false).equals(new String(cs1));
     }
 
 }

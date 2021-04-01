@@ -38,7 +38,8 @@ import org.springframework.data.domain.Sort.Order;
  * @param <T> 实体类型
  * @param <I> ID类型
  */
-public interface EntityService<T, I> {
+public interface EntityService<T, I>
+{
 
     /**
      * 错误描述
@@ -112,7 +113,8 @@ public interface EntityService<T, I> {
      * @param orders 排序字段
      * @return 单条记录
      */
-    default T findOne(Map<String, Object> condition, boolean clear, Order... orders) {
+    default T findOne(Map<String, Object> condition, boolean clear, Order... orders)
+    {
         return findOne(condition, clear, emptyList(), orders);
     }
 
@@ -154,7 +156,8 @@ public interface EntityService<T, I> {
      * @param orders 排序字段
      * @return 列表
      */
-    default List<T> findAll(Map<String, Object> condition, boolean clear, Order... orders) {
+    default List<T> findAll(Map<String, Object> condition, boolean clear, Order... orders)
+    {
         return findAll(condition, clear, emptyList(), orders);
     }
 
@@ -175,7 +178,8 @@ public interface EntityService<T, I> {
      * @param pageable 分页
      * @return 列表
      */
-    default Page<T> findPage(Pageable pageable) {
+    default Page<T> findPage(Pageable pageable)
+    {
         return findPage(emptyMap(), false, emptyList(), pageable);
     }
 
@@ -198,7 +202,8 @@ public interface EntityService<T, I> {
      * @param pageable 分页
      * @return 列表
      */
-    default Page<T> findPage(Map<String, Object> condition, boolean clear, Pageable pageable) {
+    default Page<T> findPage(Map<String, Object> condition, boolean clear, Pageable pageable)
+    {
         return findPage(condition, clear, emptyList(), pageable);
     }
 

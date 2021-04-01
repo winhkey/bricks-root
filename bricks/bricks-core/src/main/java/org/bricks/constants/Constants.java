@@ -9,12 +9,14 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class Constants {
+public class Constants
+{
 
     /**
      * 数字常量
      */
-    public static final class NumberConstants {
+    public static final class NumberConstants
+    {
 
         /**
          * 0
@@ -61,7 +63,8 @@ public class Constants {
     /**
      * 时间格式
      */
-    public static final class FormatConstants {
+    public static final class FormatConstants
+    {
 
         /**
          * yyyy-MM-dd HH:mm:ss
@@ -83,7 +86,8 @@ public class Constants {
     /**
      * 网络常量
      */
-    public static final class NetworkConstants {
+    public static final class NetworkConstants
+    {
 
         /**
          * 本机地址

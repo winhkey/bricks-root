@@ -25,7 +25,8 @@ package org.bricks.function;
  * @param <E> 异常
  */
 @FunctionalInterface
-public interface ThrowableSupplier<T, E extends Throwable> {
+public interface ThrowableSupplier<T, E extends Throwable>
+{
 
     /**
      * 获取

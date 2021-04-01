@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * @author fuzy
  *
  */
-public abstract class AbstractThread implements Runnable {
+public abstract class AbstractThread implements Runnable
+{
 
     /**
      * 日志
@@ -33,10 +34,14 @@ public abstract class AbstractThread implements Runnable {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void run() {
-        try {
+    public void run()
+    {
+        try
+        {
             doRun();
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             log.error(e.getMessage(), e);
         }
     }

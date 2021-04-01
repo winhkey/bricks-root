@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> 任务参数
  */
-public abstract class AbstractBrickTask<T> implements BrickTask<T> {
+public abstract class AbstractBrickTask<T> implements BrickTask<T>
+{
 
     /**
      * 日志
@@ -53,18 +54,23 @@ public abstract class AbstractBrickTask<T> implements BrickTask<T> {
     protected JsonDataService jsonDataService;
 
     @Override
-    public void task(T target) {
+    public void task(T target)
+    {
         String taskClass = getClass().getSimpleName();
         String key = format("{0}_{1}", taskClass, jsonDataService.output(target));
         String running = RUNNING_MAP.get(key);
-        if (running != null) {
+        if (running != null)
+        {
             log.debug("Task {} is still running, wait for the next time.", key);
             return;
         }
         RUNNING_MAP.put(key, "");
-        try {
+        try
+        {
             doTask(target);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             log.error(e.getMessage(), e);
         }
         RUNNING_MAP.remove(key);
@@ -76,7 +82,8 @@ public abstract class AbstractBrickTask<T> implements BrickTask<T> {
      * @param condition 查询条件
      * @param paramMap 任务参数
      */
-    protected void buildCondition(Map<String, Object> condition, Map<String, Object> paramMap) {
+    protected void buildCondition(Map<String, Object> condition, Map<String, Object> paramMap)
+    {
 
     }
 

@@ -40,7 +40,8 @@ import lombok.experimental.UtilityClass;
  * 
  */
 @UtilityClass
-public class FunctionUtils {
+public class FunctionUtils
+{
 
     /**
      * 处理对象
@@ -50,17 +51,26 @@ public class FunctionUtils {
      */
     public static void accept(Object object, Map<Class<?>, Consumer<Object>> consumerMap)
     {
-        if (isNotEmpty(consumerMap)) {
-            if (object == null) {
+        if (isNotEmpty(consumerMap))
+        {
+            if (object == null)
+            {
                 ofNullable(consumerMap.get(Void.class)).ifPresent(consumer -> consumer.accept(null));
-            } else if (object.getClass().isArray()) {
+            }
+            else if (object.getClass()
+                    .isArray())
+            {
                 ofNullable(consumerMap.get(Object[].class)).ifPresent(consumer -> consumer.accept(object));
-            } else {
+            }
+            else
+            {
                 consumerMap.entrySet()
                         .stream()
-                        .filter(entry -> entry.getKey().isInstance(object))
+                        .filter(entry -> entry.getKey()
+                                .isInstance(object))
                         .findFirst()
-                        .ifPresent(entry -> entry.getValue().accept(object));
+                        .ifPresent(entry -> entry.getValue()
+                                .accept(object));
             }
         }
     }
@@ -69,18 +79,23 @@ public class FunctionUtils {
      * 处理异常的consumer
      *
      * @param throwableConsumer 抛异常的consumer
-     * @param catchConsumer     出现异常后执行的consumer
-     * @param logger            日志对象
+     * @param catchConsumer 出现异常后执行的consumer
+     * @param logger 日志对象
      * @param exceptionFunction 异常转换
-     * @param <T>               入参
+     * @param <T> 入参
      * @return consumer
      */
     public static <T> Consumer<T> accept(ThrowableConsumer<T, Throwable> throwableConsumer, Consumer<T> catchConsumer,
-                                         Logger logger, Function<Throwable, RuntimeException> exceptionFunction) {
-        return t -> {
-            try {
+            Logger logger, Function<Throwable, RuntimeException> exceptionFunction)
+    {
+        return t ->
+        {
+            try
+            {
                 throwableConsumer.accept(t);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 ofNullable(catchConsumer).ifPresent(c -> c.accept(t));
                 handle(e, logger, exceptionFunction);
             }
@@ -91,18 +106,23 @@ public class FunctionUtils {
      * 处理异常的Supplier
      *
      * @param throwableSupplier 抛异常的Supplier
-     * @param logger            日志对象
+     * @param logger 日志对象
      * @param exceptionFunction 异常转换
-     * @param <T>               入参
+     * @param <T> 入参
      * @return Supplier
      */
     public static <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Logger logger,
-                                      Function<Throwable, RuntimeException> exceptionFunction) {
-        return () -> {
+            Function<Throwable, RuntimeException> exceptionFunction)
+    {
+        return () ->
+        {
             T t = null;
-            try {
+            try
+            {
                 t = throwableSupplier.get();
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 handle(e, logger, exceptionFunction);
             }
             return t;
@@ -113,18 +133,23 @@ public class FunctionUtils {
      * 处理异常的Predicate
      *
      * @param throwablePredicate 抛异常的Predicate
-     * @param logger             日志对象
-     * @param exceptionFunction  异常转换
-     * @param <T>                入参
+     * @param logger 日志对象
+     * @param exceptionFunction 异常转换
+     * @param <T> 入参
      * @return Predicate
      */
     public static <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Logger logger,
-                                        Function<Throwable, RuntimeException> exceptionFunction) {
-        return t -> {
+            Function<Throwable, RuntimeException> exceptionFunction)
+    {
+        return t ->
+        {
             boolean result = false;
-            try {
+            try
+            {
                 result = throwablePredicate.test(t);
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 handle(e, logger, exceptionFunction);
             }
             return result;
@@ -135,30 +160,38 @@ public class FunctionUtils {
      * 处理异常的Function
      *
      * @param throwableFunction 抛异常的Function
-     * @param catchFunction     出现异常后执行的function
-     * @param logger            日志对象
+     * @param catchFunction 出现异常后执行的function
+     * @param logger 日志对象
      * @param exceptionFunction 异常转换
-     * @param <T>               入参
-     * @param <R>               结果
+     * @param <T> 入参
+     * @param <R> 结果
      * @return Function
      */
     public static <T, R> Function<T, R> apply(ThrowableFunction<T, R, Throwable> throwableFunction,
-                                              Function<T, R> catchFunction, Logger logger, Function<Throwable, RuntimeException> exceptionFunction) {
-        return t -> {
+            Function<T, R> catchFunction, Logger logger, Function<Throwable, RuntimeException> exceptionFunction)
+    {
+        return t ->
+        {
             R r;
-            try {
+            try
+            {
                 r = throwableFunction.apply(t);
-            } catch (Throwable e) {
-                r = ofNullable(catchFunction).map(f -> f.apply(t)).orElse(null);
+            }
+            catch (Throwable e)
+            {
+                r = ofNullable(catchFunction).map(f -> f.apply(t))
+                        .orElse(null);
                 handle(e, logger, exceptionFunction);
             }
             return r;
         };
     }
 
-    private static void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function) {
+    private static void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function)
+    {
         ofNullable(logger).ifPresent(log -> log.error(e.getMessage(), e));
-        if (function != null) {
+        if (function != null)
+        {
             throw function.apply(e);
         }
     }

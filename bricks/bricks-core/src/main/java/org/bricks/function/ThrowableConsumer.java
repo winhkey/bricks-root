@@ -25,7 +25,8 @@ package org.bricks.function;
  * @param <E> 异常
  */
 @FunctionalInterface
-public interface ThrowableConsumer<T, E extends Throwable> {
+public interface ThrowableConsumer<T, E extends Throwable>
+{
 
     /**
      * 消费

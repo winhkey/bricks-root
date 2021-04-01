@@ -26,7 +26,8 @@ package org.bricks.function;
  * @param <E> 异常
  */
 @FunctionalInterface
-public interface ThrowableFunction<T, R, E extends Throwable> {
+public interface ThrowableFunction<T, R, E extends Throwable>
+{
 
     /**
      * 操作

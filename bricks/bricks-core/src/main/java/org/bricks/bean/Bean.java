@@ -22,5 +22,6 @@ package org.bricks.bean;
  * @author fuzy
  * 
  */
-public interface Bean {
+public interface Bean
+{
 }

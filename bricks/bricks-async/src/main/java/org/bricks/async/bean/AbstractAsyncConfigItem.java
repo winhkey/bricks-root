@@ -33,7 +33,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public abstract class AbstractAsyncConfigItem extends AbstractBean {
+public abstract class AbstractAsyncConfigItem extends AbstractBean
+{
 
     /**
      * 线程池最大容量

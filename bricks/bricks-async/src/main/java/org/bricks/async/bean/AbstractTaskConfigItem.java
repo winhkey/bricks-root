@@ -33,7 +33,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public abstract class AbstractTaskConfigItem extends AbstractBean {
+public abstract class AbstractTaskConfigItem extends AbstractBean
+{
 
     /**
      * 最大任务池

@@ -30,13 +30,15 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service("jacksonXmlService")
-public class JacksonXmlServiceImpl extends AbstractJacksonService implements XmlDataService {
+public class JacksonXmlServiceImpl extends AbstractJacksonService implements XmlDataService
+{
 
     /**
      * 初始化
      */
     @PostConstruct
-    public void init() {
+    public void init()
+    {
         objectMapper = createXmlMapper();
     }
 

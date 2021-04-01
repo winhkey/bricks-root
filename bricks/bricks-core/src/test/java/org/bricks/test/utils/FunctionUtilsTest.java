@@ -20,10 +20,12 @@ import static org.bricks.utils.FunctionUtils.accept;
 
 import org.junit.Test;
 
-public class FunctionUtilsTest {
+public class FunctionUtilsTest
+{
 
     @Test
-    public void testAcceptEmpty() {
+    public void testAcceptEmpty()
+    {
         accept(null, null);
     }
 

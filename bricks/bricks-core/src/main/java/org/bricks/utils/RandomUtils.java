@@ -29,7 +29,8 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class RandomUtils {
+public class RandomUtils
+{
 
     /**
      * 随机种子
@@ -57,7 +58,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    public static String randomNumber(int length) {
+    public static String randomNumber(int length)
+    {
         return random(ALL_NUMBERS, length);
     }
 
@@ -67,7 +69,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    public static String randomString(int length) {
+    public static String randomString(int length)
+    {
         return random(ALL_CHARS, length);
     }
 
@@ -77,7 +80,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    public static String randomLetter(int length) {
+    public static String randomLetter(int length)
+    {
         return random(ENGLISH_CHARS, length);
     }
 
@@ -88,7 +92,8 @@ public class RandomUtils {
      * @param length 长度
      * @return 随机串
      */
-    private static String random(String source, int length) {
+    private static String random(String source, int length)
+    {
         StringBuilder builder = new StringBuilder();
         range(0, length).forEach(i -> builder.append(source.charAt(DEFAULT_RANDOM.nextInt(source.length()))));
         return builder.toString();

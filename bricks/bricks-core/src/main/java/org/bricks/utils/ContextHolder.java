@@ -34,7 +34,8 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class ContextHolder implements ApplicationContextAware {
+public class ContextHolder implements ApplicationContextAware
+{
 
     /**
      * ApplicationContext
@@ -52,9 +53,10 @@ public class ContextHolder implements ApplicationContextAware {
      * @param beanId bean id
      * @return bean
      */
-    public static Object getBean(String beanId) {
+    public static Object getBean(String beanId)
+    {
         return ofNullable(context).map(ctx -> ctx.getBean(beanId))
-            .orElse(null);
+                .orElse(null);
     }
 
     /**
@@ -64,9 +66,10 @@ public class ContextHolder implements ApplicationContextAware {
      * @param clazz 类型
      * @return bean
      */
-    public static <T> T getBean(Class<T> clazz) {
+    public static <T> T getBean(Class<T> clazz)
+    {
         return ofNullable(context).map(ctx -> ctx.getBean(clazz))
-            .orElse(null);
+                .orElse(null);
     }
 
     /**
@@ -77,9 +80,10 @@ public class ContextHolder implements ApplicationContextAware {
      * @param <T> 类型
      * @return bean
      */
-    public static <T> T getBean(String beanId, Class<T> clazz) {
+    public static <T> T getBean(String beanId, Class<T> clazz)
+    {
         return ofNullable(context).map(apply(ctx -> ctx.getBean(beanId, clazz), null, null, null))
-            .orElse(null);
+                .orElse(null);
     }
 
     /**
@@ -88,7 +92,8 @@ public class ContextHolder implements ApplicationContextAware {
      * @param applicationContext spring环境
      */
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext)
+    {
         setContext(applicationContext);
     }
 
@@ -97,7 +102,8 @@ public class ContextHolder implements ApplicationContextAware {
      *
      * @return ApplicationContext spring环境
      */
-    public static ApplicationContext getContext() {
+    public static ApplicationContext getContext()
+    {
         return context;
     }
 
@@ -106,7 +112,8 @@ public class ContextHolder implements ApplicationContextAware {
      *
      * @param applicationContext spring环境
      */
-    public static void setContext(ApplicationContext applicationContext) {
+    public static void setContext(ApplicationContext applicationContext)
+    {
         context = applicationContext;
         environment = applicationContext.getEnvironment();
     }
@@ -114,7 +121,8 @@ public class ContextHolder implements ApplicationContextAware {
     /**
      * @return 环境
      */
-    public static Environment getEnvironment() {
+    public static Environment getEnvironment()
+    {
         return environment;
     }
 
@@ -125,7 +133,8 @@ public class ContextHolder implements ApplicationContextAware {
      * @param locale 语言
      * @return value
      */
-    public static String getMessage(String key, Locale locale) {
+    public static String getMessage(String key, Locale locale)
+    {
         return context.getMessage(key, null, null, locale);
     }
 
@@ -138,25 +147,28 @@ public class ContextHolder implements ApplicationContextAware {
      * @param locale 语言
      * @return value
      */
-    public static String getMessage(String key, Object[] args, String defaultMessage, Locale locale) {
+    public static String getMessage(String key, Object[] args, String defaultMessage, Locale locale)
+    {
         return context.getMessage(key, args, defaultMessage, locale);
     }
 
     /**
      * @return 是否windows系统
      */
-    public static boolean isWindows() {
+    public static boolean isWindows()
+    {
         return ofNullable(environment.getProperty("os.name")).map(osName -> osName.contains("Windows"))
-            .orElse(false);
+                .orElse(false);
     }
 
     /**
      * @return 是否unix系统
      */
-    public static boolean isUnix() {
+    public static boolean isUnix()
+    {
         return ofNullable(environment.getProperty("os.name"))
-            .map(osName -> osName.contains("unix") || osName.contains("linux") || osName.contains("Mac OS X"))
-            .orElse(false);
+                .map(osName -> osName.contains("unix") || osName.contains("linux") || osName.contains("Mac OS X"))
+                .orElse(false);
     }
 
 }

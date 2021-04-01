@@ -36,7 +36,8 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class AsyncService {
+public class AsyncService
+{
 
     /**
      * 线程池
@@ -53,7 +54,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果列表
      */
-    public <T, V> List<V> asyncList(Collection<T> collection, Callback<T, V> callback) {
+    public <T, V> List<V> asyncList(Collection<T> collection, Callback<T, V> callback)
+    {
         return futureStream(collection, callback).map(CompletableFuture::join)
                 .collect(toList());
     }
@@ -67,7 +69,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果
      */
-    public <T, V> V async(T t, Callback<T, V> callback) {
+    public <T, V> V async(T t, Callback<T, V> callback)
+    {
         return future(t, callback).join();
     }
 
@@ -80,7 +83,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果
      */
-    public <T, V> CompletableFuture<V> future(T t, Callback<T, V> callback) {
+    public <T, V> CompletableFuture<V> future(T t, Callback<T, V> callback)
+    {
         return CompletableFuture.supplyAsync(() -> callback.call(t), executor);
     }
 
@@ -93,7 +97,8 @@ public class AsyncService {
      * @param callback 回调
      * @return 结果流
      */
-    public <T, V> Stream<CompletableFuture<V>> futureStream(Collection<T> collection, Callback<T, V> callback) {
+    public <T, V> Stream<CompletableFuture<V>> futureStream(Collection<T> collection, Callback<T, V> callback)
+    {
         return collection.stream()
                 .map(t -> future(t, callback))
                 .collect(toList())

@@ -25,7 +25,8 @@ import java.io.Serializable;
  *
  * @param <I> ID类型
  */
-public interface Entity<I extends Serializable> extends Serializable {
+public interface Entity<I extends Serializable> extends Serializable
+{
 
     /**
      * 获取主键

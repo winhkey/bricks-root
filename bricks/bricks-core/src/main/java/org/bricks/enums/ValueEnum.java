@@ -23,7 +23,8 @@ package org.bricks.enums;
  *
  * @param <T>
  */
-public interface ValueEnum<T> {
+public interface ValueEnum<T>
+{
 
     /**
      * @return 枚举值

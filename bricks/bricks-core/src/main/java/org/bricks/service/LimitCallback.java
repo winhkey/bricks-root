@@ -30,7 +30,8 @@ import org.springframework.stereotype.Service;
  * @author fuzy
  */
 @Service
-public class LimitCallback {
+public class LimitCallback
+{
 
     /**
      *
@@ -41,25 +42,32 @@ public class LimitCallback {
      * @param <V> 目标
      * @return 列表
      */
-    public <T, V> List<V> limit(Collection<T> collection, int limit, Callback<List<T>, List<V>> callback) {
+    public <T, V> List<V> limit(Collection<T> collection, int limit, Callback<List<T>, List<V>> callback)
+    {
         List<V> vList = newArrayList();
-        if (isNotEmpty(collection)) {
+        if (isNotEmpty(collection))
+        {
             List<T> list = newArrayList(collection);
             int length = collection.size();
             int page = length / limit;
             int mod = length % limit;
             int i = 0;
             List<V> subList;
-            try {
-                for (; i < page; i++) {
+            try
+            {
+                for (; i < page; i++)
+                {
                     subList = callback.call(list.subList(i * limit, (i + 1) * limit));
                     addSubList(vList, subList);
                 }
-                if (mod > 0) {
+                if (mod > 0)
+                {
                     subList = callback.call(list.subList(i * limit, length));
                     addSubList(vList, subList);
                 }
-            } finally {
+            }
+            finally
+            {
                 list.clear();
             }
         }
@@ -73,8 +81,10 @@ public class LimitCallback {
      * @param subList 子列表
      * @param <V> 目标类型
      */
-    private <V> void addSubList(List<V> list, List<V> subList) {
-        if (isNotEmpty(subList)) {
+    private <V> void addSubList(List<V> list, List<V> subList)
+    {
+        if (isNotEmpty(subList))
+        {
             list.addAll(subList);
         }
     }

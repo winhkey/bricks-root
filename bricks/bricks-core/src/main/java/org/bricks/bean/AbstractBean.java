@@ -25,10 +25,12 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  * @author fuzy
  * 
  */
-public class AbstractBean implements Bean {
+public class AbstractBean implements Bean
+{
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return reflectionToString(this, SHORT_PREFIX_STYLE);
     }
 

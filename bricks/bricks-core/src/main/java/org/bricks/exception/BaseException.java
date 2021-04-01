@@ -28,7 +28,8 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public class BaseException extends RuntimeException {
+public class BaseException extends RuntimeException
+{
 
     private static final long serialVersionUID = 1L;
 
@@ -40,7 +41,8 @@ public class BaseException extends RuntimeException {
     /**
      * 默认构造
      */
-    public BaseException() {
+    public BaseException()
+    {
         super();
     }
 
@@ -49,7 +51,8 @@ public class BaseException extends RuntimeException {
      *
      * @param errorCode 错误码
      */
-    public BaseException(String errorCode) {
+    public BaseException(String errorCode)
+    {
         super(errorCode);
         this.errorCode = errorCode;
     }
@@ -58,10 +61,11 @@ public class BaseException extends RuntimeException {
      * 构造方法
      *
      * @param errorCode 错误码
-     * @param pattern   描述
-     * @param args      参数
+     * @param pattern 描述
+     * @param args 参数
      */
-    public BaseException(String errorCode, String pattern, Object... args) {
+    public BaseException(String errorCode, String pattern, Object... args)
+    {
         super(format(pattern, args));
         this.errorCode = errorCode;
     }
@@ -71,17 +75,19 @@ public class BaseException extends RuntimeException {
      *
      * @param t 异常
      */
-    public BaseException(Throwable t) {
+    public BaseException(Throwable t)
+    {
         super(t);
     }
 
     /**
      * 构造方法
      *
-     * @param t         异常
+     * @param t 异常
      * @param errorCode 错误码
      */
-    public BaseException(Throwable t, String errorCode) {
+    public BaseException(Throwable t, String errorCode)
+    {
         super(t);
         this.errorCode = errorCode;
     }
@@ -90,9 +96,10 @@ public class BaseException extends RuntimeException {
      * 构造方法
      *
      * @param message 描述
-     * @param t       异常
+     * @param t 异常
      */
-    public BaseException(String message, Throwable t) {
+    public BaseException(String message, Throwable t)
+    {
         super(message, t);
     }
 

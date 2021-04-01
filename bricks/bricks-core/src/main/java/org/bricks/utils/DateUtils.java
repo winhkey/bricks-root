@@ -50,7 +50,8 @@ import lombok.experimental.UtilityClass;
  *
  */
 @UtilityClass
-public class DateUtils {
+public class DateUtils
+{
 
     /**
      * 定时任务时间规则
@@ -62,7 +63,8 @@ public class DateUtils {
      */
     public static final Map<String, DateTimeFormatter> FORMAT_MAP;
 
-    static {
+    static
+    {
         FORMAT_MAP = newHashMap();
         FORMAT_MAP.put(CRON_PATTERN, ofPattern(CRON_PATTERN, US));
         FORMAT_MAP.put(DATETIME_FORMAT, ofPattern(DATETIME_FORMAT, US));
@@ -76,7 +78,8 @@ public class DateUtils {
      * @param formatter 格式字符串
      * @return 格式对象
      */
-    public static DateTimeFormatter get(String formatter) {
+    public static DateTimeFormatter get(String formatter)
+    {
         return FORMAT_MAP.get(formatter);
     }
 
@@ -87,7 +90,8 @@ public class DateUtils {
      * @param formatStr FormatStr
      * @return string.
      */
-    public static String format(LocalDateTime dateTime, String formatStr) {
+    public static String format(LocalDateTime dateTime, String formatStr)
+    {
         if (dateTime == null)
         {
             return "";
@@ -103,7 +107,8 @@ public class DateUtils {
      * @param dateTime 日期时间
      * @return 字符串
      */
-    public static String format(LocalDateTime dateTime) {
+    public static String format(LocalDateTime dateTime)
+    {
         return format(dateTime, DATETIME_FORMAT);
     }
 
@@ -114,7 +119,8 @@ public class DateUtils {
      * @param formatStr formatStr
      * @return Date.
      */
-    public static LocalDateTime parse(String dateStr, String formatStr) {
+    public static LocalDateTime parse(String dateStr, String formatStr)
+    {
         if (isEmpty(dateStr))
         {
             return null;
@@ -129,7 +135,8 @@ public class DateUtils {
      * @param dateStr 时间字符串
      * @return Date 时间对象
      */
-    public static LocalDateTime parse(String dateStr) {
+    public static LocalDateTime parse(String dateStr)
+    {
         if (isEmpty(dateStr))
         {
             return null;
@@ -145,12 +152,16 @@ public class DateUtils {
      * @param dateStr 时间字符串
      * @return 日期
      */
-    public static LocalDateTime parse(Pattern datePattern, String dateStr) {
-        return ofNullable(datePattern).map(pattern -> {
+    public static LocalDateTime parse(Pattern datePattern, String dateStr)
+    {
+        return ofNullable(datePattern).map(pattern ->
+        {
             LocalDateTime result = null;
-            if (isNotEmpty(dateStr)) {
+            if (isNotEmpty(dateStr))
+            {
                 Matcher matcher = datePattern.matcher(dateStr);
-                if (matcher.find()) {
+                if (matcher.find())
+                {
                     DateTimeFormatter formatter = getDateTimeFormatter(dateStr, matcher);
                     result = ofNullable(formatter).map(f -> LocalDateTime.parse(dateStr, formatter))
                             .orElse(null);
@@ -161,12 +172,16 @@ public class DateUtils {
                 .orElse(null);
     }
 
-    private static DateTimeFormatter getDateTimeFormatter(String dateStr, Matcher matcher) {
+    private static DateTimeFormatter getDateTimeFormatter(String dateStr, Matcher matcher)
+    {
         DateTimeFormatter formatter = null;
-        if (dateStr.equals(matcher.group(1))) {
+        if (dateStr.equals(matcher.group(1)))
+        {
             String parse = changeDate(dateStr);
             formatter = ofPattern(parse, US);
-        } else if (dateStr.equals(matcher.group(6))) {
+        }
+        else if (dateStr.equals(matcher.group(6)))
+        {
             String month = matcher.group(7);
             String parse = month == null ? dateStr : dateStr.replace(month, month.substring(0, 3));
             parse = parse.replaceFirst("(?<=\\d)st|nd|rd|th", "")
@@ -183,7 +198,8 @@ public class DateUtils {
         return formatter;
     }
 
-    private static DateTimeFormatter getDateTimeFormatter(String pattern) {
+    private static DateTimeFormatter getDateTimeFormatter(String pattern)
+    {
         return ofNullable(get(pattern)).orElseGet(() -> FORMAT_MAP.compute(pattern, (k, v) -> ofPattern(pattern, US)));
     }
 
@@ -193,7 +209,8 @@ public class DateUtils {
      * @param dateTime LocalDateTime
      * @return date
      */
-    public static Date toDate(LocalDateTime dateTime) {
+    public static Date toDate(LocalDateTime dateTime)
+    {
         return Date.from(dateTime.atZone(systemDefault())
                 .toInstant());
     }
@@ -204,7 +221,8 @@ public class DateUtils {
      * @param date LocalDate
      * @return Date
      */
-    public static Date toDate(LocalDate date) {
+    public static Date toDate(LocalDate date)
+    {
         return Date.from(date.atStartOfDay()
                 .atZone(systemDefault())
                 .toInstant());
@@ -216,7 +234,8 @@ public class DateUtils {
      * @param date Date
      * @return LocalDateTime
      */
-    public static LocalDateTime toLocalDateTime(Date date) {
+    public static LocalDateTime toLocalDateTime(Date date)
+    {
         return LocalDateTime.ofInstant(date.toInstant(), systemDefault());
     }
 
@@ -226,7 +245,8 @@ public class DateUtils {
      * @param date Date
      * @return LocalDate
      */
-    public static LocalDate toLocalDate(Date date) {
+    public static LocalDate toLocalDate(Date date)
+    {
         return toLocalDateTime(date).toLocalDate();
     }
 
@@ -236,7 +256,8 @@ public class DateUtils {
      * @param date Date
      * @return LocalTime
      */
-    public static LocalTime toLocalTime(Date date) {
+    public static LocalTime toLocalTime(Date date)
+    {
         return toLocalDateTime(date).toLocalTime();
     }
 
@@ -247,10 +268,14 @@ public class DateUtils {
      * @param dateTime2 时间2
      * @return 日期
      */
-    public static String getdras(LocalDateTime dateTime1, LocalDateTime dateTime2) {
-        if (dateTime1 == null || dateTime2 == null) {
+    public static String getdras(LocalDateTime dateTime1, LocalDateTime dateTime2)
+    {
+        if (dateTime1 == null || dateTime2 == null)
+        {
             return null;
-        } else {
+        }
+        else
+        {
             long mills = between(dateTime1, dateTime2).toMillis();
             return calculate(mills);
         }
@@ -262,22 +287,30 @@ public class DateUtils {
      * @param dras 毫秒
      * @return 相差字符串
      */
-    private static String calculate(long dras) {
+    private static String calculate(long dras)
+    {
         long daylong = DAYS.toMillis(1);
         long hourlong = HOURS.toMillis(1);
         long minulong = MINUTES.toMillis(1);
         long secodlong = SECONDS.toMillis(1);
         String result;
-        if (dras > daylong) {
+        if (dras > daylong)
+        {
             long days = dras / daylong;
             result = days + "天" + calculate(dras % daylong);
-        } else if (dras > hourlong) {
+        }
+        else if (dras > hourlong)
+        {
             long hour = dras / hourlong;
             result = hour + "小时" + calculate(dras % hourlong);
-        } else if (dras > minulong) {
+        }
+        else if (dras > minulong)
+        {
             long minu = dras / minulong;
             result = minu + "分" + calculate(dras % minulong);
-        } else {
+        }
+        else
+        {
             long second = dras / secodlong;
             result = second + "秒";
         }
@@ -290,7 +323,8 @@ public class DateUtils {
      * @param dateStr 日期字符串
      * @return 日期格式
      */
-    private static String changeDate(String dateStr) {
+    private static String changeDate(String dateStr)
+    {
         return dateStr.replaceFirst("^[\\d]{4}([^\\d])", "yyyy$1")
                 .replaceFirst("^[\\d]{2}([^\\d])", "yy$1")
                 .replaceFirst("([^\\d])[\\d]{1,2}([^\\d])", "$1MM$2")

@@ -33,7 +33,8 @@ import org.bricks.module.service.ValidateFilter;
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ExcelColumn {
+public @interface ExcelColumn
+{
 
     /**
      * @return 列序号
@@ -91,10 +92,12 @@ public @interface ExcelColumn {
      * @author fuzy
      *
      */
-    final class UselessFilter implements ValidateFilter<Object> {
+    final class UselessFilter implements ValidateFilter<Object>
+    {
 
         @Override
-        public boolean validate(Object data, TableConfig config) {
+        public boolean validate(Object data, TableConfig config)
+        {
             return false;
         }
 

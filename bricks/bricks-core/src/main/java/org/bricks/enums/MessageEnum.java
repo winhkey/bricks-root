@@ -22,7 +22,8 @@ package org.bricks.enums;
  * @author fuzy
  *
  */
-public interface MessageEnum {
+public interface MessageEnum
+{
 
     /**
      * @return 返回码

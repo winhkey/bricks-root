@@ -26,7 +26,8 @@ import java.util.Collection;
  * @param <T> 实体类型
  * @param <I> ID类型
  */
-public interface LogicDeleteEntityService<T, I> extends EntityService<T, I> {
+public interface LogicDeleteEntityService<T, I> extends EntityService<T, I>
+{
 
     /**
      * 逻辑删除

@@ -28,7 +28,8 @@ import org.springframework.context.ApplicationListener;
  *
  */
 @SpringBootApplication
-public abstract class AbstractApplication {
+public abstract class AbstractApplication
+{
 
     /**
      * 添加监听器
@@ -37,7 +38,9 @@ public abstract class AbstractApplication {
      * @param listeners 监听器列表
      * @return 应用
      */
-    protected static SpringApplication addListeners(SpringApplication application, final ApplicationListener<?>... listeners) {
+    protected static SpringApplication addListeners(SpringApplication application,
+            final ApplicationListener<?>... listeners)
+    {
         application.addListeners(listeners);
         application.addListeners(new Log4j2ApplicationListener());
         return application;

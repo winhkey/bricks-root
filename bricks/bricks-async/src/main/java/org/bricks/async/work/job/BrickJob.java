@@ -25,7 +25,8 @@ import org.bricks.async.work.service.BrickJobService;
  *
  * @param <R> 任务接口
  */
-public interface BrickJob<R extends BrickJobService> {
+public interface BrickJob<R extends BrickJobService>
+{
 
     /**
      * 执行

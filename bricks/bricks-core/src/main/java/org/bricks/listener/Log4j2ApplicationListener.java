@@ -43,7 +43,8 @@ import org.springframework.core.env.Environment;
  *
  * @author fuzy
  */
-public class Log4j2ApplicationListener implements GenericApplicationListener {
+public class Log4j2ApplicationListener implements GenericApplicationListener
+{
 
     /**
      * 排序
@@ -53,7 +54,9 @@ public class Log4j2ApplicationListener implements GenericApplicationListener {
     /**
      * 事件类型数组
      */
-    private static final Class<?>[] EVENT_TYPES = {ApplicationStartingEvent.class, ApplicationEnvironmentPreparedEvent.class, ApplicationPreparedEvent.class, ContextClosedEvent.class, ApplicationFailedEvent.class};
+    private static final Class<?>[] EVENT_TYPES = {ApplicationStartingEvent.class,
+            ApplicationEnvironmentPreparedEvent.class, ApplicationPreparedEvent.class, ContextClosedEvent.class,
+            ApplicationFailedEvent.class};
 
     /**
      * 源类型数组
@@ -61,44 +64,57 @@ public class Log4j2ApplicationListener implements GenericApplicationListener {
     private static final Class<?>[] SOURCE_TYPES = {SpringApplication.class, ApplicationContext.class};
 
     @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ApplicationEnvironmentPreparedEvent) {
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ApplicationEnvironmentPreparedEvent)
+        {
             onApplicationEvent((ApplicationEnvironmentPreparedEvent) event);
         }
     }
 
-    private void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
+    private void onApplicationEvent(ApplicationEnvironmentPreparedEvent event)
+    {
         ConfigurableEnvironment environment = event.getEnvironment();
-        String path = format("{0}/{1}/{2}", environment.getProperty("spring.application.name"), getIp(environment), environment.getProperty("server.port"));
+        String path = format("{0}/{1}/{2}", environment.getProperty("spring.application.name"), getIp(environment),
+                environment.getProperty("server.port"));
         MDC.put("app", path);
     }
 
     @Override
-    public int getOrder() {
+    public int getOrder()
+    {
         return DEFAULT_ORDER;
     }
 
     @Override
-    public boolean supportsEventType(ResolvableType resolvableType) {
+    public boolean supportsEventType(ResolvableType resolvableType)
+    {
         return isAssignableFrom(resolvableType.getRawClass(), EVENT_TYPES);
     }
 
     @Override
-    public boolean supportsSourceType(Class<?> sourceType) {
+    public boolean supportsSourceType(Class<?> sourceType)
+    {
         return isAssignableFrom(sourceType, SOURCE_TYPES);
     }
 
-    private boolean isAssignableFrom(Class<?> type, Class<?>... supportedTypes) {
+    private boolean isAssignableFrom(Class<?> type, Class<?>... supportedTypes)
+    {
         return of(supportedTypes).anyMatch(supportedType -> supportedType.isAssignableFrom(type));
     }
 
-    private String getIp(Environment environment) {
+    private String getIp(Environment environment)
+    {
         String ip = environment.getProperty("eureka.local");
-        if (isBlank(ip)) {
-            try {
+        if (isBlank(ip))
+        {
+            try
+            {
                 InetAddress address = InetAddress.getLocalHost();
                 ip = address.getHostAddress();
-            } catch (UnknownHostException e) {
+            }
+            catch (UnknownHostException e)
+            {
                 ip = "";
             }
         }

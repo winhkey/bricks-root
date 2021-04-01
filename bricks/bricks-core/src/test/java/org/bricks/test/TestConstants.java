@@ -17,6 +17,7 @@
 package org.bricks.test;
 
 import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
 import org.bricks.enums.ValueEnum;
@@ -29,12 +30,14 @@ import lombok.experimental.Accessors;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class TestConstants {
+public class TestConstants
+{
 
     @Setter
     @Getter
     @Accessors(chain = true)
-    public static class Parent implements Serializable {
+    public static class Parent implements Serializable
+    {
 
         private static final long serialVersionUID = 1L;
 
@@ -52,7 +55,8 @@ public class TestConstants {
 
     @Setter
     @Getter
-    public static class Child extends Parent {
+    public static class Child extends Parent
+    {
 
         private static final long serialVersionUID = 1L;
 
@@ -60,7 +64,8 @@ public class TestConstants {
 
     @Getter
     @AllArgsConstructor
-    public enum Color implements ValueEnum<Integer> {
+    public enum Color implements ValueEnum<Integer>
+    {
 
         RED(0);
 

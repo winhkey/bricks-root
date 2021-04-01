@@ -38,7 +38,8 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @Component
 @ConfigurationProperties(prefix = "brick.async")
-public class AsyncItemService {
+public class AsyncItemService
+{
 
     /**
      * 线程池配置
