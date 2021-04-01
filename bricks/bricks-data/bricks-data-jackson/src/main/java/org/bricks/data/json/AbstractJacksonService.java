@@ -16,17 +16,13 @@
 
 package org.bricks.data.json;
 
-import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
-import static org.bricks.constants.Constants.NumberConstants.NUMBER_1;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.stream.IntStream;
 
 import org.bricks.annotation.NoLog;
+import org.bricks.data.utils.JacksonUtils;
 import org.bricks.exception.BaseException;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -113,38 +109,12 @@ public abstract class AbstractJacksonService extends AbstractJsonDataService
     /**
      * java类型转JavaType
      *
-     * @param type java类型
+     * @param types java类型
      * @return JavaType
      */
-    protected JavaType getJavaType(Type... type)
+    protected JavaType getJavaType(Type... types)
     {
-        JavaType javaType = null;
-        if (isNotEmpty(type))
-        {
-            if (type.length > NUMBER_1 && type[0] instanceof Class<?>)
-            {
-                javaType = getJavaType(javaType, (Class<?>) type[0]);
-            }
-            if (javaType == null)
-            {
-                javaType = objectMapper.constructType(type[0]);
-            }
-        }
-        return javaType;
-    }
-
-    private JavaType getJavaType(JavaType javaType, Class<?> rawType)
-    {
-        TypeVariable<?>[] vars = rawType.getTypeParameters();
-        if (isNotEmpty(vars))
-        {
-            JavaType[] javaTypes = new JavaType[vars.length];
-            IntStream.range(0, vars.length)
-                    .forEach(i -> javaTypes[i] = objectMapper.constructType(vars[i]));
-            return objectMapper.getTypeFactory()
-                    .constructParametricType(rawType, javaTypes);
-        }
-        return javaType;
+        return JacksonUtils.getJavaType(types[0]);
     }
 
 }
