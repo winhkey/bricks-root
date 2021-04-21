@@ -23,10 +23,10 @@ import java.util.Collection;
  *
  * @author fuzy
  *
- * @param <T> 实体类型
  * @param <I> ID类型
+ * @param <T> 实体类型
  */
-public interface LogicDeleteEntityService<T, I> extends EntityService<T, I>
+public interface LogicDeleteEntityService<I, T> extends EntityService<I, T>
 {
 
     /**
