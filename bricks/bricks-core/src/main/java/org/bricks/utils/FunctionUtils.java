@@ -20,14 +20,17 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.bricks.function.ThrowableBiFunction;
 import org.bricks.function.ThrowableConsumer;
 import org.bricks.function.ThrowableFunction;
 import org.bricks.function.ThrowablePredicate;
+import org.bricks.function.ThrowableRunnable;
 import org.bricks.function.ThrowableSupplier;
 import org.slf4j.Logger;
 
@@ -37,7 +40,7 @@ import lombok.experimental.UtilityClass;
  * 函数式处理工具
  *
  * @author fuzy
- * 
+ *
  */
 @UtilityClass
 public class FunctionUtils
@@ -80,13 +83,14 @@ public class FunctionUtils
      *
      * @param throwableConsumer 抛异常的consumer
      * @param catchConsumer 出现异常后执行的consumer
-     * @param logger 日志对象
+     * @param finallyRunnable finally执行
+     * @param log 日志对象
      * @param exceptionFunction 异常转换
      * @param <T> 入参
      * @return consumer
      */
     public static <T> Consumer<T> accept(ThrowableConsumer<T, Throwable> throwableConsumer, Consumer<T> catchConsumer,
-            Logger logger, Function<Throwable, RuntimeException> exceptionFunction)
+            Runnable finallyRunnable, Logger log, Function<Throwable, RuntimeException> exceptionFunction)
     {
         return t ->
         {
@@ -97,7 +101,11 @@ public class FunctionUtils
             catch (Throwable e)
             {
                 ofNullable(catchConsumer).ifPresent(c -> c.accept(t));
-                handle(e, logger, exceptionFunction);
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
             }
         };
     }
@@ -106,13 +114,14 @@ public class FunctionUtils
      * 处理异常的Supplier
      *
      * @param throwableSupplier 抛异常的Supplier
-     * @param logger 日志对象
+     * @param finallyRunnable finally执行
+     * @param log 日志对象
      * @param exceptionFunction 异常转换
      * @param <T> 入参
      * @return Supplier
      */
-    public static <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Logger logger,
-            Function<Throwable, RuntimeException> exceptionFunction)
+    public static <T> Supplier<T> get(ThrowableSupplier<T, Throwable> throwableSupplier, Runnable finallyRunnable,
+            Logger log, Function<Throwable, RuntimeException> exceptionFunction)
     {
         return () ->
         {
@@ -123,7 +132,11 @@ public class FunctionUtils
             }
             catch (Throwable e)
             {
-                handle(e, logger, exceptionFunction);
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
             }
             return t;
         };
@@ -133,13 +146,14 @@ public class FunctionUtils
      * 处理异常的Predicate
      *
      * @param throwablePredicate 抛异常的Predicate
-     * @param logger 日志对象
+     * @param finallyRunnable finally执行
+     * @param log 日志对象
      * @param exceptionFunction 异常转换
      * @param <T> 入参
      * @return Predicate
      */
-    public static <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Logger logger,
-            Function<Throwable, RuntimeException> exceptionFunction)
+    public static <T> Predicate<T> test(ThrowablePredicate<T, Throwable> throwablePredicate, Runnable finallyRunnable,
+            Logger log, Function<Throwable, RuntimeException> exceptionFunction)
     {
         return t ->
         {
@@ -150,7 +164,11 @@ public class FunctionUtils
             }
             catch (Throwable e)
             {
-                handle(e, logger, exceptionFunction);
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
             }
             return result;
         };
@@ -161,14 +179,16 @@ public class FunctionUtils
      *
      * @param throwableFunction 抛异常的Function
      * @param catchFunction 出现异常后执行的function
-     * @param logger 日志对象
+     * @param finallyRunnable finally执行
+     * @param log 日志对象
      * @param exceptionFunction 异常转换
      * @param <T> 入参
      * @param <R> 结果
      * @return Function
      */
     public static <T, R> Function<T, R> apply(ThrowableFunction<T, R, Throwable> throwableFunction,
-            Function<T, R> catchFunction, Logger logger, Function<Throwable, RuntimeException> exceptionFunction)
+            BiFunction<T, Throwable, R> catchFunction, Runnable finallyRunnable, Logger log,
+            Function<Throwable, RuntimeException> exceptionFunction)
     {
         return t ->
         {
@@ -179,21 +199,94 @@ public class FunctionUtils
             }
             catch (Throwable e)
             {
-                r = ofNullable(catchFunction).map(f -> f.apply(t))
+                r = ofNullable(catchFunction).map(f -> f.apply(t, e))
                         .orElse(null);
-                handle(e, logger, exceptionFunction);
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
             }
             return r;
         };
     }
 
-    private static void handle(Throwable e, Logger logger, Function<Throwable, RuntimeException> function)
+    /**
+     * 处理异常的BiFunction
+     *
+     * @param throwableFunction 抛异常的Function
+     * @param catchFunction 捕获异常后执行的function
+     * @param finallyRunnable finally执行的Runnable
+     * @param log 日志对象
+     * @param exceptionFunction 异常转换
+     * @param <T> 入参
+     * @param <U> 入参
+     * @param <R> 结果
+     * @return BiFunction
+     */
+    public static <T, U, R> BiFunction<T, U, R> apply(ThrowableBiFunction<T, U, R, Throwable> throwableFunction,
+            BiFunction<T, U, R> catchFunction, Runnable finallyRunnable, Logger log,
+            Function<Throwable, RuntimeException> exceptionFunction)
     {
-        ofNullable(logger).ifPresent(log -> log.error(e.getMessage(), e));
+        return (t, u) ->
+        {
+            R r;
+            try
+            {
+                r = throwableFunction.apply(t, u);
+            }
+            catch (Throwable e)
+            {
+                r = ofNullable(catchFunction).map(f -> f.apply(t, u))
+                        .orElse(null);
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
+            }
+            return r;
+        };
+    }
+
+    /**
+     * 处理异常的Runnable
+     *
+     * @param throwableRunnable 抛异常的Runnable
+     * @param catchRunnable 捕获异常执行的Runnable
+     * @param finallyRunnable finally执行的Runnable
+     * @param log 日志对象
+     */
+    public static void run(ThrowableRunnable<Throwable> throwableRunnable, Runnable catchRunnable,
+            Runnable finallyRunnable, Logger log)
+    {
+        try
+        {
+            throwableRunnable.run();
+        }
+        catch (Throwable e)
+        {
+            handle(catchRunnable);
+            handle(e, log, null);
+        }
+        finally
+        {
+            handle(finallyRunnable);
+        }
+    }
+
+    private static void handle(Throwable e, Logger log, Function<Throwable, RuntimeException> function)
+    {
+        ofNullable(log).ifPresent(l -> l.error(e.getMessage(), e));
         if (function != null)
         {
             throw function.apply(e);
         }
+    }
+
+    private static void handle(Runnable runnable)
+    {
+        ofNullable(runnable).ifPresent(Runnable::run);
     }
 
 }
