@@ -13,10 +13,10 @@
         <module>bricks-framework</module>
     </modules>
     <properties>
-        <spring-boot.version>2.2.9.RELEASE</spring-boot.version>
-        <spring-cloud.version>Hoxton.SR7</spring-cloud.version>
+        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
         <alibaba-cloud.version>2.2.3.RELEASE</alibaba-cloud.version>
-
+        <lombok.version>1.18.16</lombok.version>
         <org-dom4j.version>2.1.3</org-dom4j.version>
         <apache-text.version>1.6</apache-text.version>
         <apache-beanutils.version>1.9.4</apache-beanutils.version>
@@ -24,7 +24,7 @@
         <apache-io.version>2.6</apache-io.version>
         <apache-exec.version>1.3</apache-exec.version>
         <apache-upload.version>1.3.3</apache-upload.version>
-        <google-guava.version>28.1-jre</google-guava.version>
+        <google-guava.version>29.0-jre</google-guava.version>
         <kaptcha.version>2.3.2</kaptcha.version>
         <swagger2.version>2.9.2</swagger2.version>
         <jfreechart.version>1.0.19</jfreechart.version>
@@ -87,8 +87,19 @@
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
