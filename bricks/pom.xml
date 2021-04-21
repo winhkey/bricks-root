@@ -15,5 +15,6 @@
         <module>bricks-data</module>
         <module>bricks-async</module>
         <module>bricks-repository</module>
+        <module>bricks-statemachine</module>
     </modules>
 </project>

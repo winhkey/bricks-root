@@ -16,17 +16,12 @@
 
 package org.bricks.async.service;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
-import org.bricks.service.Callback;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,29 +31,15 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
-public class AsyncService
+public interface AsyncService
 {
 
     /**
-     * 线程池
-     */
-    @Resource
-    private ThreadPoolTaskExecutor executor;
-
-    /**
-     * 批量异步请求，合并结果
+     * 异步执行单个线程
      *
-     * @param <T> 请求类型
-     * @param <V> 结果类型
-     * @param collection 请求列表
-     * @param callback 回调
-     * @return 结果列表
+     * @param runnable 异步任务
      */
-    public <T, V> List<V> asyncList(Collection<T> collection, Callback<T, V> callback)
-    {
-        return futureStream(collection, callback).map(CompletableFuture::join)
-                .collect(toList());
-    }
+    void async(Runnable runnable);
 
     /**
      * 单个异步请求
@@ -67,42 +48,55 @@ public class AsyncService
      * @param <V> 结果类型
      * @param t 请求
      * @param callback 回调
+     * @param timeout 超时
+     * @param timeUnit 单位
+     * @param defaultValue 默认值
      * @return 结果
      */
-    public <T, V> V async(T t, Callback<T, V> callback)
-    {
-        return future(t, callback).join();
-    }
+    <T, V> V async(T t, Function<T, V> callback, long timeout, TimeUnit timeUnit, V defaultValue);
 
     /**
-     * 异步请求，不同步结果
+     * 一个异步请求多个结果
      *
-     * @param <T> 请求类型
-     * @param <V> 结果类型
      * @param t 请求
-     * @param callback 回调
-     * @return 结果
+     * @param list 回调列表
+     * @param <T> 请求类型
+     * @param <V> 结果类型
+     * @param timeout 超时
+     * @param timeUnit 单位
+     * @param defaultValue 默认值
+     * @return 结果列表
      */
-    public <T, V> CompletableFuture<V> future(T t, Callback<T, V> callback)
-    {
-        return CompletableFuture.supplyAsync(() -> callback.call(t), executor);
-    }
+    <T, V> List<V> async(T t, List<Function<T, V>> list, long timeout, TimeUnit timeUnit, V defaultValue);
 
     /**
-     * 异步请求，不同步结果
+     * 批量异步请求，合并结果
      *
      * @param <T> 请求类型
      * @param <V> 结果类型
-     * @param collection 请求
+     * @param collection 请求列表
      * @param callback 回调
-     * @return 结果流
+     * @param timeout 超时
+     * @param timeUnit 单位
+     * @param defaultValue 默认值
+     * @return 结果列表
      */
-    public <T, V> Stream<CompletableFuture<V>> futureStream(Collection<T> collection, Callback<T, V> callback)
-    {
-        return collection.stream()
-                .map(t -> future(t, callback))
-                .collect(toList())
-                .stream();
-    }
+    <T, V> List<V> asyncList(Collection<T> collection, Function<T, V> callback, long timeout, TimeUnit timeUnit,
+                             V defaultValue);
+
+    /**
+     * 批量异步请求，合并结果
+     *
+     * @param <T> 请求类型
+     * @param <V> 结果类型
+     * @param stream 请求流
+     * @param callback 回调
+     * @param timeout 超时
+     * @param timeUnit 单位
+     * @param defaultValue 默认值
+     * @return 结果列表
+     */
+    <T, V> List<V> asyncStream(Stream<T> stream, Function<T, V> callback, long timeout, TimeUnit timeUnit,
+                               V defaultValue);
 
 }

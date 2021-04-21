@@ -24,9 +24,11 @@ import javax.annotation.Resource;
 
 import org.bricks.async.bean.ExecutorConfigItem;
 import org.bricks.async.bean.SchedulerConfigItem;
+import org.bricks.async.service.AsyncFactory;
 import org.bricks.async.service.AsyncItemService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -35,12 +37,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 异步配置
  *
  * @author fuzy
  *
  */
+@Slf4j
 @Configuration
 @EnableAsync
 @EnableScheduling
@@ -51,26 +56,28 @@ public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingCon
      * 异步配置加载
      */
     @Resource
-    private AsyncItemService asyncItemService;
+    private AsyncFactory asyncFactory;
+
+    /**
+     * @return 线程池
+     */
+    @Primary
+    @Bean(destroyMethod = "shutdown")
+    public ThreadPoolTaskExecutor executor()
+    {
+        ThreadPoolTaskExecutor executor = asyncFactory.buildExecutor();
+        log.debug("create executor {}", executor.getCorePoolSize());
+        return executor;
+    }
 
     /**
      * @return 线程池
      */
     @Bean(destroyMethod = "shutdown")
-    public ThreadPoolTaskExecutor executor()
+    public ThreadPoolTaskExecutor asyncExecutor()
     {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        ExecutorConfigItem item = asyncItemService.getExecutor();
-        executor.setCorePoolSize(item.getCorePoolSize());
-        executor.setMaxPoolSize(item.getMaxPoolSize());
-        executor.setQueueCapacity(item.getQueueCapacity());
-        String threadNamePrefix = item.getThreadNamePrefix();
-        if (isNotBlank(threadNamePrefix))
-        {
-            executor.setThreadNamePrefix(threadNamePrefix.concat("-"));
-        }
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.initialize();
+        ThreadPoolTaskExecutor executor = asyncFactory.buildExecutor();
+        log.debug("create asyncExecutor {}", executor.getCorePoolSize());
         return executor;
     }
 
@@ -80,19 +87,7 @@ public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingCon
     @Bean(destroyMethod = "shutdown")
     public ThreadPoolTaskScheduler scheduler()
     {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        SchedulerConfigItem item = asyncItemService.getScheduler();
-        scheduler.setPoolSize(item.getMaxPoolSize());
-        String taskNamePrefix = item.getThreadNamePrefix();
-        if (isNotBlank(taskNamePrefix))
-        {
-            scheduler.setThreadNamePrefix(taskNamePrefix.concat("-"));
-        }
-        scheduler.setAwaitTerminationSeconds(item.getAwaitTerminationSeconds());
-        scheduler.setWaitForTasksToCompleteOnShutdown(true);
-        scheduler.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        scheduler.initialize();
-        return scheduler;
+        return asyncFactory.buildScheduler();
     }
 
     @Override
