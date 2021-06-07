@@ -65,7 +65,7 @@ public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String
         ofNullable(object).ifPresent(o ->
         {
             List<Field> fieldList = newArrayList();
-            addDeclaredFields(object.getClass(), fieldList, false);
+            addDeclaredFields(object.getClass(), fieldList, true, false);
             fieldList.forEach(accept(field ->
             {
                 field.setAccessible(true);
@@ -113,7 +113,7 @@ public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String
                         conditionMap.put(n, value);
                     }
                 });
-            }, null, log, null));
+            }, null, null, log, null));
         });
     }
 

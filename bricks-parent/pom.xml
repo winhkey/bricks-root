@@ -38,6 +38,7 @@
         <antlr.version>4.7.2</antlr.version>
         <jsoup.version>1.11.3</jsoup.version>
         <javassist.version>3.25.0-GA</javassist.version>
+        <transmittable.version>2.11.5</transmittable.version>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <checkstyle.version>8.29</checkstyle.version>
