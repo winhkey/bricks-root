@@ -18,7 +18,6 @@ package org.bricks.entity;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -36,13 +35,8 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-public abstract class AbstractEntity<I extends Serializable> extends AbstractBean implements Entity<I>
+public abstract class AbstractEntity<I> extends AbstractBean implements Entity<I>
 {
-
-    /**
-     * 序列化
-     */
-    private static final long serialVersionUID = 1L;
 
     @Override
     public String toString()

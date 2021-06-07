@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package org.bricks.entity;
+package org.bricks.event.listener;
+
+import org.bricks.event.BricksEvent;
 
 /**
- * 实体接口
- *
+ * 事件监听接口
+ * 
  * @author fuzy
  *
- * @param <I> ID类型
+ * @param <E> 事件
  */
-public interface Entity<I>
+public interface BricksEventListener<E extends BricksEvent<?>>
 {
 
     /**
-     * 获取主键
+     * 监听方法
      *
-     * @return 主键
+     * @param event 事件
+     * @param <N> 新事件类型
+     * @return 新事件
      */
-    I getId();
+    <N extends BricksEvent<?>> E onEvent(E event);
 
 }

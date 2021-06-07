@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package org.bricks.entity;
+package org.bricks.event;
 
 /**
- * 实体接口
- *
+ * 事件接口
+ * 
  * @author fuzy
  *
- * @param <I> ID类型
+ * @param <S> 事件源
  */
-public interface Entity<I>
+public interface BricksEvent<S>
 {
 
     /**
-     * 获取主键
-     *
-     * @return 主键
+     * @return 事件源
      */
-    I getId();
+    S getSource();
 
 }

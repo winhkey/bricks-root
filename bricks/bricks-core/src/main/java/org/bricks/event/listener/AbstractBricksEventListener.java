@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package org.bricks.entity;
+package org.bricks.event.listener;
+
+import org.bricks.event.BricksEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 实体接口
+ * 事件监听抽象类
  *
  * @author fuzy
  *
- * @param <I> ID类型
+ * @param <E> 事件
  */
-public interface Entity<I>
+public abstract class AbstractBricksEventListener<E extends BricksEvent<?>> implements BricksEventListener<E>
 {
 
     /**
-     * 获取主键
-     *
-     * @return 主键
+     * 日志
      */
-    I getId();
+    protected Logger log = LoggerFactory.getLogger(getClass());
 
 }

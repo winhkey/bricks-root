@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package org.bricks.entity;
+package org.bricks.event.publish;
+
+import org.bricks.event.BricksEvent;
 
 /**
- * 实体接口
- *
+ * 发布事件接口
+ * 
  * @author fuzy
  *
- * @param <I> ID类型
+ * @param <E> 事件源
  */
-public interface Entity<I>
+public interface BricksEventPublish<E extends BricksEvent<?>>
 {
 
     /**
-     * 获取主键
-     *
-     * @return 主键
+     * 发布
+     * 
+     * @param event 事件
      */
-    I getId();
+    void publish(E event);
 
 }

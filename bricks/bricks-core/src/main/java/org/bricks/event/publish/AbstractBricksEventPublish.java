@@ -14,23 +14,40 @@
  * limitations under the License.
  */
 
-package org.bricks.entity;
+package org.bricks.event.publish;
+
+import javax.annotation.Resource;
+
+import org.bricks.event.BricksEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
- * 实体接口
- *
+ * 发布事件
+ * 
  * @author fuzy
  *
- * @param <I> ID类型
+ * @param <E> 事件源
  */
-public interface Entity<I>
+public abstract class AbstractBricksEventPublish<E extends BricksEvent<?>> implements BricksEventPublish<E>
 {
 
     /**
-     * 获取主键
-     *
-     * @return 主键
+     * 日志
      */
-    I getId();
+    protected Logger log = LoggerFactory.getLogger(getClass());
+
+    /**
+     * 发布者
+     */
+    @Resource
+    protected ApplicationEventPublisher applicationEventPublisher;
+
+    @Override
+    public void publish(E event)
+    {
+        applicationEventPublisher.publishEvent(event);
+    }
 
 }
