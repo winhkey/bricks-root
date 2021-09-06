@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bricks.service;
+package org.bricks.pattern;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
@@ -27,15 +27,19 @@ import javax.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import org.bricks.annotation.NoLog;
+
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 正则缓存
  *
  * @author fuzy
- * 
+ *
  */
+@Slf4j
 @Setter
 @Getter
 @Service
@@ -61,7 +65,11 @@ public class PatternService
     {
         if (isNotEmpty(patternMap))
         {
-            patternMap.forEach((key, value) -> PATTERN_MAP.put(key, Pattern.compile(value)));
+            patternMap.forEach((key, value) ->
+            {
+                log.info("{}-{}", key, value);
+                PATTERN_MAP.put(key, Pattern.compile(value));
+            });
         }
     }
 
@@ -71,9 +79,11 @@ public class PatternService
      * @param id id
      * @return 正则对象
      */
+    @NoLog
     public Pattern loadPatternById(String id)
     {
         return PATTERN_MAP.get(id);
     }
 
 }
+

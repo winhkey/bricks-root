@@ -1,0 +1,23 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    format:
+      date: yyyy-MM-dd
+      date-time: yyyy-MM-dd HH:mm:ss
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: ${bricks.timezone:Asia/Shanghai}
+    property-naming-strategy: SNAKE_CASE
+  freemarker:
+    prefer-file-system-access: false
+    settings:
+      template_update_delay: 0
+      classic_compatible: true
+      number_format: 0.######
+      template_exception_handler: ignore
+    request-context-attribute: request
+    charset: UTF-8
+    template-loader-path: ${bricks.templates.path},classpath:/templates/
+  resources:
+    static-locations: classpath:/resources/,classpath:/static/,classpath:/public/,classpath:/templates/,${bricks.templates.path},file:${bricks.web.save-dir}
