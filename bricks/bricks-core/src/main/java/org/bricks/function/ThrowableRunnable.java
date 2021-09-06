@@ -19,7 +19,7 @@ package org.bricks.function;
 /**
  * 线程
  *
- * @author fuzhiying
+ * @author fuzy
  *
  * @param <E> 异常
  */

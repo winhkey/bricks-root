@@ -16,8 +16,14 @@
 
 package org.bricks.utils;
 
+import static java.text.MessageFormat.format;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.bricks.constants.Constants.PatternConstants.LOWER_START_PATTERN;
+import static org.bricks.utils.FunctionUtils.apply;
+import static org.bricks.utils.RegexUtils.matches;
 
 import java.util.Collection;
 import java.util.Map;
@@ -26,10 +32,12 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 
 import org.bricks.exception.BaseException;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * jsr参数校验
@@ -37,15 +45,36 @@ import lombok.experimental.UtilityClass;
  * @author fuzy
  * 
  */
+@Slf4j
 @UtilityClass
 public class ValidationUtils
 {
 
     /**
-     * hibernate验证器
+     * 验证器
      */
     private static final Validator VALIDATOR = Validation.buildDefaultValidatorFactory()
             .getValidator();
+
+    /**
+     * 执行验证器
+     */
+    private static final ExecutableValidator EXECUTABLE_VALIDATOR = VALIDATOR.forExecutables();
+
+    /**
+     * 注解验证方法
+     *
+     * @param object 对象
+     * @param name 方法名
+     * @param value 返回值
+     * @param <T> 对象类型
+     */
+    public static <T> void validateMethods(T object, String name, Object value)
+    {
+        ofNullable(object).map(apply(t -> EXECUTABLE_VALIDATOR.validateReturnValue(t, t.getClass()
+                .getMethod(name), value), null, null, log, null))
+                .ifPresent(ValidationUtils::check);
+    }
 
     /**
      * 注解验证参数
@@ -65,7 +94,7 @@ public class ValidationUtils
      * @param collection 参数集合
      * @param <T> 参数
      */
-    public static <T> void validate(Collection<T> collection)
+    public static <T> void validateCollection(Collection<T> collection)
     {
         Set<ConstraintViolation<T>> set = collection.stream()
                 .flatMap(t -> VALIDATOR.validate(t)
@@ -81,7 +110,7 @@ public class ValidationUtils
      * @param <T> 键类型
      * @param <V> 值类型
      */
-    public static <T, V> void validate(Map<T, V> map)
+    public static <T, V> void validateMap(Map<T, V> map)
     {
         Set<ConstraintViolation<V>> set = map.entrySet()
                 .stream()
@@ -95,10 +124,11 @@ public class ValidationUtils
     {
         if (isNotEmpty(set))
         {
-            ConstraintViolation<T> c = set.iterator()
-                    .next();
-            throw new BaseException("0001", "{0}{1}", c.getPropertyPath()
-                    .toString(), c.getMessage());
+            String message = set.stream()
+                    .map(c -> format("{0}{1}", matches(LOWER_START_PATTERN, c.getMessage()) ? "" : c.getPropertyPath(),
+                            c.getMessage()))
+                    .collect(joining(", "));
+            throw new BaseException(message);
         }
     }
 

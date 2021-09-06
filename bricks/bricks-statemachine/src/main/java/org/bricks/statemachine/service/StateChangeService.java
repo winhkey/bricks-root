@@ -16,26 +16,33 @@
 
 package org.bricks.statemachine.service;
 
-import java.util.Map;
-
 /**
  * 改变状态接口
  *
  * @author fuzy
  *
+ * @param <I> 主键
+ * @param <S> 状态
  * @param <E> 事件
  */
-public interface StateChangeService<E>
+public interface StateChangeService<I, S, E>
 {
 
     /**
-     * 发送事件消息
+     * 改变状态
      *
+     * @param id 主键
      * @param event 事件
-     * @param header 消息头
-     * @param condition 定位条件
      * @return 结果
      */
-    boolean sendEvent(E event, String header, Map<String, Object> condition);
+    boolean changeState(I id, E event);
+
+    /**
+     * 当前状态
+     *
+     * @param id 主键
+     * @return 状态
+     */
+    S currentState(I id);
 
 }

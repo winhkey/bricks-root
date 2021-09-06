@@ -28,6 +28,8 @@ import org.bricks.exception.BaseException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.SneakyThrows;
+
 /**
  * jackson实现抽象类
  *
@@ -53,7 +55,7 @@ public abstract class AbstractJacksonService extends AbstractJsonDataService
     {
         try
         {
-            return objectMapper.readValue(trim(json), getJavaType(type));
+            return objectMapper.readValue(simplify(json), getJavaType(type));
         }
         catch (IOException e)
         {
@@ -115,6 +117,15 @@ public abstract class AbstractJacksonService extends AbstractJsonDataService
     protected JavaType getJavaType(Type... types)
     {
         return JacksonUtils.getJavaType(types[0]);
+    }
+
+    @Override
+    @SneakyThrows
+    public String simplify(String content)
+    {
+        return content.startsWith("\"") && content.endsWith("\"")
+                ? objectMapper.readValue(content, getJavaType(String.class))
+                : content;
     }
 
 }

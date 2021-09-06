@@ -21,12 +21,15 @@ import static java.util.Optional.ofNullable;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import org.springframework.stereotype.Service;
+
 /**
  * CDATA支持
  *
  * @author fuzy
  *
  */
+@Service
 public class CDataAdapter extends XmlAdapter<String, String>
 {
 

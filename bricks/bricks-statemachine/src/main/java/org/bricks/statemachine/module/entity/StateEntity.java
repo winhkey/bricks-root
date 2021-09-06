@@ -16,18 +16,15 @@
 
 package org.bricks.statemachine.module.entity;
 
-import org.bricks.entity.Entity;
-
 /**
  * 状态实体
  *
  * @author fuzy
  *
  * @param <S> 状态
- * @param <I> 主键
  * @param <T> 子类
  */
-public interface StateEntity<S, I, T> extends Entity<I>
+public interface StateEntity<S, T>
 {
 
     /**
@@ -38,9 +35,9 @@ public interface StateEntity<S, I, T> extends Entity<I>
     /**
      * 设置状态
      *
-     * @param status 状态
+     * @param state 状态
      * @return 对象
      */
-    T setState(S status);
+    T setState(S state);
 
 }

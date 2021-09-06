@@ -21,6 +21,8 @@ import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 
 import java.util.List;
 
+import org.bricks.bean.AbstractBean;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,24 +35,31 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class AbstractBricksEvent<S> implements BricksEvent<S>
+public class AbstractBricksEvent<S> extends AbstractBean implements BricksEvent<S>
 {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 事件源
      */
     private S source;
 
+    /**
+     * 事件源类型
+     */
     private Class<S> sourceClass;
 
+    /**
+     * 构造方法
+     *
+     * @param source 事件源
+     */
     @SuppressWarnings(UNCHECKED)
     public AbstractBricksEvent(S source)
     {
-        this.source = source;
+        super();
         List<Class<?>> classList = getComponentClassList(getClass(), BricksEvent.class);
         sourceClass = (Class<S>) classList.get(0);
+        this.source = source;
     }
 
 }

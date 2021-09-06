@@ -78,4 +78,12 @@ public interface DataService
      */
     String output(Object object, Type... type);
 
+    /**
+     * 简化
+     *
+     * @param content 字符串
+     * @return 结果
+     */
+    String simplify(String content);
+
 }

@@ -19,20 +19,22 @@ package org.bricks.data.utils;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.annotation.PropertyAccessor.ALL;
-import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_NUMBERS_AS_STRINGS;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_SINGLE_QUOTES;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS;
-import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_SINGLE_QUOTES;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS;
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_UNQUOTED_FIELD_NAMES;
+import static com.fasterxml.jackson.core.json.JsonWriteFeature.WRITE_NUMBERS_AS_STRINGS;
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
+import static com.fasterxml.jackson.databind.type.TypeFactory.defaultInstance;
 import static com.google.common.collect.Maps.newConcurrentMap;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Arrays.stream;
 import static java.util.Locale.US;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.bricks.constants.Constants.FormatConstants.DATETIME_FORMAT;
 import static org.bricks.constants.Constants.FormatConstants.DATE_FORMAT;
@@ -46,10 +48,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.Set;
 
+import org.reflections.Reflections;
+
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -77,24 +83,62 @@ public class JacksonUtils
     private static final Map<String, JavaType> JAVA_TYPE_MAP = newConcurrentMap();
 
     /**
+     * json
+     */
+    private static final ObjectMapper JSON_MAPPER;
+
+    /**
+     * xml
+     */
+    private static final ObjectMapper XML_MAPPER;
+
+    static
+    {
+        JSON_MAPPER = createJsonMapper();
+        XML_MAPPER = createXmlMapper();
+    }
+
+    /**
+     * @return json
+     */
+    public static ObjectMapper getJsonMapper()
+    {
+        return JSON_MAPPER;
+    }
+
+    /**
+     * @return xml
+     */
+    public static ObjectMapper getXmlMapper()
+    {
+        return XML_MAPPER;
+    }
+
+    /**
      * @return ObjectMapper
      */
-    @SuppressWarnings("deprecation")
     public static ObjectMapper createJsonMapper()
     {
-        ObjectMapper objectMapper = new ObjectMapper();
+        JsonFactoryBuilder builder = new JsonFactoryBuilder();
+        // 设置数字按字符串处理
+        builder.enable(WRITE_NUMBERS_AS_STRINGS);
+        // 非法转义字符
+        builder.enable(ALLOW_UNESCAPED_CONTROL_CHARS);
+        // 允许字段名不含双引号
+        builder.enable(ALLOW_UNQUOTED_FIELD_NAMES);
+        // 允许单引号
+        builder.enable(ALLOW_SINGLE_QUOTES);
+        ObjectMapper objectMapper = new ObjectMapper(builder.build());
         configure(objectMapper);
         objectMapper.setSerializationInclusion(NON_NULL);
-        // 设置数字按字符串处理
-        objectMapper.enable(WRITE_NUMBERS_AS_STRINGS);
-        // 允许字段名不含双引号
-        objectMapper.enable(ALLOW_UNQUOTED_FIELD_NAMES);
-        // 允许单引号
-        objectMapper.enable(ALLOW_SINGLE_QUOTES);
-        // 非法转义字符
-        objectMapper.enable(ALLOW_UNQUOTED_CONTROL_CHARS);
         objectMapper.disable(FAIL_ON_EMPTY_BEANS);
         objectMapper.setVisibility(ALL, ANY);
+        Reflections reflections = new Reflections("com.wgc.");
+        Set<Class<?>> set = reflections.getTypesAnnotatedWith(JsonTypeName.class);
+        if (isNotEmpty(set))
+        {
+            objectMapper.registerSubtypes(set.toArray(new Class[0]));
+        }
         return objectMapper;
     }
 
@@ -110,7 +154,7 @@ public class JacksonUtils
         return xmlMapper;
     }
 
-    private void configure(ObjectMapper objectMapper)
+    private static void configure(ObjectMapper objectMapper)
     {
         objectMapper.disable(FAIL_ON_UNKNOWN_PROPERTIES);
         // json转换对象忽略找不到属性的对象
@@ -132,15 +176,16 @@ public class JacksonUtils
 
     /**
      * 处理类型
-     *
+     * 
      * @param type 类型
      * @return 结果
      */
     public static JavaType getJavaType(Type type)
     {
-        return JAVA_TYPE_MAP.computeIfAbsent(getCacheKey(type), k ->
+        String key = getCacheKey(type);
+        JavaType javaType = JAVA_TYPE_MAP.get(key);
+        if (javaType == null)
         {
-            TypeFactory typeFactory = TypeFactory.defaultInstance();
             Class<?> clazz;
             JavaType[] javaTypes;
             if (type instanceof ParameterizedType)
@@ -155,8 +200,10 @@ public class JacksonUtils
                 clazz = (Class<?>) type;
                 javaTypes = new JavaType[0];
             }
-            return typeFactory.constructParametricType(clazz, javaTypes);
-        });
+            javaType = defaultInstance().constructParametricType(clazz, javaTypes);
+            JAVA_TYPE_MAP.put(key, javaType);
+        }
+        return javaType;
     }
 
     /**

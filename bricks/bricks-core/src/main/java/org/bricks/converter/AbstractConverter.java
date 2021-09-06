@@ -16,10 +16,13 @@
 
 package org.bricks.converter;
 
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
 import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,7 +67,7 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
     /**
      * 构造方法
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings(UNCHECKED)
     protected AbstractConverter()
     {
         List<Class<?>> classList = getComponentClassList(getClass(), Converter.class);
@@ -89,13 +92,6 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
 
     @NoLog
     @Override
-    public N apply(M m)
-    {
-        return convert(m);
-    }
-
-    @NoLog
-    @Override
     public N convert(@NotNull M m, @NotNull P p)
     {
         return check(m, p) ? from(m, p) : null;
@@ -112,11 +108,12 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
     @Override
     public List<N> convertList(Collection<M> mList, P p)
     {
-        return mList.stream()
+        return ofNullable(mList).map(list -> list.stream()
                 .filter(m -> check(m, p))
                 .map(m -> convert(m, p))
                 .filter(Objects::nonNull)
-                .collect(toList());
+                .collect(toList()))
+                .orElseGet(Collections::emptyList);
     }
 
     @NoLog

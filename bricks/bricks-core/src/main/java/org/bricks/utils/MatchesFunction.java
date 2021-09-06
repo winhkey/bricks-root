@@ -35,7 +35,6 @@ import org.jaxen.function.StringFunction;
 public class MatchesFunction implements Function
 {
 
-    @SuppressWarnings("rawtypes")
     @Override
     public Object call(Context context, List list) throws FunctionCallException
     {

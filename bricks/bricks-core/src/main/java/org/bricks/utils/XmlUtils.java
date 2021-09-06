@@ -21,14 +21,12 @@ import static java.nio.charset.Charset.forName;
 import static java.nio.file.Files.newBufferedWriter;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Paths.get;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bricks.utils.FunctionUtils.apply;
-import static org.dom4j.DocumentHelper.parseText;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -36,6 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -47,17 +46,19 @@ import javax.xml.validation.Validator;
 import org.bricks.io.XMLWriter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentFactory;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.XPath;
 import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.jaxen.XPathFunctionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * xml工具类
@@ -65,14 +66,10 @@ import lombok.experimental.UtilityClass;
  * @author fuzy
  *
  */
+@Slf4j
 @UtilityClass
 public class XmlUtils
 {
-
-    /**
-     * 日志
-     */
-    private final Logger log = LoggerFactory.getLogger(XmlUtils.class);
 
     static
     {
@@ -90,7 +87,7 @@ public class XmlUtils
      */
     public static Document getDocument(InputStream stream) throws DocumentException
     {
-        return ofNullable(stream).map(apply(s -> new SAXReader().read(s), null, log, null))
+        return ofNullable(stream).map(apply(s -> new SAXReader().read(s), null, null, log, null))
                 .orElse(null);
     }
 
@@ -99,11 +96,10 @@ public class XmlUtils
      *
      * @param url url
      * @return doc doc
-     * @throws DocumentException DocumentException
      */
-    public static Document getDocument(URL url) throws DocumentException
+    public static Document getDocument(URL url)
     {
-        return ofNullable(url).map(apply(u -> new SAXReader().read(u), null, log, null))
+        return ofNullable(url).map(apply(u -> new SAXReader().read(u), null, null, log, null))
                 .orElse(null);
     }
 
@@ -113,7 +109,7 @@ public class XmlUtils
      * @param xmlFile xml文件
      * @return doc
      */
-    public static Document parseXMLFile(File xmlFile)
+    public static Document getDocument(File xmlFile)
     {
         Document doc = null;
         if (xmlFile == null || !xmlFile.exists() || !xmlFile.isFile())
@@ -148,10 +144,27 @@ public class XmlUtils
      * @param xml xml字符串
      * @return doc
      */
-    public static Document parseXML(String xml)
+    public static Document getDocument(String xml)
     {
-        return ofNullable(xml).map(apply(x -> parseText(x), null, log, null))
+        return ofNullable(xml).map(apply(DocumentHelper::parseText, null, null, log, null))
                 .orElse(null);
+    }
+
+    /**
+     * map转doc
+     * 
+     * @param map map
+     * @param rootName 根节点名
+     * @return doc
+     */
+    public static Document getDocument(Map<String, Object> map, String rootName)
+    {
+        DocumentFactory documentFactory = DocumentFactory.getInstance();
+        Document document = documentFactory.createDocument();
+        Element root = document.addElement(rootName);
+        map.forEach((key, value) -> root.addElement(key)
+                .addText(String.valueOf(value)));
+        return document;
     }
 
     /**
@@ -193,7 +206,7 @@ public class XmlUtils
         return ofNullable(node).filter(n -> isNotBlank(xpath))
                 .map(n -> isNotEmpty(namespaces) ? buildXPath(node, xpath, namespaces).selectNodes(node)
                         : node.selectNodes(xpath))
-                .orElseGet(() -> emptyList());
+                .orElseGet(Collections::emptyList);
     }
 
     /**
@@ -208,7 +221,7 @@ public class XmlUtils
         List<Node> removes = selectNodes(node, xpath, namespaces);
         if (isNotEmpty(removes))
         {
-            removes.forEach(remove -> remove.detach());
+            removes.forEach(Node::detach);
         }
     }
 
@@ -238,8 +251,8 @@ public class XmlUtils
      */
     public static String selectSingleNodeValue(Node node, String xpath, Namespace... namespaces)
     {
-        return ofNullable(selectSingleNode(node, xpath, namespaces)).map(subNode -> subNode.getText())
-                .filter(value -> isNotBlank(value))
+        return ofNullable(selectSingleNode(node, xpath, namespaces)).map(Node::getText)
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
                 .orElse("");
     }
 
@@ -255,8 +268,8 @@ public class XmlUtils
     {
         return ofNullable(node).filter(n -> isNotBlank(attrName))
                 .map(n -> selectSingleNode(n, "@" + attrName, namespaces))
-                .map(subNode -> subNode.getText())
-                .filter(value -> isNotBlank(value))
+                .map(Node::getText)
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
                 .orElse("");
     }
 
@@ -272,8 +285,8 @@ public class XmlUtils
     {
         return ofNullable(node).filter(n -> isNotBlank(nodeName))
                 .map(n -> selectSingleNode(n, nodeName, namespaces))
-                .map(subNode -> subNode.getText())
-                .filter(value -> isNotBlank(value))
+                .map(Node::getText)
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
                 .orElse("");
     }
 
@@ -287,7 +300,7 @@ public class XmlUtils
     public static boolean validateXsd(URL xsdUrl, Node node)
     {
         return ofNullable(xsdUrl).filter(url -> node != null)
-                .map(apply(url -> validateXsd(url, new DocumentSource(node)), null, log, null))
+                .map(apply(url -> validateXsd(url, new DocumentSource(node)), null, null, log, null))
                 .orElse(false);
     }
 

@@ -16,8 +16,6 @@
 
 package org.bricks.data.json;
 
-import static org.apache.commons.text.StringEscapeUtils.unescapeJson;
-
 import org.bricks.data.AbstractDataService;
 
 /**
@@ -26,18 +24,7 @@ import org.bricks.data.AbstractDataService;
  * @author fuzy
  * 
  */
-public abstract class AbstractJsonDataService extends AbstractDataService
+public abstract class AbstractJsonDataService extends AbstractDataService implements JsonDataService
 {
-
-    /**
-     * 去除多余引号
-     *
-     * @param content json
-     * @return 结果
-     */
-    protected String trim(String content)
-    {
-        return unescapeJson(content).replaceAll("^\"|\"$", "");
-    }
 
 }

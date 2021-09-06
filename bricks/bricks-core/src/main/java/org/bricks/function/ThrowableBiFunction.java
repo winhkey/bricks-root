@@ -19,7 +19,7 @@ package org.bricks.function;
 /**
  * 抛异常的BiFunction
  * 
- * @author fuzhiying
+ * @author fuzy
  *
  * @param <T> 入参
  * @param <U> 入参

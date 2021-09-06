@@ -18,7 +18,10 @@ package org.bricks.converter;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.bricks.annotation.NoLog;
 
 /**
  * 对象转换
@@ -29,7 +32,7 @@ import java.util.function.Function;
  * @param <N> 目标对象
  * @param <P> 参数
  */
-public interface Converter<M, N, P> extends Function<M, N>
+public interface Converter<M, N, P>
 {
 
     /**
@@ -47,9 +50,40 @@ public interface Converter<M, N, P> extends Function<M, N>
      * @param m 源对象
      * @return 目标对象
      */
+    @NoLog
     default N convert(M m)
     {
         return convert(m, null);
+    }
+
+    /**
+     * 转换
+     *
+     * @param m 源对象
+     * @param function 转换lambda
+     * @param <M> 源类型
+     * @param <N> 目标类型
+     * @return 目标对象
+     */
+    static <M, N> N convertFunction(M m, Function<M, N> function)
+    {
+        return function.apply(m);
+    }
+
+    /**
+     * 转换
+     *
+     * @param m 源对象
+     * @param p 参数
+     * @param function 转换lambda
+     * @param <M> 源类型
+     * @param <N> 目标类型
+     * @param <P> 参数类型
+     * @return 目标对象
+     */
+    static <M, N, P> N convertFunction(M m, P p, BiFunction<M, P, N> function)
+    {
+        return function.apply(m, p);
     }
 
     /**

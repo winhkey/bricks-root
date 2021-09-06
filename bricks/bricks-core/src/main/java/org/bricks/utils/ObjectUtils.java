@@ -18,28 +18,39 @@ package org.bricks.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.contains;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
 import static org.bricks.utils.FunctionUtils.accept;
 import static org.bricks.utils.FunctionUtils.apply;
 import static org.bricks.utils.ReflectionUtils.addDeclaredFields;
 import static org.bricks.utils.ReflectionUtils.getDeclaredField;
+import static org.bricks.utils.StringUtils.humpToLine;
 import static org.springframework.aop.support.AopUtils.isAopProxy;
 import static org.springframework.aop.support.AopUtils.isJdkDynamicProxy;
 import static org.springframework.beans.BeanUtils.instantiateClass;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.bricks.enums.ValueEnum;
+import org.bricks.exception.BaseException;
 import org.bricks.service.AbstractConsumerService;
 import org.springframework.aop.framework.AdvisedSupport;
 
@@ -58,6 +69,44 @@ public class ObjectUtils
 {
 
     /**
+     * 构建实体类对象
+     *
+     * @param clazz 类型
+     * @param <T> 类型
+     * @return 对象
+     */
+    @SuppressWarnings(UNCHECKED)
+    public static <T> T newInstance(Class<T> clazz)
+    {
+        T t = null;
+        if (clazz != null)
+        {
+            try
+            {
+                t = (T) Class.forName(clazz.getName())
+                        .newInstance();
+            }
+            catch (Exception e)
+            {
+                throw new BaseException(e);
+            }
+        }
+        return t;
+    }
+
+    /**
+     * 判断是否自定义类型
+     *
+     * @param clazz 类
+     * @return 结果
+     */
+    public static boolean isCustomType(Class<?> clazz)
+    {
+        return ofNullable(clazz).map(Class::getClassLoader)
+                .isPresent();
+    }
+
+    /**
      * 直接读取对象的属性值
      *
      * @param object 子类对象
@@ -65,14 +114,14 @@ public class ObjectUtils
      * @param <T> 对象类型
      * @return 父类中的属性值
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings(UNCHECKED)
     public static <T> T getFieldValue(Object object, String fieldName)
     {
-        return ofNullable(getDeclaredField(object.getClass(), fieldName)).map(apply(field ->
+        return ofNullable(getDeclaredField(object.getClass(), fieldName, true)).map(apply(field ->
         {
             field.setAccessible(true);
             return (T) field.get(object);
-        }, null, null, null))
+        }, null, null, null, null))
                 .orElse(null);
     }
 
@@ -85,12 +134,12 @@ public class ObjectUtils
      */
     public static void setFieldValue(Object object, String fieldName, Object value)
     {
-        ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName))
+        ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName, true))
                 .ifPresent(accept(field ->
                 {
                     field.setAccessible(true);
                     field.set(object, value);
-                }, null, log, null));
+                }, null, null, log, null));
     }
 
     /**
@@ -102,13 +151,42 @@ public class ObjectUtils
     public static void copy(Object src, Object dest)
     {
         List<Field> fieldList = newArrayList();
-        addDeclaredFields(src.getClass(), fieldList, false);
-        fieldList.stream()
-                .forEach(field ->
+        addDeclaredFields(src.getClass(), fieldList, true, false);
+        fieldList.forEach(field ->
+        {
+            String name = field.getName();
+            ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
+        });
+    }
+
+    /**
+     * 比较对象的属性
+     *
+     * @param oldObj 旧对象
+     * @param newObj 新对象
+     * @return 不同的属性
+     */
+    public static Map<String, String> diff(Object oldObj, Object newObj)
+    {
+        Map<String, String> diffMap = newHashMap();
+        Class<?> c1 = oldObj.getClass();
+        Class<?> c2 = newObj.getClass();
+        if (c1.equals(c2))
+        {
+            List<Field> fieldList = newArrayList();
+            addDeclaredFields(c1, fieldList, true, false);
+            fieldList.forEach(field ->
+            {
+                String name = field.getName();
+                Object oldValue = getFieldValue(oldObj, name);
+                Object newValue = getFieldValue(newObj, name);
+                if (oldValue == null && newValue != null || oldValue != null && !oldValue.equals(newValue))
                 {
-                    String name = field.getName();
-                    ofNullable(getFieldValue(src, name)).ifPresent(value -> setFieldValue(dest, name, value));
-                });
+                    diffMap.put(name, format("from {0} to {1}", oldValue, newValue));
+                }
+            });
+        }
+        return diffMap;
     }
 
     /**
@@ -119,10 +197,10 @@ public class ObjectUtils
      * @param clazz 实体类
      * @return 对象
      */
-    public static <T> List<T> convertMapList(List<Map<String, Object>> dataList, Class<T> clazz)
+    public static <T> List<T> mapToDataList(List<Map<String, Object>> dataList, Class<T> clazz)
     {
         return isNotEmpty(dataList) ? dataList.stream()
-                .map(dataMap -> convertMap(dataMap, clazz))
+                .map(dataMap -> mapToData(dataMap, clazz))
                 .collect(toList()) : null;
     }
 
@@ -134,17 +212,16 @@ public class ObjectUtils
      * @param clazz 实体类
      * @return 对象
      */
-    public static <T> T convertMap(Map<String, Object> dataMap, Class<T> clazz)
+    public static <T> T mapToData(Map<String, Object> dataMap, Class<T> clazz)
     {
         T t = instantiateClass(clazz);
         List<Field> list = newArrayList();
-        addDeclaredFields(clazz, list, false);
-        list.stream()
-                .forEach(field ->
-                {
-                    String fieldName = field.getName();
-                    setFieldValue(t, fieldName, dataMap.get(fieldName));
-                });
+        addDeclaredFields(clazz, list, true, false);
+        list.forEach(field ->
+        {
+            String fieldName = field.getName();
+            setFieldValue(t, fieldName, dataMap.get(fieldName));
+        });
         return t;
     }
 
@@ -155,23 +232,44 @@ public class ObjectUtils
      * @param excludes 排除字段
      * @return map
      */
-    public static Map<String, Object> convertData(Object object, String... excludes)
+    public static Map<String, Object> dataToMap(Object object, String... excludes)
+    {
+        return dataToMap(object, false, o -> o, excludes);
+    }
+
+    private static <R> Map<String, R> dataToMap(Object object, boolean humpToLine, Function<Object, R> function,
+            String... excludes)
     {
         return ofNullable(object).map(o ->
         {
-            Map<String, Object> map = newHashMap();
+            Map<String, R> map = newHashMap();
             List<Field> list = newArrayList();
-            addDeclaredFields(o.getClass(), list, false);
+            addDeclaredFields(o.getClass(), list, true, false);
             list.stream()
                     .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
                     .forEach(accept(field ->
                     {
                         field.setAccessible(true);
-                        ofNullable(field.get(o)).ifPresent(value -> map.put(field.getName(), value));
-                    }, null, log, null));
+                        ofNullable(field.get(o))
+                                .ifPresent(value -> map.put(humpToLine ? humpToLine(field.getName()) : field.getName(),
+                                        function.apply(value)));
+                    }, null, null, log, null));
             return map;
         })
                 .orElse(null);
+    }
+
+    /**
+     * 对象转map
+     *
+     * @param object 对象
+     * @param humpToLine 字段名转下划线
+     * @param excludes 排除字段
+     * @return map
+     */
+    public static Map<String, String> dataToMap(Object object, boolean humpToLine, String... excludes)
+    {
+        return dataToMap(object, humpToLine, String::valueOf, excludes);
     }
 
     /**
@@ -179,96 +277,91 @@ public class ObjectUtils
      *
      * @param builder StringBuilder
      * @param object 对象
+     * @return builder
      */
-    public static void buildString(StringBuilder builder, Object object)
+    public static StringBuilder buildString(StringBuilder builder, Object object)
     {
-        new AbstractConsumerService()
+        return new AbstractConsumerService<StringBuilder>()
         {
 
             @Override
-            public void arrayConsumer(Object object)
+            public StringBuilder arrayConsumer(StringBuilder builder, Object object)
             {
                 builder.append('[');
-                super.arrayConsumer(object);
-                builder.append(']');
+                return super.arrayConsumer(builder, object).append(']');
             }
 
             @Override
-            protected void arrayConsumer(int n, Object object)
+            protected StringBuilder arrayConsumer(StringBuilder builder, int n, Object object)
             {
-                super.arrayConsumer(n, object);
-                builder.delete(builder.lastIndexOf(", "), builder.length());
+                return super.arrayConsumer(builder, n, object).delete(builder.lastIndexOf(", "), builder.length());
             }
 
             @Override
-            protected void collectionConsumer(Collection<?> collection)
+            protected StringBuilder collectionConsumer(StringBuilder builder, Collection<?> collection)
             {
-                super.collectionConsumer(collection);
-                builder.delete(builder.lastIndexOf(", "), builder.length());
+                return super.collectionConsumer(builder, collection).delete(builder.lastIndexOf(", "),
+                        builder.length());
             }
 
             @Override
-            public void collectionConsumer(Object object)
+            protected StringBuilder collectionConsumer(StringBuilder builder, Object object)
             {
                 builder.append('[');
-                super.collectionConsumer(object);
-                builder.append(']');
+                return super.collectionConsumer(builder, object).append(']');
             }
 
             @Override
-            protected void mapConsumer(Object object)
+            protected StringBuilder mapConsumer(StringBuilder builder, Object object)
             {
                 builder.append('{');
-                super.mapConsumer(object);
-                builder.append('}');
+                return super.mapConsumer(builder, object).append('}');
             }
 
             @Override
-            protected void mapConsumer(Map<?, ?> map)
+            protected StringBuilder mapConsumer(StringBuilder builder, Map<?, ?> map)
             {
-                super.mapConsumer(map);
-                builder.delete(builder.lastIndexOf(", "), builder.length());
+                return super.mapConsumer(builder, map).delete(builder.lastIndexOf(", "), builder.length());
             }
 
             @Override
-            protected void nullConsumer()
+            protected StringBuilder nullConsumer(StringBuilder builder)
             {
-                builder.append("null");
+                return builder.append("null");
             }
 
             @Override
-            protected void elementConsumer(Object object)
+            protected StringBuilder elementConsumer(StringBuilder builder, Object object)
             {
-                buildValue(builder, object);
+                return buildValue(builder, object);
             }
 
             @Override
-            protected void elementConsumer(int i, Object object)
+            protected StringBuilder elementConsumer(StringBuilder builder, int i, Object object)
             {
-                buildValue(builder, object);
+                return buildValue(builder, object);
             }
 
             @Override
-            protected void entryConsumer(Object key, Object value)
+            protected StringBuilder entryConsumer(StringBuilder builder, Object key, Object value)
             {
-                builder.append(key)
-                        .append('=');
-                buildValue(builder, value);
+                buildValue(builder.append(key)
+                        .append('='), value);
+                return builder;
             }
 
             @Override
-            protected void otherConsumers(Map<Class<?>, Consumer<Object>> consumerMap)
+            protected void otherConsumers(StringBuilder builder, Map<Class<?>, Consumer<Object>> consumerMap)
             {
                 consumerMap.put(Object.class, builder::append);
             }
 
-        }.consumer(object);
-    }
+            private StringBuilder buildValue(StringBuilder builder, Object value)
+            {
+                return buildString(builder, value).append(", ");
+            }
 
-    private static void buildValue(StringBuilder builder, Object value)
-    {
-        buildString(builder, value);
-        builder.append(", ");
+        }.consumer(builder, object);
     }
 
     /**
@@ -278,7 +371,7 @@ public class ObjectUtils
      * @param value 枚举值
      * @return 枚举对象
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings(UNCHECKED)
     public static Object getEnumValue(Class<?> clazz, Object value)
     {
         Stream<?> stream = ValueEnum.class.isAssignableFrom(
@@ -286,6 +379,43 @@ public class ObjectUtils
                         .equals(value)) : of(clazz.getEnumConstants()).filter(v -> v.equals(value));
         return stream.findAny()
                 .orElse(null);
+    }
+
+    /**
+     * 深拷贝
+     *
+     * @param obj 对象
+     * @param clazz 类型
+     * @return 拷贝对象
+     * @throws IOException IO异常
+     * @throws ClassNotFoundException 类异常
+     * @param <T> 类型
+     */
+    @SuppressWarnings(UNCHECKED)
+    public static <T> T deepClone(Object obj, Class<T> clazz) throws IOException, ClassNotFoundException
+    {
+        /* 写入当前对象的二进制流 */
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(obj);
+        /* 读出二进制流产生的新对象 */
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        return (T) ois.readObject();
+    }
+
+    /**
+     * 泛型数组
+     *
+     * @param clazz 类型
+     * @param length 长度
+     * @param <T> 类型
+     * @return 数组
+     */
+    @SuppressWarnings(UNCHECKED)
+    public static <T> T[] genericsArray(Class<T> clazz, int length)
+    {
+        return (T[]) Array.newInstance(clazz, length);
     }
 
     /**
@@ -315,7 +445,7 @@ public class ObjectUtils
             target = ((AdvisedSupport) advised.get(obj)).getTargetSource()
                     .getTarget();
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             log.error(e.getMessage(), e);
         }

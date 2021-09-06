@@ -17,11 +17,11 @@
 package org.bricks.enums;
 
 /**
- * 枚举接口
+ * 值枚举接口
  * 
  * @author fuzy
  *
- * @param <T>
+ * @param <T> 值类型
  */
 public interface ValueEnum<T>
 {

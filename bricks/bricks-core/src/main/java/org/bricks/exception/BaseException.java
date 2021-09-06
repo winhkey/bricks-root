@@ -18,8 +18,11 @@ package org.bricks.exception;
 
 import static java.text.MessageFormat.format;
 
+import org.bricks.enums.MessageEnum;
+
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * 封装基础异常
@@ -28,6 +31,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@Accessors(chain = true)
 public class BaseException extends RuntimeException
 {
 
@@ -37,6 +41,11 @@ public class BaseException extends RuntimeException
      * 错误码
      */
     private String errorCode;
+
+    /**
+     * 数据
+     */
+    private Object data;
 
     /**
      * 默认构造
@@ -49,12 +58,11 @@ public class BaseException extends RuntimeException
     /**
      * 构造方法
      *
-     * @param errorCode 错误码
+     * @param message 描述
      */
-    public BaseException(String errorCode)
+    public BaseException(String message)
     {
-        super(errorCode);
-        this.errorCode = errorCode;
+        super(message);
     }
 
     /**
@@ -74,22 +82,24 @@ public class BaseException extends RuntimeException
      * 构造方法
      *
      * @param t 异常
+     * @param errorCode 错误码
+     * @param pattern 描述
+     * @param args 参数
      */
-    public BaseException(Throwable t)
+    public BaseException(Throwable t, String errorCode, String pattern, Object... args)
     {
-        super(t);
+        super(format(pattern, args), t);
+        this.errorCode = errorCode;
     }
 
     /**
      * 构造方法
      *
      * @param t 异常
-     * @param errorCode 错误码
      */
-    public BaseException(Throwable t, String errorCode)
+    public BaseException(Throwable t)
     {
         super(t);
-        this.errorCode = errorCode;
     }
 
     /**
@@ -101,6 +111,27 @@ public class BaseException extends RuntimeException
     public BaseException(String message, Throwable t)
     {
         super(message, t);
+    }
+
+    /**
+     * 构造方法
+     * 
+     * @param messageEnum 消息枚举
+     */
+    public BaseException(MessageEnum messageEnum)
+    {
+        this(messageEnum.getCode(), messageEnum.getMessage());
+    }
+
+    /**
+     * 构造方法
+     * 
+     * @param messageEnum 消息枚举
+     * @param t 异常
+     */
+    public BaseException(MessageEnum messageEnum, Throwable t)
+    {
+        this(t, messageEnum.getCode(), messageEnum.getMessage());
     }
 
 }

@@ -16,22 +16,50 @@
 
 package org.bricks.bean;
 
-import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
-import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import java.lang.reflect.Field;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.bricks.annotation.Ignore;
 
 /**
  * 抽象数据Bean
  *
  * @author fuzy
- * 
+ *
  */
-public class AbstractBean implements Bean
+public abstract class AbstractBean implements Bean
 {
+
+    /**
+     * 样式
+     */
+    private static final ToStringStyle NO_NULL_STYLE = new NoNullStyle();
 
     @Override
     public String toString()
     {
-        return reflectionToString(this, SHORT_PREFIX_STYLE);
+        return new ReflectionToStringBuilder(this, NO_NULL_STYLE)
+        {
+
+            @Override
+            protected boolean accept(Field field)
+            {
+                return super.accept(field) && acceptField(field);
+            }
+
+        }.toString();
+    }
+
+    /**
+     * 接受字段
+     *
+     * @param field 字段
+     * @return 是否接受
+     */
+    protected boolean acceptField(Field field)
+    {
+        return !field.isAnnotationPresent(Ignore.class);
     }
 
 }

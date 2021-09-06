@@ -16,11 +16,18 @@
 
 package org.bricks.utils;
 
+import static java.util.Arrays.stream;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.bricks.utils.FunctionUtils.apply;
+import static org.springframework.beans.factory.support.BeanDefinitionBuilder.genericBeanDefinition;
 
 import java.util.Locale;
+import java.util.Map;
 
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
@@ -48,18 +55,6 @@ public class ContextHolder implements ApplicationContextAware
     private static Environment environment;
 
     /**
-     * 根据id获取bean
-     *
-     * @param beanId bean id
-     * @return bean
-     */
-    public static Object getBean(String beanId)
-    {
-        return ofNullable(context).map(ctx -> ctx.getBean(beanId))
-                .orElse(null);
-    }
-
-    /**
      * 根据类型获取bean
      *
      * @param <T> 类型
@@ -68,7 +63,7 @@ public class ContextHolder implements ApplicationContextAware
      */
     public static <T> T getBean(Class<T> clazz)
     {
-        return ofNullable(context).map(ctx -> ctx.getBean(clazz))
+        return ofNullable(context).map(apply(ctx -> ctx.getBean(clazz), null, null, null, null))
                 .orElse(null);
     }
 
@@ -82,7 +77,7 @@ public class ContextHolder implements ApplicationContextAware
      */
     public static <T> T getBean(String beanId, Class<T> clazz)
     {
-        return ofNullable(context).map(apply(ctx -> ctx.getBean(beanId, clazz), null, null, null))
+        return ofNullable(context).map(apply(ctx -> ctx.getBean(beanId, clazz), null, null, null, null))
                 .orElse(null);
     }
 
@@ -169,6 +164,27 @@ public class ContextHolder implements ApplicationContextAware
         return ofNullable(environment.getProperty("os.name"))
                 .map(osName -> osName.contains("unix") || osName.contains("linux") || osName.contains("Mac OS X"))
                 .orElse(false);
+    }
+
+    public <T> void constructorRegistry(BeanDefinitionRegistry registry, String name, Class<T> clazz, Object... args)
+    {
+        BeanDefinitionBuilder beanDefinitionBuilder = genericBeanDefinition(clazz);
+        if (isNotEmpty(args))
+        {
+            stream(args).forEach(beanDefinitionBuilder::addConstructorArgValue);
+        }
+        registry.registerBeanDefinition(name, beanDefinitionBuilder.getRawBeanDefinition());
+    }
+
+    public <T> void propertyRegistry(BeanDefinitionRegistry registry, String name, Class<T> clazz,
+            Map<String, Object> propertyMap)
+    {
+        BeanDefinitionBuilder beanDefinitionBuilder = genericBeanDefinition(clazz);
+        if (isNotEmpty(propertyMap))
+        {
+            propertyMap.forEach(beanDefinitionBuilder::addPropertyValue);
+        }
+        registry.registerBeanDefinition(name, beanDefinitionBuilder.getRawBeanDefinition());
     }
 
 }

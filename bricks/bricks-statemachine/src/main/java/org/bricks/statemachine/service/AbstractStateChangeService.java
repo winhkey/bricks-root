@@ -16,19 +16,20 @@
 
 package org.bricks.statemachine.service;
 
+import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 import static org.springframework.messaging.support.MessageBuilder.withPayload;
 
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
+import org.bricks.annotation.NoLog;
+import org.bricks.exception.BaseException;
 import org.bricks.statemachine.builder.StateMachineBuilder;
+import org.bricks.statemachine.persister.BricksStateMachinePersist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.statemachine.StateMachinePersist;
 import org.springframework.statemachine.persist.DefaultStateMachinePersister;
 import org.springframework.statemachine.persist.StateMachinePersister;
 import org.springframework.statemachine.region.Region;
@@ -38,10 +39,11 @@ import org.springframework.statemachine.region.Region;
  *
  * @author fuzy
  *
+ * @param <I> 主键
  * @param <S> 状态
  * @param <E> 事件
  */
-public abstract class AbstractStateChangeService<S, E> implements StateChangeService<E>
+public abstract class AbstractStateChangeService<I, S, E> implements StateChangeService<I, S, E>
 {
 
     /**
@@ -59,44 +61,78 @@ public abstract class AbstractStateChangeService<S, E> implements StateChangeSer
      * 存储
      */
     @Autowired
-    private StateMachinePersist<S, E, Map<String, Object>> stateMachinePersist;
+    private BricksStateMachinePersist<S, E, I> stateMachinePersist;
 
     /**
      * 存储服务
      */
-    private StateMachinePersister<S, E, Map<String, Object>> persister;
+    private StateMachinePersister<S, E, I> persister;
 
+    /**
+     * 初始化
+     */
     @PostConstruct
     public void init()
     {
         persister = new DefaultStateMachinePersister<>(stateMachinePersist);
     }
 
+    @NoLog
     @Override
-    public boolean sendEvent(E event, String header, Map<String, Object> condition)
+    public boolean changeState(I id, E event)
     {
-        synchronized (String.valueOf(condition)
-                .intern())
+        String key = format("{0}:{1}", event, id).intern();
+        synchronized (key)
         {
-            boolean result = false;
+            boolean result;
             StateMachine<S, E> machine = null;
             try
             {
                 machine = builder.build(true);
-                persister.restore(machine, condition);
-                result = machine.sendEvent(withPayload(event).setHeader(header, condition)
+                persister.restore(machine, id);
+                result = machine.sendEvent(withPayload(event).setHeader(stateMachinePersist.stateMachineId(), id)
                         .build());
-                persister.persist(machine, condition);
+                log.debug("-> {} {}", event, result ? "成功" : "失败");
+                if (result)
+                {
+                    persister.persist(machine, id);
+                }
             }
             catch (Exception e)
             {
-                log.error(e.getMessage(), e);
+                throw new BaseException(e);
             }
             finally
             {
                 ofNullable(machine).ifPresent(Region::stop);
             }
             return result;
+        }
+    }
+
+    @Override
+    public S currentState(I id)
+    {
+        synchronized (format("{1}", id).intern())
+        {
+            S state;
+            StateMachine<S, E> machine = null;
+            try
+            {
+                machine = builder.build(true);
+                persister.restore(machine, id);
+                state = machine.getState()
+                        .getId();
+            }
+            catch (Exception e)
+            {
+                throw new BaseException(e);
+            }
+            finally
+            {
+                ofNullable(machine).ifPresent(Region::stop);
+            }
+            return state;
         }
     }
 

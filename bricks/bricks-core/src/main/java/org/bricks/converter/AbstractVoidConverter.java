@@ -41,4 +41,21 @@ public abstract class AbstractVoidConverter<M, N> extends AbstractConverter<M, N
      */
     protected abstract N from(M m);
 
+    @Override
+    protected M reverseFrom(N n, Void v)
+    {
+        return null;
+    }
+
+    /**
+     * 反转
+     *
+     * @param n N
+     * @return M
+     */
+    protected M reverseFrom(N n)
+    {
+        return null;
+    }
+
 }

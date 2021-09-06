@@ -18,12 +18,17 @@ package org.bricks.statemachine.builder;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
+import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 import static org.bricks.utils.ReflectionUtils.getDeclaredAnnotation;
 import static org.springframework.statemachine.config.StateMachineBuilder.builder;
+
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.bricks.annotation.NoLog;
 import org.bricks.exception.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +59,16 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     /**
+     * 状态枚举类型
+     */
+    protected Class<S> stateClass;
+
+    /**
+     * 事件枚举类型
+     */
+    protected Class<E> eventClass;
+
+    /**
      * 状态机id
      */
     private String machineId;
@@ -68,6 +83,7 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
      * 初始化获取状态机id
      */
     @PostConstruct
+    @SuppressWarnings(UNCHECKED)
     public void init()
     {
         machineId = ofNullable(getDeclaredAnnotation(getClass(), Service.class)).map(Service::value)
@@ -77,8 +93,12 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
         {
             throw new BaseException("@Service或@Component注解缺少value");
         }
+        List<Class<?>> classList = getComponentClassList(getClass(), StateMachineBuilder.class);
+        stateClass = (Class<S>) classList.get(0);
+        eventClass = (Class<E>) classList.get(1);
     }
 
+    @NoLog
     @Override
     public StateMachine<S, E> build(boolean autostart)
     {
@@ -94,15 +114,16 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
                     {
 
                         @Override
-                        public void stateChanged(State from, State to)
+                        public void stateChanged(State<S, E> from, State<S, E> to)
                         {
                             log.debug("state changed from {} to {}", ofNullable(from).map(State::getId)
                                     .orElse(null), to.getId());
                         }
 
                     });
-            configureStates(builder.configureStates()
-                    .withStates());
+            StateConfigurer<S, E> stateConfigurer = builder.configureStates()
+                    .withStates();
+            configureStates(stateConfigurer);
             configureTransitions(builder.configureTransitions());
             machine = builder.build();
             if (autostart)
@@ -129,7 +150,6 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
      *
      * @param transitionConfigurer 配置器
      */
-    protected abstract void configureTransitions(StateMachineTransitionConfigurer<S, E> transitionConfigurer)
-            throws Exception;
+    protected abstract void configureTransitions(StateMachineTransitionConfigurer<S, E> transitionConfigurer);
 
 }

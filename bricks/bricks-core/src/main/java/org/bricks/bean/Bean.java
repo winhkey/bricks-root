@@ -16,12 +16,27 @@
 
 package org.bricks.bean;
 
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
+
 /**
  * 数据Bean接口
  *
  * @author fuzy
- * 
+ *
  */
 public interface Bean
 {
+
+    /**
+     * 返回自对象
+     * 
+     * @param <T> 自类型
+     * @return 自对象
+     */
+    @SuppressWarnings(UNCHECKED)
+    default <T> T self()
+    {
+        return (T) this;
+    }
+
 }

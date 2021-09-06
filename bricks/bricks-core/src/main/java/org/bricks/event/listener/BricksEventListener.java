@@ -23,18 +23,17 @@ import org.bricks.event.BricksEvent;
  * 
  * @author fuzy
  *
- * @param <E> 事件
+ * @param <S> 事件
  */
-public interface BricksEventListener<E extends BricksEvent<?>>
+public interface BricksEventListener<S extends BricksEvent<?>>
 {
 
     /**
      * 监听方法
      *
      * @param event 事件
-     * @param <N> 新事件类型
      * @return 新事件
      */
-    <N extends BricksEvent<?>> E onEvent(E event);
+    BricksEvent<?> onEvent(S event);
 
 }

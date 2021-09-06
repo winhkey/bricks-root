@@ -17,6 +17,9 @@
 package org.bricks.utils;
 
 import static java.util.stream.IntStream.range;
+import static org.bricks.constants.Constants.StringConstants.ALL_CHARS;
+import static org.bricks.constants.Constants.StringConstants.ALL_NUMBERS;
+import static org.bricks.constants.Constants.StringConstants.ENGLISH_CHARS;
 
 import java.util.Random;
 
@@ -36,21 +39,6 @@ public class RandomUtils
      * 随机种子
      */
     private static final Random DEFAULT_RANDOM = new Random();
-
-    /**
-     * 数字字符串
-     */
-    private static final String ALL_NUMBERS = "0123456789";
-
-    /**
-     * 数字字母字符串
-     */
-    private static final String ALL_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-    /**
-     * 字母字符串
-     */
-    private static final String ENGLISH_CHARS = "abcdefghijklmnopqrstuvwxyz";
 
     /**
      * 数字随机串

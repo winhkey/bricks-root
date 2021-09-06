@@ -16,23 +16,42 @@
 
 package org.bricks.event.publish;
 
+import static java.util.Optional.ofNullable;
+
+import javax.annotation.Resource;
+
 import org.bricks.event.BricksEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 发布事件接口
+ * 发布事件
  * 
  * @author fuzy
  *
- * @param <E> 事件源
  */
-public interface BricksEventPublish<E extends BricksEvent<?>>
+@Slf4j
+@Service
+public class BricksEventPublish
 {
+
+    /**
+     * 发布者
+     */
+    @Resource
+    protected ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 发布
      * 
+     * @param <E> 事件
      * @param event 事件
      */
-    void publish(E event);
+    public <E extends BricksEvent<?>> void publish(E event)
+    {
+        ofNullable(event).ifPresent(e -> applicationEventPublisher.publishEvent(e));
+    }
 
 }

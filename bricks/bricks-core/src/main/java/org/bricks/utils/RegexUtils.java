@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -256,9 +257,28 @@ public class RegexUtils
         StringBuffer result = new StringBuffer(content.length());
         while (matcher.find())
         {
-            matcher.appendReplacement(result, "");
-            result.append(matcher.group()
+            matcher.appendReplacement(result, matcher.group()
                     .replaceAll(source, target));
+        }
+        matcher.appendTail(result);
+        return result.toString();
+    }
+
+    /**
+     * 正则捕获替换
+     *
+     * @param pattern 正则对象
+     * @param content 源字符串
+     * @param function 替换函数
+     * @return 替换结果
+     */
+    public static String regularGroupReplaceAll(Pattern pattern, String content, Function<Matcher, String> function)
+    {
+        Matcher matcher = pattern.matcher(content);
+        StringBuffer result = new StringBuffer(content.length());
+        while (matcher.find())
+        {
+            matcher.appendReplacement(result, function.apply(matcher));
         }
         matcher.appendTail(result);
         return result.toString();

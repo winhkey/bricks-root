@@ -178,7 +178,7 @@ public class Constants
         /**
          * IP头列表
          */
-        public static final String[] IP_HEADERS = {"x-forwarded-for", "Proxy-Client-IP", "WL-Proxy-Client-IP",
+        public static final String[] IP_HEADERS = {"x-forwarded-for", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP",
                 "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
 
     }
@@ -203,6 +203,16 @@ public class Constants
          * 数字字母字符串
          */
         public static final String ALL_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+
+        /**
+         * 十六进制字节数组
+         */
+        public static final String HEX = "0123456789ABCDEF";
+
+        /**
+         * 十六进制字节数组
+         */
+        public static final char[] HEX_ARRAY = HEX.toCharArray();
 
         /**
          * 简体字符串，与下面的繁体字符串一一对应
@@ -343,7 +353,7 @@ public class Constants
     /**
      * 网页正则
      *
-     * @author fuzhiying
+     * @author fuzy
      *
      */
     public static final class PatternConstants

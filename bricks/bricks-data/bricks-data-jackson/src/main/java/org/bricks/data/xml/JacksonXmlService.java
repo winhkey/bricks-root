@@ -14,26 +14,32 @@
  * limitations under the License.
  */
 
-package org.bricks.service;
+package org.bricks.data.xml;
+
+import static org.bricks.data.utils.JacksonUtils.getXmlMapper;
+
+import javax.annotation.PostConstruct;
+
+import org.bricks.data.json.AbstractJacksonService;
+import org.springframework.stereotype.Service;
 
 /**
- * 回调接口
+ * xml转对象实现类(jackson)
  *
  * @author fuzy
  *
- * @param <P> 请求
- * @param <R> 响应
  */
-@FunctionalInterface
-public interface Callback<P, R>
+@Service("jacksonXmlService")
+public class JacksonXmlService extends AbstractJacksonService implements XmlDataService
 {
 
     /**
-     * 回调
-     * 
-     * @param param 参数
-     * @return 返回值
+     * 初始化
      */
-    R call(P param);
+    @PostConstruct
+    public void init()
+    {
+        objectMapper = getXmlMapper();
+    }
 
 }

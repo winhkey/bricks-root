@@ -19,6 +19,7 @@ package org.bricks.utils;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newInputStream;
 import static java.util.Locale.US;
+import static org.bricks.constants.Constants.AlgorithmConstants.MD5;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class MD5Utils
         byte[] buffer = new byte[1024];
         try (InputStream fis = newInputStream(file.toPath()))
         {
-            MessageDigest messagedigest = MessageDigest.getInstance("MD5");
+            MessageDigest messagedigest = MessageDigest.getInstance(MD5);
             int numRead;
             while ((numRead = fis.read(buffer)) > 0)
             {
@@ -89,7 +90,7 @@ public class MD5Utils
     {
         try
         {
-            MessageDigest messagedigest = MessageDigest.getInstance("MD5");
+            MessageDigest messagedigest = MessageDigest.getInstance(MD5);
             return bufferToHex(messagedigest.digest(bytes), uppercase);
         }
         catch (NoSuchAlgorithmException e)

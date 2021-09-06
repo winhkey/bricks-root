@@ -18,7 +18,11 @@ package org.bricks.utils;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.time.Duration.between;
+import static java.time.LocalDateTime.now;
+import static java.time.LocalDateTime.ofInstant;
 import static java.time.ZoneId.systemDefault;
+import static java.time.ZoneOffset.UTC;
+import static java.time.ZonedDateTime.of;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Locale.US;
 import static java.util.Optional.ofNullable;
@@ -26,12 +30,16 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.bricks.constants.Constants.FormatConstants.CRON_PATTERN;
 import static org.bricks.constants.Constants.FormatConstants.DATETIME_FORMAT;
 import static org.bricks.constants.Constants.FormatConstants.DATE_FORMAT;
+import static org.bricks.constants.Constants.FormatConstants.HOUR_PATTERN;
+import static org.bricks.constants.Constants.FormatConstants.MINUTE_SECOND_PATTERN;
 import static org.bricks.constants.Constants.FormatConstants.TIME_FORMAT;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -52,11 +60,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class DateUtils
 {
-
-    /**
-     * 定时任务时间规则
-     */
-    private static final String CRON_PATTERN = "ss mm HH dd MM ? yyyy";
 
     /**
      * 日期格式
@@ -87,18 +90,14 @@ public class DateUtils
      * 格式化日期
      *
      * @param dateTime Date
-     * @param formatStr FormatStr
-     * @return string.
+     * @param formatStr 格式
+     * @return 字符串
      */
     public static String format(LocalDateTime dateTime, String formatStr)
     {
-        if (dateTime == null)
-        {
-            return "";
-        }
-        String pattern = isEmpty(formatStr) ? DATETIME_FORMAT : formatStr;
-        DateTimeFormatter formatter = getDateTimeFormatter(pattern);
-        return dateTime.format(formatter);
+        return ofNullable(dateTime)
+                .map(d -> d.format(getDateTimeFormatter(isBlank(formatStr) ? DATETIME_FORMAT : formatStr)))
+                .orElse("");
     }
 
     /**
@@ -113,6 +112,54 @@ public class DateUtils
     }
 
     /**
+     * 格式化日期
+     *
+     * @param date 日期
+     * @param formatStr 格式
+     * @return 字符串
+     */
+    public static String format(LocalDate date, String formatStr)
+    {
+        return ofNullable(date).map(d -> d.format(getDateTimeFormatter(isBlank(formatStr) ? DATE_FORMAT : formatStr)))
+                .orElse("");
+    }
+
+    /**
+     * 格式化
+     *
+     * @param date 日期
+     * @return 字符串
+     */
+    public static String format(LocalDate date)
+    {
+        return format(date, DATE_FORMAT);
+    }
+
+    /**
+     * 格式化时间
+     *
+     * @param time 时间
+     * @param formatStr 格式
+     * @return 字符串
+     */
+    public static String format(LocalTime time, String formatStr)
+    {
+        return ofNullable(time).map(t -> t.format(getDateTimeFormatter(isBlank(formatStr) ? TIME_FORMAT : formatStr)))
+                .orElse("");
+    }
+
+    /**
+     * 格式化
+     *
+     * @param time 时间
+     * @return 字符串
+     */
+    public static String format(LocalTime time)
+    {
+        return format(time, TIME_FORMAT);
+    }
+
+    /**
      * 把字符串格式化日期
      *
      * @param dateStr date
@@ -121,7 +168,7 @@ public class DateUtils
      */
     public static LocalDateTime parse(String dateStr, String formatStr)
     {
-        if (isEmpty(dateStr))
+        if (isBlank(dateStr))
         {
             return null;
         }
@@ -137,7 +184,7 @@ public class DateUtils
      */
     public static LocalDateTime parse(String dateStr)
     {
-        if (isEmpty(dateStr))
+        if (isBlank(dateStr))
         {
             return null;
         }
@@ -157,7 +204,7 @@ public class DateUtils
         return ofNullable(datePattern).map(pattern ->
         {
             LocalDateTime result = null;
-            if (isNotEmpty(dateStr))
+            if (isNotBlank(dateStr))
             {
                 Matcher matcher = datePattern.matcher(dateStr);
                 if (matcher.find())
@@ -189,9 +236,9 @@ public class DateUtils
                     .replaceFirst("^[a-zA-Z]{3,8}([^a-zA-Z])", "MMM$1")
                     .replaceFirst("([^\\d])[\\d]{1,2}(st|nd|rd|th)?([^\\d])", "$1d ")
                     .replaceFirst("([^\\d])[\\d]{4}( ?)", "$1yyyy$2")
-                    .replaceFirst("( ?)[\\d]{1,2}([^\\d])", "$1K$2")
-                    .replaceFirst("([^\\d])[\\d]{1,2}([^\\d]?)", "$1m$2")
-                    .replaceFirst("([^\\d])[\\d]{1,2}([^\\d]?)", "$1s$2")
+                    .replaceFirst(HOUR_PATTERN, "$1h$2")
+                    .replaceFirst(MINUTE_SECOND_PATTERN, "$1m$2")
+                    .replaceFirst(MINUTE_SECOND_PATTERN, "$1s$2")
                     .replaceFirst("(am|pm|AM|PM)", "a");
             formatter = ofPattern(parse, US);
         }
@@ -211,8 +258,7 @@ public class DateUtils
      */
     public static Date toDate(LocalDateTime dateTime)
     {
-        return Date.from(dateTime.atZone(systemDefault())
-                .toInstant());
+        return Date.from(toInstant(dateTime));
     }
 
     /**
@@ -223,9 +269,7 @@ public class DateUtils
      */
     public static Date toDate(LocalDate date)
     {
-        return Date.from(date.atStartOfDay()
-                .atZone(systemDefault())
-                .toInstant());
+        return Date.from(toInstant(date.atStartOfDay()));
     }
 
     /**
@@ -236,7 +280,7 @@ public class DateUtils
      */
     public static LocalDateTime toLocalDateTime(Date date)
     {
-        return LocalDateTime.ofInstant(date.toInstant(), systemDefault());
+        return ofInstant(date.toInstant(), systemDefault());
     }
 
     /**
@@ -259,6 +303,46 @@ public class DateUtils
     public static LocalTime toLocalTime(Date date)
     {
         return toLocalDateTime(date).toLocalTime();
+    }
+
+    /**
+     * @return UNIX时间戳
+     */
+    public long unixSecond()
+    {
+        return now(UTC).atZone(UTC)
+                .toEpochSecond();
+    }
+
+    /**
+     * UNIX时间戳
+     *
+     * @param dateTime 时间
+     * @return UNIX时间戳
+     */
+    public long unixSecond(LocalDateTime dateTime)
+    {
+        return of(dateTime, systemDefault()).withZoneSameInstant(UTC)
+                .toEpochSecond();
+    }
+
+    /**
+     * @return UNIX时间戳（豪秒）
+     */
+    public long milliSecond()
+    {
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * UNIX时间戳（豪秒）
+     *
+     * @param dateTime 时间
+     * @return UNIX时间戳
+     */
+    public static long milliSecond(LocalDateTime dateTime)
+    {
+        return toInstant(dateTime).toEpochMilli();
     }
 
     /**
@@ -329,9 +413,21 @@ public class DateUtils
                 .replaceFirst("^[\\d]{2}([^\\d])", "yy$1")
                 .replaceFirst("([^\\d])[\\d]{1,2}([^\\d])", "$1MM$2")
                 .replaceFirst("([^\\d])[\\d]{1,2}( ?)", "$1dd$2")
-                .replaceFirst("( ?)[\\d]{1,2}([^\\d])", "$1HH$2")
-                .replaceFirst("([^\\d])[\\d]{1,2}([^\\d]?)", "$1mm$2")
-                .replaceFirst("([^\\d])[\\d]{1,2}([^\\d]?)", "$1ss$2");
+                .replaceFirst(HOUR_PATTERN, "$1HH$2")
+                .replaceFirst(MINUTE_SECOND_PATTERN, "$1mm$2")
+                .replaceFirst(MINUTE_SECOND_PATTERN, "$1ss$2");
+    }
+
+    /**
+     * 时钟
+     *
+     * @param dateTime 时间
+     * @return 时钟
+     */
+    public static Instant toInstant(LocalDateTime dateTime)
+    {
+        return dateTime.atZone(systemDefault())
+                .toInstant();
     }
 
 }

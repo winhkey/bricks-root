@@ -16,6 +16,9 @@
 
 package org.bricks.utils;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.bricks.constants.Constants.NumberConstants.NUMBER_3;
+import static org.bricks.constants.Constants.NumberConstants.NUMBER_48;
 import static org.bricks.utils.MD5Utils.getMD5String;
 import static org.bricks.utils.RandomUtils.randomString;
 
@@ -53,7 +56,7 @@ public class PasswordUtils
     {
         String md5 = getMD5String(password.concat(salt), false);
         char[] cs = new char[48];
-        for (int i = 0; i < 48; i += 3)
+        for (int i = 0; i < NUMBER_48; i += NUMBER_3)
         {
             cs[i] = md5.charAt(i / 3 * 2);
             char c = salt.charAt(i / 3);
@@ -72,9 +75,13 @@ public class PasswordUtils
      */
     public static boolean verify(String inputPassword, String storedPassword)
     {
+        if (isBlank(inputPassword) || isBlank(storedPassword))
+        {
+            return false;
+        }
         char[] cs1 = new char[32];
         char[] cs2 = new char[16];
-        for (int i = 0; i < 48; i += 3)
+        for (int i = 0; i < NUMBER_48; i += NUMBER_3)
         {
             cs1[i / 3 * 2] = storedPassword.charAt(i);
             cs1[i / 3 * 2 + 1] = storedPassword.charAt(i + 2);

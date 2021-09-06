@@ -16,6 +16,7 @@
 
 package org.bricks.data.serializer;
 
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
 import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import javax.annotation.PostConstruct;
  *
  * @param <D> 数据类
  */
-public class AbstractDataSerializer<D> implements DataSerializer<D>
+public abstract class AbstractDataSerializer<D> implements DataSerializer<D>
 {
 
     /**
@@ -40,8 +41,8 @@ public class AbstractDataSerializer<D> implements DataSerializer<D>
     /**
      * 初始化获取参数类型
      */
-    @SuppressWarnings("unchecked")
     @PostConstruct
+    @SuppressWarnings(UNCHECKED)
     public void init()
     {
         List<Class<?>> classList = getComponentClassList(getClass(), DataSerializer.class);

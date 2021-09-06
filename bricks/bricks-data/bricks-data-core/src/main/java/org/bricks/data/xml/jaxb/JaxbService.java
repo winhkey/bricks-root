@@ -16,13 +16,18 @@
 
 package org.bricks.data.xml.jaxb;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newConcurrentMap;
+import static java.lang.String.join;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newInputStream;
-import static java.util.Arrays.asList;
+import static java.util.Arrays.copyOf;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.of;
+import static javax.xml.bind.JAXBContext.newInstance;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
+import static org.bricks.utils.FunctionUtils.apply;
 
 import java.io.File;
 import java.io.InputStream;
@@ -34,6 +39,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -45,10 +51,13 @@ import javax.xml.transform.sax.SAXSource;
 import org.bricks.data.AbstractDataService;
 import org.bricks.data.xml.XmlDataService;
 import org.bricks.exception.BaseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+
+import lombok.SneakyThrows;
 
 /**
  * JAXB转换XML和java bean
@@ -57,13 +66,37 @@ import org.xml.sax.XMLReader;
  *
  */
 @Service("jaxbService")
-public class JaxbServiceImpl extends AbstractDataService implements XmlDataService
+public class JaxbService extends AbstractDataService implements XmlDataService
 {
+
+    /**
+     * 路径列表
+     */
+    @Value("${bricks.jaxb.context-paths:}")
+    private List<String> contextPaths;
 
     /**
      * JAXBContext缓存
      */
-    private static final Map<List<Class<?>>, JAXBContext> JAXB_CONTEXT_MAP = newConcurrentMap();
+    private static final Map<String, JAXBContext> JAXB_CONTEXT_MAP = newConcurrentMap();
+
+    /**
+     * 全局JAXBContext
+     */
+    private JAXBContext jaxbContext;
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    @SneakyThrows
+    public void init()
+    {
+        if (isNotEmpty(contextPaths))
+        {
+            jaxbContext = newInstance(join(":", contextPaths));
+        }
+    }
 
     @Override
     protected <T> T readFrom(String content, Type... type)
@@ -73,7 +106,7 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
             Unmarshaller unmarshaller = buildUnmarshaller(parse(type));
             return unmarshal(unmarshaller, reader);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             throw new BaseException(e);
         }
@@ -86,7 +119,7 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
         {
             return readFrom(stream, type);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             throw new BaseException(e);
         }
@@ -100,14 +133,14 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
             Unmarshaller unmarshaller = buildUnmarshaller(parse(type));
             return unmarshal(unmarshaller, reader);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             throw new BaseException(e);
         }
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings(UNCHECKED)
     protected <T> T convertFrom(Object object, Type... type)
     {
         try
@@ -116,7 +149,7 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
             return unmarshaller.unmarshal((Node) object, (Class<T>) type[0])
                     .getValue();
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             throw new BaseException(e);
         }
@@ -133,7 +166,7 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
             return sw.toString()
                     .replace(" standalone=\"yes\"", "");
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             throw new BaseException(e);
         }
@@ -147,11 +180,17 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
      */
     private Class<?>[] parse(Type... types)
     {
+        Type[] t;
         if (isEmpty(types))
         {
-            throw new IllegalArgumentException("Unknown Type");
+            t = new Type[] {MapElementFactory.class};
         }
-        return of(types).map(type -> (Class<?>) type)
+        else
+        {
+            t = copyOf(types, types.length + 1);
+            t[t.length - 1] = MapElementFactory.class;
+        }
+        return of(t).map(type -> (Class<?>) type)
                 .toArray(Class[]::new);
     }
 
@@ -181,7 +220,7 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
         return jaxb.createUnmarshaller();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings(UNCHECKED)
     private <T> T unmarshal(Unmarshaller unmarshaller, Reader reader)
     {
         try
@@ -193,17 +232,16 @@ public class JaxbServiceImpl extends AbstractDataService implements XmlDataServi
             Source source = new SAXSource(xmlReader, new InputSource(reader));
             return (T) unmarshaller.unmarshal(source);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             throw new BaseException(e);
         }
     }
 
-    private JAXBContext getJaxbContext(Class<?>... classes) throws JAXBException
+    private JAXBContext getJaxbContext(Class<?>... classes)
     {
-        JAXBContext context = JAXBContext.newInstance(classes);
-        JAXB_CONTEXT_MAP.putIfAbsent(newArrayList(asList(classes)), context);
-        return context;
+        return ofNullable(jaxbContext).orElseGet(() -> JAXB_CONTEXT_MAP.computeIfAbsent(getCacheKey(classes),
+                apply(k -> newInstance(classes), null, null, log, null)));
     }
 
 }

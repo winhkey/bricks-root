@@ -16,7 +16,11 @@
 
 package org.bricks.data;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.bricks.utils.MD5Utils.getMD5String;
 
 import java.io.File;
 import java.io.InputStream;
@@ -48,7 +52,7 @@ public abstract class AbstractDataService implements DataService
         {
             try
             {
-                return readFrom(content, type);
+                return readFrom(simplify(content), type);
             }
             catch (Throwable e)
             {
@@ -125,6 +129,26 @@ public abstract class AbstractDataService implements DataService
             }
         }
         return null;
+    }
+
+    @Override
+    public String simplify(String content)
+    {
+        return content;
+    }
+
+    /**
+     * 根据类型生成缓存的key
+     *
+     * @param types 类型列表
+     * @return key
+     */
+    protected String getCacheKey(Type... types)
+    {
+        return isEmpty(types) ? null
+                : getMD5String(stream(types).map(Type::getTypeName)
+                        .sorted()
+                        .collect(joining("|")), false);
     }
 
     /**

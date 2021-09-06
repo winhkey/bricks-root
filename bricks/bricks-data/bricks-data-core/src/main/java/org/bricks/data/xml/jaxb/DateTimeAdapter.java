@@ -7,12 +7,15 @@ import java.time.LocalDateTime;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import org.springframework.stereotype.Service;
+
 /**
- * 序列/反序列化时间
+ * LocalDateTime支持
  *
  * @author fuzy
  *
  */
+@Service
 public class DateTimeAdapter extends XmlAdapter<String, LocalDateTime>
 {
 
@@ -25,7 +28,7 @@ public class DateTimeAdapter extends XmlAdapter<String, LocalDateTime>
     @Override
     public String marshal(LocalDateTime v)
     {
-        return format(v, null);
+        return format(v);
     }
 
 }

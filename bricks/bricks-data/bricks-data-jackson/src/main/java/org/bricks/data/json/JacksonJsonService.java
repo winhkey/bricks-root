@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.bricks.data.xml;
+package org.bricks.data.json;
 
-import static org.bricks.data.utils.JacksonJsonUtils.createXmlMapper;
+import static org.bricks.data.utils.JacksonUtils.getJsonMapper;
 
 import javax.annotation.PostConstruct;
 
-import org.bricks.data.json.AbstractJacksonService;
 import org.springframework.stereotype.Service;
 
 /**
- * xml转对象实现类(jackson)
+ * json实现(jackson)
  *
  * @author fuzy
  *
  */
-@Service("jacksonXmlService")
-public class JacksonXmlServiceImpl extends AbstractJacksonService implements XmlDataService
+@Service("jacksonJsonService")
+public class JacksonJsonService extends AbstractJacksonService implements JsonDataService
 {
 
     /**
@@ -39,7 +38,7 @@ public class JacksonXmlServiceImpl extends AbstractJacksonService implements Xml
     @PostConstruct
     public void init()
     {
-        objectMapper = createXmlMapper();
+        objectMapper = getJsonMapper();
     }
 
 }

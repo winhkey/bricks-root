@@ -21,11 +21,13 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
 
 /**
- * 限量回调
+ * 限流回调
  *
  * @author fuzy
  */
@@ -34,15 +36,33 @@ public class LimitCallback
 {
 
     /**
-     *
-     * @param collection 集合
-     * @param limit 分批
-     * @param callback 回调
+     * 限流回调
+     * 
      * @param <T> 源
      * @param <V> 目标
+     * @param collection 集合
+     * @param limit 分批
+     * @param function function
      * @return 列表
      */
-    public <T, V> List<V> limit(Collection<T> collection, int limit, Callback<List<T>, List<V>> callback)
+    public <T, V> List<V> limitFunction(Collection<T> collection, int limit, Function<List<T>, List<V>> function)
+    {
+        return limitFunction(collection, limit, function, 0);
+    }
+
+    /**
+     * 限流回调
+     * 
+     * @param <T> 源
+     * @param <V> 目标
+     * @param collection 集合
+     * @param limit 分批
+     * @param function function
+     * @param delaySeconds 每批间隔
+     * @return 列表
+     */
+    public <T, V> List<V> limitFunction(Collection<T> collection, int limit, Function<List<T>, List<V>> function,
+            int delaySeconds)
     {
         List<V> vList = newArrayList();
         if (isNotEmpty(collection))
@@ -57,12 +77,13 @@ public class LimitCallback
             {
                 for (; i < page; i++)
                 {
-                    subList = callback.call(list.subList(i * limit, (i + 1) * limit));
+                    subList = function.apply(list.subList(i * limit, (i + 1) * limit));
                     addSubList(vList, subList);
+                    delay(delaySeconds);
                 }
                 if (mod > 0)
                 {
-                    subList = callback.call(list.subList(i * limit, length));
+                    subList = function.apply(list.subList(i * limit, length));
                     addSubList(vList, subList);
                 }
             }
@@ -75,17 +96,77 @@ public class LimitCallback
     }
 
     /**
-     * 添加子列表
-     *
-     * @param list 列表
-     * @param subList 子列表
-     * @param <V> 目标类型
+     * 限流回调
+     * 
+     * @param <T> 源
+     * @param <V> 目标
+     * @param collection 集合
+     * @param limit 分批
+     * @param consumer consumer
      */
+    public <T, V> void limit(Collection<T> collection, int limit, Consumer<List<T>> consumer)
+    {
+        limit(collection, limit, consumer, 0);
+    }
+
+    /**
+     * 限流回调
+     * 
+     * @param <T> 源
+     * @param <V> 目标
+     * @param collection 集合
+     * @param limit 分批
+     * @param consumer consumer
+     * @param delaySeconds 每批间隔
+     */
+    public <T, V> void limit(Collection<T> collection, int limit, Consumer<List<T>> consumer, int delaySeconds)
+    {
+        if (isNotEmpty(collection))
+        {
+            List<T> list = newArrayList(collection);
+            int length = collection.size();
+            int page = length / limit;
+            int mod = length % limit;
+            int i = 0;
+            try
+            {
+                for (; i < page; i++)
+                {
+                    consumer.accept(list.subList(i * limit, (i + 1) * limit));
+                    delay(delaySeconds);
+                }
+                if (mod > 0)
+                {
+                    consumer.accept(list.subList(i * limit, length));
+                }
+            }
+            finally
+            {
+                list.clear();
+            }
+        }
+    }
+
     private <V> void addSubList(List<V> list, List<V> subList)
     {
         if (isNotEmpty(subList))
         {
             list.addAll(subList);
+        }
+    }
+
+    private void delay(int delaySeconds)
+    {
+        if (delaySeconds > 0)
+        {
+            try
+            {
+                Thread.sleep(delaySeconds * 1000L);
+            }
+            catch (InterruptedException e)
+            {
+                // do nth.
+            }
         }
     }
 

@@ -17,6 +17,7 @@
 package org.bricks.listener;
 
 import static java.text.MessageFormat.format;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -47,7 +48,7 @@ public class Log4j2ApplicationListener implements GenericApplicationListener
 {
 
     /**
-     * 排序
+     * 默认优先级
      */
     public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
 
@@ -68,16 +69,11 @@ public class Log4j2ApplicationListener implements GenericApplicationListener
     {
         if (event instanceof ApplicationEnvironmentPreparedEvent)
         {
-            onApplicationEvent((ApplicationEnvironmentPreparedEvent) event);
+            ConfigurableEnvironment environment = ((ApplicationEnvironmentPreparedEvent) event).getEnvironment();
+            String path = format("{0}/{1}/{2}", environment.getProperty("spring.application.name"), getIp(environment),
+                    environment.getProperty("server.port"));
+            MDC.put("app", path);
         }
-    }
-
-    private void onApplicationEvent(ApplicationEnvironmentPreparedEvent event)
-    {
-        ConfigurableEnvironment environment = event.getEnvironment();
-        String path = format("{0}/{1}/{2}", environment.getProperty("spring.application.name"), getIp(environment),
-                environment.getProperty("server.port"));
-        MDC.put("app", path);
     }
 
     @Override
@@ -100,7 +96,9 @@ public class Log4j2ApplicationListener implements GenericApplicationListener
 
     private boolean isAssignableFrom(Class<?> type, Class<?>... supportedTypes)
     {
-        return of(supportedTypes).anyMatch(supportedType -> supportedType.isAssignableFrom(type));
+        return ofNullable(type)
+                .map(t -> of(supportedTypes).anyMatch(supportedType -> supportedType.isAssignableFrom(type)))
+                .orElse(false);
     }
 
     private String getIp(Environment environment)
