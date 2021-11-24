@@ -16,10 +16,16 @@
 
 package org.bricks.module.annotation;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Map;
+
+import org.bricks.module.bean.TableConfig;
+import org.bricks.module.validate.filter.TableValidateFilter;
 
 /**
  * excel表注解
@@ -27,8 +33,8 @@ import java.lang.annotation.Target;
  * @author fuzy
  *
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({TYPE})
+@Retention(RUNTIME)
 public @interface Excel
 {
 
@@ -36,5 +42,36 @@ public @interface Excel
      * @return 起始行
      */
     int startRow() default 1;
+
+    /**
+     * @return 唯一列
+     */
+    Unique[] uniques() default {};
+
+    /**
+     * @return 自定义过滤器
+     */
+    String filterName() default "";
+
+    /**
+     * @return 自定义过滤器
+     */
+    Class<? extends TableValidateFilter> filterClass() default Excel.UselessTableFilter.class;
+
+    /**
+     * 默认无用filter
+     *
+     * @author fuzy
+     */
+    final class UselessTableFilter implements TableValidateFilter
+    {
+
+        @Override
+        public boolean validate(List<Map<Integer, String>> data, TableConfig config)
+        {
+            return false;
+        }
+
+    }
 
 }

@@ -18,7 +18,7 @@ package org.bricks.module.bean;
 
 import org.bricks.bean.AbstractBean;
 import org.bricks.module.enums.DataType;
-import org.bricks.module.service.ValidateFilter;
+import org.bricks.module.validate.filter.RowValidateFilter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -84,6 +84,6 @@ public class ColumnConfig extends AbstractBean
     /**
      * 自定义过滤器
      */
-    private Class<? extends ValidateFilter<?>> filterClass;
+    private Class<? extends RowValidateFilter> filterClass;
 
 }

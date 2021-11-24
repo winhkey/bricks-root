@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.bricks.bean.AbstractBean;
 import org.bricks.module.enums.DataType;
+import org.bricks.module.validate.filter.TableValidateFilter;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -58,6 +59,21 @@ public class TableConfig extends AbstractBean
     private int currentRow;
 
     /**
+     * 唯一字段列表
+     */
+    private List<int[]> uniques;
+
+    /**
+     * 自定义过滤器
+     */
+    private String filterName;
+
+    /**
+     * 自定义过滤器
+     */
+    private Class<? extends TableValidateFilter> filterClass;
+
+    /**
      * Map&lt;列序号, 列配置&gt;
      */
     private Map<Integer, ColumnConfig> columnMap;
@@ -76,6 +92,11 @@ public class TableConfig extends AbstractBean
      * 字段列表
      */
     private List<String> fieldList;
+
+    /**
+     * 是否有唯一约束
+     */
+    private boolean unique;
 
     /**
      * 根据自选字段获取标题列表

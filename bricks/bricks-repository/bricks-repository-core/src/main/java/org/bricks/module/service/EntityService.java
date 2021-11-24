@@ -42,32 +42,13 @@ public interface EntityService<I, T>
 {
 
     /**
-     * 错误描述
-     */
-    String ERR_MSG = "{0}.{1} error";
-
-    /**
-     * 新增
+     * 按条件计数
      *
-     * @param t 实体对象
-     * @return 实体对象
+     * @param condition 条件
+     * @param clear 是否清除条件
+     * @return 个数
      */
-    T save(T t);
-
-    /**
-     * 更新
-     *
-     * @param t 实体对象
-     * @return 实体对象
-     */
-    T update(T t);
-
-    /**
-     * 批量新增
-     *
-     * @param list 实体列表
-     */
-    void saveBatch(Collection<T> list);
+    long count(Map<String, Object> condition, boolean clear);
 
     /**
      * 根据id删除
@@ -77,11 +58,13 @@ public interface EntityService<I, T>
     void delete(I id);
 
     /**
-     * 删除实体对象
+     * 根据条件物理删除
      *
-     * @param t 实体对象
+     * @param condition 条件
+     * @param clear 是否清除条件
+     * @return 删除条数
      */
-    void deleteEntity(T t);
+    int deleteAll(Map<String, Object> condition, boolean clear);
 
     /**
      * 根据id列表批量删除
@@ -91,11 +74,73 @@ public interface EntityService<I, T>
     void deleteBatch(Collection<I> ids);
 
     /**
+     * 删除实体对象
+     *
+     * @param t 实体对象
+     */
+    void deleteEntity(T t);
+
+    /**
      * 删除对象列表
      *
      * @param list 对象列表
      */
     void deleteList(Collection<T> list);
+
+    /**
+     * 导出数据
+     *
+     * @param list 数据列表
+     * @param outputStream 输出流
+     * @param fields 定制字段列表
+     */
+    void export(List<List<Object>> list, OutputStream outputStream, List<String[]> fields);
+
+    /**
+     * 导出数据
+     *
+     * @param list 数据列表
+     * @param outputStream 输出流
+     * @param fields 定制字段列表
+     */
+    void exportData(List<List<Map<Integer, String>>> list, OutputStream outputStream, List<String[]> fields);
+
+    /**
+     * 根据条件查询
+     *
+     * @param condition 条件
+     * @param clear 是否清除条件
+     * @param fieldList 字段列表
+     * @param orders 排序字段
+     * @return 列表
+     */
+    List<T> findAll(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders);
+
+    /**
+     * 根据条件查询
+     *
+     * @param condition 条件
+     * @param clear 是否清除条件
+     * @param orders 排序字段
+     * @return 列表
+     */
+    List<T> findAll(Map<String, Object> condition, boolean clear, Order... orders);
+
+    /**
+     * 查询
+     *
+     * @param orders 排序字段
+     * @return 列表
+     */
+    List<T> findAll(Order... orders);
+
+    /**
+     * 根据id列表查找对象列表
+     *
+     * @param ids id列表
+     * @return 对象列表
+     */
+    List<T> findByIds(Collection<I> ids);
 
     /**
      * 根据id查找对象
@@ -110,19 +155,6 @@ public interface EntityService<I, T>
      *
      * @param condition 条件
      * @param clear 是否清除条件
-     * @param orders 排序字段
-     * @return 单条记录
-     */
-    default T findOne(Map<String, Object> condition, boolean clear, Order... orders)
-    {
-        return findOne(condition, clear, emptyList(), orders);
-    }
-
-    /**
-     * 按条件查询
-     *
-     * @param condition 条件
-     * @param clear 是否清除条件
      * @param fieldList 字段列表
      * @param orders 排序字段
      * @return 单条记录
@@ -130,58 +162,14 @@ public interface EntityService<I, T>
     T findOne(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders);
 
     /**
-     * 根据id列表查找对象列表
-     *
-     * @param ids id列表
-     * @return 对象列表
-     */
-    List<T> findByIds(Collection<I> ids);
-
-    /**
-     * 查询
-     *
-     * @param orders 排序字段
-     * @return 列表
-     */
-    default List<T> findAll(Order... orders)
-    {
-        return findAll(emptyMap(), false, emptyList(), orders);
-    }
-
-    /**
-     * 根据条件查询
+     * 按条件查询
      *
      * @param condition 条件
      * @param clear 是否清除条件
      * @param orders 排序字段
-     * @return 列表
+     * @return 单条记录
      */
-    default List<T> findAll(Map<String, Object> condition, boolean clear, Order... orders)
-    {
-        return findAll(condition, clear, emptyList(), orders);
-    }
-
-    /**
-     * 根据条件查询
-     *
-     * @param condition 条件
-     * @param clear 是否清除条件
-     * @param fieldList 字段列表
-     * @param orders 排序字段
-     * @return 列表
-     */
-    List<T> findAll(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders);
-
-    /**
-     * 分页查询
-     *
-     * @param pageable 分页
-     * @return 列表
-     */
-    default Page<T> findPage(Pageable pageable)
-    {
-        return findPage(emptyMap(), false, emptyList(), pageable);
-    }
+    T findOne(Map<String, Object> condition, boolean clear, Order... orders);
 
     /**
      * 分页查询
@@ -202,10 +190,20 @@ public interface EntityService<I, T>
      * @param pageable 分页
      * @return 列表
      */
-    default Page<T> findPage(Map<String, Object> condition, boolean clear, Pageable pageable)
-    {
-        return findPage(condition, clear, emptyList(), pageable);
-    }
+    Page<T> findPage(Map<String, Object> condition, boolean clear, Pageable pageable);
+
+    /**
+     * 分页查询
+     *
+     * @param pageable 分页
+     * @return 列表
+     */
+    Page<T> findPage(Pageable pageable);
+
+    /**
+     * @return 实体类型
+     */
+    Class<T> getEntityClass();
 
     /**
      * 导入数据文件
@@ -216,23 +214,64 @@ public interface EntityService<I, T>
     ResultData importFile(InputStream inputStream);
 
     /**
-     * 导出数据
+     * 逻辑删除
      *
-     * @param list 数据列表
-     * @param outputStream 输出流
-     * @param chart 是否导出图表
-     * @param fields 定制字段列表
+     * @param t 对象
      */
-    void export(List<List<T>> list, OutputStream outputStream, boolean chart, List<String[]> fields);
+    void logicDelete(T t);
 
     /**
-     * 根据条件物理删除
+     * 逻辑批量删除
      *
-     * @param condition 条件
-     * @param clear 是否清除条件
-     * @return 删除条数
+     * @param coll 对象列表
      */
-    int deleteAll(Map<String, Object> condition, boolean clear);
+    void logicDeleteCollection(Collection<T> coll);
+
+    /**
+     * 逻辑删除
+     *
+     * @param id id
+     */
+    void logicDeleteId(I id);
+
+    /**
+     * 逻辑批量删除
+     *
+     * @param ids id列表
+     */
+    void logicDeleteIds(Collection<I> ids);
+
+    /**
+     * 新增
+     *
+     * @param t 实体对象
+     * @return 实体对象
+     */
+    T save(T t);
+
+    /**
+     * 批量新增
+     *
+     * @param collection 实体列表
+     * @return 结果
+     */
+    List<T> saveBatch(Collection<T> collection);
+
+    /**
+     * 更新
+     *
+     * @param t 实体对象
+     * @return 实体对象
+     */
+    T update(T t);
+
+    /**
+     * 批量更新
+     *
+     * @param list 实体列表
+     * @return 结果
+     */
+    List<T> updateBatch(Collection<T> list);
 
     /**
      * 根据条件更新
@@ -243,14 +282,5 @@ public interface EntityService<I, T>
      * @return 更新条数
      */
     int updateAll(T t, Map<String, Object> condition, boolean clear);
-
-    /**
-     * 按条件计数
-     *
-     * @param condition 条件
-     * @param clear 是否清除条件
-     * @return 个数
-     */
-    long count(Map<String, Object> condition, boolean clear);
 
 }

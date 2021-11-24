@@ -26,29 +26,40 @@ import java.util.Map;
  *
  * @author fuzy
  *
- * @param <T> 实体类型
  */
-public interface ExcelService<T>
+public interface ExcelService
 {
 
     /**
      * 从流导入excel
      *
+     * @param <T> 导入类型
      * @param is 输入流
      * @param sheetNum 页码
      * @param errorList 错误列表
+     * @param clazz 导入类型
      * @return 数据列表
      */
-    List<T> importExcel(InputStream is, int sheetNum, List<Map<Integer, String>> errorList);
+    <T> List<T> importExcel(InputStream is, int sheetNum, List<Map<Integer, String>> errorList, Class<T> clazz);
 
     /**
      * 导出excel
      *
      * @param list 数据列表
      * @param os 输出流
-     * @param chart 是否导出图表
      * @param fields 导出的字段
+     * @param clazz 导入类型
      */
-    void export(List<List<T>> list, OutputStream os, boolean chart, List<String[]> fields);
+    void export(List<List<Object>> list, OutputStream os, List<String[]> fields, Class<?> clazz);
+
+    /**
+     * 导出excel
+     *
+     * @param list 数据列表
+     * @param os 输出流
+     * @param fields 导出的字段
+     * @param clazz 导入类型
+     */
+    void exportData(List<List<Map<Integer, String>>> list, OutputStream os, List<String[]> fields, Class<?> clazz);
 
 }

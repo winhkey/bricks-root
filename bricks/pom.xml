@@ -11,9 +11,10 @@
     <artifactId>bricks</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>bricks-async</module>
         <module>bricks-core</module>
         <module>bricks-data</module>
-        <module>bricks-async</module>
+        <module>bricks-poi</module>
         <module>bricks-repository</module>
         <module>bricks-statemachine</module>
     </modules>

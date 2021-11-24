@@ -20,10 +20,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Map;
 
 import org.bricks.module.bean.TableConfig;
 import org.bricks.module.enums.DataType;
-import org.bricks.module.service.ValidateFilter;
+import org.bricks.module.validate.filter.RowValidateFilter;
 
 /**
  * excel列注解
@@ -84,19 +85,18 @@ public @interface ExcelColumn
     /**
      * @return 自定义过滤器
      */
-    Class<? extends ValidateFilter<?>> filterClass() default UselessFilter.class;
+    Class<? extends RowValidateFilter> filterClass() default UselessRowFilter.class;
 
     /**
      * 默认无用filter
      *
      * @author fuzy
-     *
      */
-    final class UselessFilter implements ValidateFilter<Object>
+    final class UselessRowFilter implements RowValidateFilter
     {
 
         @Override
-        public boolean validate(Object data, TableConfig config)
+        public boolean validate(Map<Integer, String> data, TableConfig config)
         {
             return false;
         }
