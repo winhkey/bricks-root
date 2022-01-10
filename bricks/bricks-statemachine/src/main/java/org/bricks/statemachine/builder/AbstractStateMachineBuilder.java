@@ -94,7 +94,7 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
         {
             throw new BaseException("@Service或@Component注解缺少value");
         }
-        List<Class<?>> classList = getComponentClassList(getClass(), StateMachineBuilder.class);
+        List<Class<?>> classList = getComponentClassList(clazz, StateMachineBuilder.class);
         stateClass = (Class<S>) classList.get(0);
         eventClass = (Class<E>) classList.get(1);
     }
