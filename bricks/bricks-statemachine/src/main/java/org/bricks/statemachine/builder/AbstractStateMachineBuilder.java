@@ -86,8 +86,9 @@ public abstract class AbstractStateMachineBuilder<S, E> implements StateMachineB
     @SuppressWarnings(UNCHECKED)
     public void init()
     {
-        machineId = ofNullable(getDeclaredAnnotation(getClass(), Service.class)).map(Service::value)
-                .orElseGet(() -> ofNullable(getDeclaredAnnotation(getClass(), Component.class)).map(Component::value)
+        Class<?> clazz = getClass();
+        machineId = ofNullable(getDeclaredAnnotation(clazz, Service.class)).map(Service::value)
+                .orElseGet(() -> ofNullable(getDeclaredAnnotation(clazz, Component.class)).map(Component::value)
                         .orElseThrow(() -> new BaseException("缺少@Service或@Component注解")));
         if (isBlank(machineId))
         {

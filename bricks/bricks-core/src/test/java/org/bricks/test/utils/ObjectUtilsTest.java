@@ -21,11 +21,11 @@ import static com.google.common.collect.Maps.newHashMap;
 import static org.bricks.test.TestConstants.Child;
 import static org.bricks.test.TestConstants.Color;
 import static org.bricks.utils.ObjectUtils.buildString;
-import static org.bricks.utils.ObjectUtils.convertData;
-import static org.bricks.utils.ObjectUtils.convertMapList;
 import static org.bricks.utils.ObjectUtils.copy;
+import static org.bricks.utils.ObjectUtils.dataToMap;
 import static org.bricks.utils.ObjectUtils.getEnumValue;
 import static org.bricks.utils.ObjectUtils.getFieldValue;
+import static org.bricks.utils.ObjectUtils.mapToDataList;
 import static org.bricks.utils.ObjectUtils.setFieldValue;
 import static org.bricks.utils.ReflectionUtils.addDeclaredFields;
 import static org.bricks.utils.ReflectionUtils.getComponentClass;
@@ -40,7 +40,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -55,40 +54,40 @@ public class ObjectUtilsTest
     @Test
     public void testGetDeclaredMethodNull()
     {
-        assertNull(getDeclaredMethod(null, null));
+        assertNull(getDeclaredMethod(null, null, true));
     }
 
     @Test
     public void testGetDeclaredMethodObject()
     {
-        assertNull(getDeclaredMethod(Object.class, null));
+        assertNull(getDeclaredMethod(Object.class, null, true));
     }
 
     @Test
     public void testInvokeMethod()
     {
         Child child = new Child();
-        invokeMethod(child, "setSurname", new Class<?>[] {String.class}, new Object[] {"abc"});
+        invokeMethod(child, "setSurname", true, new Class<?>[] {String.class}, "abc");
         assertEquals("abc", child.getSurname());
     }
 
     @Test
     public void testGetDeclaredFieldNull()
     {
-        assertNull(getDeclaredField(null, null));
+        assertNull(getDeclaredField(null, null, true));
     }
 
     @Test
     public void testGetDeclaredFieldObject()
     {
-        assertNull(getDeclaredField(Object.class, null));
+        assertNull(getDeclaredField(Object.class, null, true));
     }
 
     @Test
     public void testGetDeclaredFieldsStatic()
     {
         List<Field> list = newArrayList();
-        addDeclaredFields(Child.class, list, true);
+        addDeclaredFields(Child.class, list, true, true);
         assertTrue(list.stream()
                 .anyMatch(field -> "serialVersionUID".equals(field.getName())));
     }
@@ -118,7 +117,7 @@ public class ObjectUtilsTest
     @Test
     public void testConvertData()
     {
-        List<Child> list = convertMapList(newArrayList(ImmutableMap.of("surname", "abc")), Child.class);
+        List<Child> list = mapToDataList(newArrayList(ImmutableMap.of("surname", "abc")), Child.class);
         assertNotNull(list);
         assertEquals("abc", list.get(0)
                 .getSurname());
@@ -127,7 +126,7 @@ public class ObjectUtilsTest
     @Test
     public void testConvertDataEmpty()
     {
-        List<Child> list = convertMapList(newArrayList(), Child.class);
+        List<Child> list = mapToDataList(newArrayList(), Child.class);
         assertNull(list);
     }
 
@@ -138,7 +137,7 @@ public class ObjectUtilsTest
         child.setSurname("a")
                 .setName("b")
                 .setAge(1);
-        Map<String, Object> map = convertData(child);
+        Map<String, Object> map = dataToMap(child);
         assertFalse(map.isEmpty());
     }
 
@@ -149,7 +148,7 @@ public class ObjectUtilsTest
         child.setSurname("a")
                 .setName("b")
                 .setAge(1);
-        Map<String, Object> map = convertData(child, "surname");
+        Map<String, Object> map = dataToMap(child, "surname");
         assertNull(map.get("surname"));
         assertNotNull(map.get("name"));
     }
@@ -158,7 +157,7 @@ public class ObjectUtilsTest
     public void testBuildStringCollectionNull()
     {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, (Collection<?>) null);
+        buildString(builder, null);
         assertEquals("null", builder.toString());
     }
 
@@ -202,7 +201,7 @@ public class ObjectUtilsTest
     public void testBuildStringMapNull()
     {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, (Map<?, ?>) null);
+        buildString(builder, null);
         assertEquals("null", builder.toString());
     }
 
@@ -228,7 +227,7 @@ public class ObjectUtilsTest
     public void testBuildStringArrayNull()
     {
         StringBuilder builder = new StringBuilder();
-        buildString(builder, (Integer[]) null);
+        buildString(builder, null);
         assertEquals("null", builder.toString());
     }
 

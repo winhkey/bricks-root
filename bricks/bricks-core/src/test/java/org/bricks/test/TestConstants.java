@@ -49,7 +49,7 @@ public class TestConstants
 
         @NotNull
         @Range(min = 1, max = 200)
-        protected int age;
+        protected Integer age;
 
     }
 

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import io.micrometer.core.instrument.util.JsonUtils;
 import org.apache.commons.codec.binary.Hex;
 
 import lombok.experimental.UtilityClass;

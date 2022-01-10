@@ -16,10 +16,14 @@
 
 package org.bricks.test.utils;
 
-import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static org.bricks.test.TestConstants.Child;
 import static org.bricks.utils.ValidationUtils.validate;
+import static org.bricks.utils.ValidationUtils.validateCollection;
+import static org.bricks.utils.ValidationUtils.validateMap;
+
+import java.util.Map;
 
 import org.bricks.exception.BaseException;
 import org.junit.Test;
@@ -44,13 +48,13 @@ public class ValidationUtilsTest
     @Test(expected = BaseException.class)
     public void testValidateListException()
     {
-        validate(newArrayList(new Child()));
+        validateCollection(newArrayList(new Child()));
     }
 
     @Test
     public void testValidateList()
     {
-        validate(newArrayList(new Child().setName("name")
+        validateCollection(newArrayList(new Child().setName("name")
                 .setSurname("surname")
                 .setAge(1)));
     }
@@ -58,15 +62,19 @@ public class ValidationUtilsTest
     @Test(expected = BaseException.class)
     public void testValidateMapException()
     {
-        validate(of("", new Child()));
+        Map<String, Object> map = newHashMap();
+        map.put("a", new Child());
+        validateMap(map);
     }
 
     @Test
     public void testValidateMap()
     {
-        validate(of("", new Child().setName("name")
+        Map<String, Object> map = newHashMap();
+        map.put("a", new Child().setName("name")
                 .setSurname("surname")
-                .setAge(1)));
+                .setAge(1));
+        validateMap(map);
     }
 
 }

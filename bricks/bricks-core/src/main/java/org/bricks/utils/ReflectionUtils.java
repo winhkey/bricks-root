@@ -68,7 +68,7 @@ public class ReflectionUtils
             Class<?>... parameterTypes)
     {
         return ofNullable(clazz).filter(c -> c != Object.class)
-                .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes),
+                .map(apply(c -> c.getMethod(methodName, parameterTypes),
                         (c, e) -> includeParent
                                 ? getDeclaredMethod(c.getSuperclass(), methodName, includeParent, parameterTypes)
                                 : null,
@@ -221,10 +221,7 @@ public class ReflectionUtils
      */
     public static void getDeclaredAnnotations(AnnotatedElement element, List<Annotation> list)
     {
-        ofNullable(element).ifPresent(e ->
-        {
-            list.addAll(of(e.getDeclaredAnnotations()).collect(toList()));
-        });
+        ofNullable(element).ifPresent(e -> list.addAll(of(e.getDeclaredAnnotations()).collect(toList())));
     }
 
     /**
