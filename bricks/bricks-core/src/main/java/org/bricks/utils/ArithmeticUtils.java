@@ -275,4 +275,26 @@ public class ArithmeticUtils
         return Double.parseDouble(result);
     }
 
+    /**
+     * 整数的n次幂
+     * 
+     * @param a 整数
+     * @param n 幂
+     * @return 结果
+     */
+    public static long power(long a, int n)
+    {
+        int rtn = 1;
+        while (n >= 1)
+        {
+            if ((n & 1) == 1)
+            {
+                rtn *= a;
+            }
+            a *= a;
+            n = n >> 1;
+        }
+        return rtn;
+    }
+
 }
