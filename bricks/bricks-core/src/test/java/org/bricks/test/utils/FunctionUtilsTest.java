@@ -18,7 +18,7 @@ package org.bricks.test.utils;
 
 import static org.bricks.utils.FunctionUtils.accept;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FunctionUtilsTest
 {

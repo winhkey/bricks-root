@@ -22,19 +22,20 @@ import static org.bricks.test.TestConstants.Child;
 import static org.bricks.utils.ValidationUtils.validate;
 import static org.bricks.utils.ValidationUtils.validateCollection;
 import static org.bricks.utils.ValidationUtils.validateMap;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Map;
 
 import org.bricks.exception.BaseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ValidationUtilsTest
 {
 
-    @Test(expected = BaseException.class)
+    @Test
     public void testValidateObjectException()
     {
-        validate(new Child());
+        assertThrows(BaseException.class, () -> validate(new Child()));
     }
 
     @Test
@@ -45,10 +46,10 @@ public class ValidationUtilsTest
                 .setAge(1));
     }
 
-    @Test(expected = BaseException.class)
+    @Test
     public void testValidateListException()
     {
-        validateCollection(newArrayList(new Child()));
+        assertThrows(BaseException.class, () -> validateCollection(newArrayList(new Child())));
     }
 
     @Test
@@ -59,12 +60,12 @@ public class ValidationUtilsTest
                 .setAge(1)));
     }
 
-    @Test(expected = BaseException.class)
+    @Test
     public void testValidateMapException()
     {
         Map<String, Object> map = newHashMap();
         map.put("a", new Child());
-        validateMap(map);
+        assertThrows(BaseException.class, () -> validateMap(map));
     }
 
     @Test
