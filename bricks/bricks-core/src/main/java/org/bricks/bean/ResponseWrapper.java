@@ -18,7 +18,7 @@ package org.bricks.bean;
 
 import org.bricks.enums.MessageEnum;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -46,6 +46,7 @@ public class ResponseWrapper<T> extends AbstractBean
     /**
      * 描述信息
      */
+    @JsonAlias({"message", "msg"})
     private String message;
 
     /**
@@ -84,25 +85,6 @@ public class ResponseWrapper<T> extends AbstractBean
         this.message = message;
     }
 
-    /**
-     * @return message
-     */
-    @JsonProperty("msg")
-    public String getMsg()
-    {
-        return message;
-    }
-
-    /**
-     * message
-     *
-     * @param message message
-     */
-    @JsonProperty("msg")
-    public void setMsg(String message)
-    {
-        this.message = message;
-    }
 
     /**
      * @return 无数据的成功结果
