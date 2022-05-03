@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 
+import org.bricks.annotation.NoLog;
 import org.bricks.async.bean.ExecutorConfigItem;
 import org.bricks.async.bean.SchedulerConfigItem;
 import org.bricks.async.service.AsyncFactory;
@@ -46,10 +47,11 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@NoLog
 @Configuration
 @EnableAsync
 @EnableScheduling
-public class AsyncConfig extends AsyncConfigurerSupport implements SchedulingConfigurer
+public class AsyncConfig implements SchedulingConfigurer
 {
 
     /**

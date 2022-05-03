@@ -14,36 +14,23 @@
  * limitations under the License.
  */
 
-package org.bricks.async.bean;
+package org.bricks.async.work.job;
 
-import static org.bricks.constants.Constants.NumberConstants.NUMBER_100;
-
-import org.bricks.bean.AbstractBean;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import org.bricks.async.work.service.BricksJobService;
 
 /**
- * 并发配置
+ * 定时任务
  *
  * @author fuzy
  *
+ * @param <R> 任务接口
  */
-@Setter
-@Getter
-@Accessors(chain = true)
-public abstract class AbstractTaskConfigItem extends AbstractBean
+public interface BricksJob<R extends BricksJobService>
 {
 
     /**
-     * 最大任务池
+     * 执行
      */
-    private int maxPoolSize = NUMBER_100;
-
-    /**
-     * 线程名前缀
-     */
-    private String threadNamePrefix;
+    void execute();
 
 }

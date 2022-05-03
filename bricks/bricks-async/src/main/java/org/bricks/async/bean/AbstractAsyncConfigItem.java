@@ -16,34 +16,54 @@
 
 package org.bricks.async.bean;
 
-import static org.bricks.constants.Constants.NumberConstants.NUMBER_100;
 
 import org.bricks.bean.AbstractBean;
 
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * 并发配置
  *
  * @author fuzy
- *
+ * 
+ * @param <T> 自对象
  */
-@Setter
 @Getter
-@Accessors(chain = true)
-public abstract class AbstractAsyncConfigItem extends AbstractBean
+public abstract class AbstractAsyncConfigItem<T extends AbstractAsyncConfigItem<T>> extends AbstractBean
 {
 
     /**
      * 线程池最大容量
      */
-    private int maxPoolSize = NUMBER_100;
+    private int maxPoolSize = 10;
 
     /**
      * 线程名前缀
      */
     private String threadNamePrefix;
+
+    /**
+     * 设置最大容量
+     * 
+     * @param maxPoolSize 最大容量
+     * @return 对象
+     */
+    public T setMaxPoolSize(int maxPoolSize)
+    {
+        this.maxPoolSize = maxPoolSize;
+        return self();
+    }
+
+    /**
+     * 设置线程名前缀
+     * 
+     * @param threadNamePrefix 前缀
+     * @return 对象
+     */
+    public T setThreadNamePrefix(String threadNamePrefix)
+    {
+        this.threadNamePrefix = threadNamePrefix;
+        return self();
+    }
 
 }

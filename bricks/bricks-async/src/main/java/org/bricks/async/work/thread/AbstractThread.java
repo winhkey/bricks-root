@@ -16,6 +16,7 @@
 
 package org.bricks.async.work.thread;
 
+import org.bricks.bean.AbstractBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * @author fuzy
  *
  */
-public abstract class AbstractThread implements Runnable
+public abstract class AbstractThread extends AbstractBean implements Runnable
 {
 
     /**

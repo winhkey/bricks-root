@@ -23,7 +23,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.bricks.data.json.JsonDataService;
+import org.bricks.data.json.JacksonJsonService;
+import org.bricks.utils.MD5Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <T> 任务参数
  */
-public abstract class AbstractBrickTask<T> implements BrickTask<T>
+public abstract class AbstractBricksTask<T> implements BricksTask<T>
 {
 
     /**
@@ -48,16 +49,18 @@ public abstract class AbstractBrickTask<T> implements BrickTask<T>
     protected static final Map<String, String> RUNNING_MAP = newConcurrentMap();
 
     /**
-     * jsonDataService
+     * json
      */
-    @Resource(name = "jacksonJsonService")
-    protected JsonDataService jsonDataService;
+    @Resource
+    protected JacksonJsonService jacksonJsonService;
 
     @Override
     public void task(T target)
     {
         String taskClass = getClass().getSimpleName();
-        String key = format("{0}_{1}", taskClass, jsonDataService.output(target));
+        String key = format("{0}_{1}", taskClass, jacksonJsonService.output(target));
+        key = MD5Utils.getMD5String(key, false);
+        log.debug("running key: {}", key);
         String running = RUNNING_MAP.get(key);
         if (running != null)
         {
@@ -69,22 +72,12 @@ public abstract class AbstractBrickTask<T> implements BrickTask<T>
         {
             doTask(target);
         }
-        catch (Exception e)
+        catch (Throwable e)
         {
             log.error(e.getMessage(), e);
         }
         RUNNING_MAP.remove(key);
-    }
-
-    /**
-     * 查询条件
-     *
-     * @param condition 查询条件
-     * @param paramMap 任务参数
-     */
-    protected void buildCondition(Map<String, Object> condition, Map<String, Object> paramMap)
-    {
-
+        log.debug("remove running key: {}", key);
     }
 
     /**

@@ -16,16 +16,18 @@
 
 package org.bricks.async.work.job;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.bricks.async.work.service.BrickJobService;
+import org.bricks.async.work.service.BricksJobService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 
 /**
  * 定时任务抽象类
@@ -34,7 +36,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @param <R> 任务接口
  */
-public abstract class AbstractBrickJob<R extends BrickJobService> implements BrickJob<R>
+public abstract class AbstractBricksJob<R extends BricksJobService> implements BricksJob<R>
 {
 
     /**
@@ -49,6 +51,12 @@ public abstract class AbstractBrickJob<R extends BrickJobService> implements Bri
     protected ApplicationContext applicationContext;
 
     /**
+     * environment
+     */
+    @Resource
+    protected Environment environment;
+
+    /**
      * 任务线程
      */
     private final Class<R> jobServiceClass;
@@ -57,9 +65,9 @@ public abstract class AbstractBrickJob<R extends BrickJobService> implements Bri
      * 构造方法
      */
     @SuppressWarnings("unchecked")
-    protected AbstractBrickJob()
+    protected AbstractBricksJob()
     {
-        List<Class<?>> classList = getComponentClassList(getClass(), BrickJob.class);
+        List<Class<?>> classList = getComponentClassList(getClass(), BricksJob.class);
         jobServiceClass = (Class<R>) classList.get(0);
     }
 
@@ -76,6 +84,11 @@ public abstract class AbstractBrickJob<R extends BrickJobService> implements Bri
      */
     protected void execute(ApplicationContext applicationContext)
     {
+        if (!isEnabled())
+        {
+            log.warn("job off");
+            return;
+        }
         try
         {
             applicationContext.getBean(jobServiceClass)
@@ -85,6 +98,22 @@ public abstract class AbstractBrickJob<R extends BrickJobService> implements Bri
         {
             log.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * @return 定时任务有效
+     */
+    protected boolean isEnabled()
+    {
+        return isBlank(enableKey()) || environment.getProperty(enableKey(), Boolean.class, true);
+    }
+
+    /**
+     * @return 开关配置名
+     */
+    protected String enableKey()
+    {
+        return null;
     }
 
 }

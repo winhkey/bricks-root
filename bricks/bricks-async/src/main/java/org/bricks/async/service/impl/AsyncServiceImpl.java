@@ -112,14 +112,14 @@ public class AsyncServiceImpl extends AbstractInitFinishedListener implements As
 
     @Override
     public <T, V> List<V> asyncList(Collection<T> collection, Function<T, V> callback, long timeout, TimeUnit timeUnit,
-                                    V defaultValue)
+            V defaultValue)
     {
         return asyncStream(collection.stream(), callback, timeout, timeUnit, defaultValue);
     }
 
     @Override
     public <T, V> List<V> asyncStream(Stream<T> stream, Function<T, V> callback, long timeout, TimeUnit timeUnit,
-                                      V defaultValue)
+            V defaultValue)
     {
         return stream.map(t -> future(t, callback, timeout, timeUnit, defaultValue))
                 .collect(toList())
@@ -129,7 +129,7 @@ public class AsyncServiceImpl extends AbstractInitFinishedListener implements As
     }
 
     private <T, V> CompletableFuture<V> future(T t, Function<T, V> callback, long timeout, TimeUnit timeUnit,
-                                               V defaultValue)
+            V defaultValue)
     {
         return supplyAsync(() -> callback.apply(t), timeout, timeUnit, defaultValue).exceptionally(e ->
         {
@@ -139,7 +139,7 @@ public class AsyncServiceImpl extends AbstractInitFinishedListener implements As
     }
 
     private <V> CompletableFuture<V> supplyAsync(final Supplier<V> supplier, long timeout, TimeUnit timeUnit,
-                                                 V defaultValue)
+            V defaultValue)
     {
         final CompletableFuture<V> completableFuture = new CompletableFuture<>();
         Runnable runnable = () ->

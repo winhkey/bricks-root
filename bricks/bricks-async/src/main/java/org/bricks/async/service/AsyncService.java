@@ -22,15 +22,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.springframework.stereotype.Service;
-
 /**
  * 异步调用
  *
  * @author fuzy
  *
  */
-@Service
 public interface AsyncService
 {
 
@@ -82,7 +79,7 @@ public interface AsyncService
      * @return 结果列表
      */
     <T, V> List<V> asyncList(Collection<T> collection, Function<T, V> callback, long timeout, TimeUnit timeUnit,
-                             V defaultValue);
+            V defaultValue);
 
     /**
      * 批量异步请求，合并结果
@@ -97,6 +94,6 @@ public interface AsyncService
      * @return 结果列表
      */
     <T, V> List<V> asyncStream(Stream<T> stream, Function<T, V> callback, long timeout, TimeUnit timeUnit,
-                               V defaultValue);
+            V defaultValue);
 
 }

@@ -16,7 +16,7 @@
 
 package org.bricks.async.bean;
 
-import static org.bricks.constants.Constants.NumberConstants.NUMBER_2000;
+import static java.lang.Runtime.getRuntime;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -31,18 +31,17 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ExecutorConfigItem extends AbstractAsyncConfigItem
+public class ExecutorConfigItem extends AbstractAsyncConfigItem<ExecutorConfigItem>
 {
 
     /**
      * 线程池初始化个数
      */
-    private int corePoolSize = (int) (Runtime.getRuntime()
-            .availableProcessors() / (1 - 0.9));
+    private int corePoolSize = 2 * getRuntime().availableProcessors() + 1;
 
     /**
      * 队列容量
      */
-    private int queueCapacity = NUMBER_2000;
+    private int queueCapacity = 2000;
 
 }

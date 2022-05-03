@@ -20,7 +20,7 @@ import static java.util.Optional.ofNullable;
 
 import javax.annotation.Resource;
 
-import org.bricks.async.work.task.BrickTask;
+import org.bricks.async.work.task.BricksTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -31,7 +31,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author fuzy
  *
  */
-public abstract class AbstractBrickJobService implements BrickJobService
+public abstract class AbstractBricksJobService implements BricksJobService
 {
 
     /**
@@ -52,7 +52,7 @@ public abstract class AbstractBrickJobService implements BrickJobService
      * @param target 任务参数
      * @param <T> 任务参数
      */
-    protected <T> void syncExecuteTask(BrickTask<T> task, T target)
+    protected <T> void syncExecuteTask(BricksTask<T> task, T target)
     {
         ofNullable(task).ifPresent(t -> task.task(target));
     }
@@ -64,7 +64,7 @@ public abstract class AbstractBrickJobService implements BrickJobService
      * @param target 任务参数
      * @param <T> 任务参数
      */
-    protected <T> void asyncExecuteTask(BrickTask<T> task, T target)
+    protected <T> void asyncExecuteTask(BricksTask<T> task, T target)
     {
         ofNullable(task).ifPresent(t -> executor.execute(() -> task.task(target)));
     }

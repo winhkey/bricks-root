@@ -31,7 +31,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class SchedulerConfigItem extends AbstractAsyncConfigItem
+public class SchedulerConfigItem extends AbstractAsyncConfigItem<SchedulerConfigItem>
 {
 
     /**

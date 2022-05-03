@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package org.bricks.async.work.job;
-
-import org.bricks.async.work.service.BrickJobService;
+package org.bricks.async.work.task;
 
 /**
- * 定时任务
+ * 任务
  *
  * @author fuzy
  *
- * @param <R> 任务接口
+ * @param <T> 任务参数
  */
-public interface BrickJob<R extends BrickJobService>
+public interface BricksTask<T>
 {
 
     /**
-     * 执行
+     * 业务
+     *
+     * @param target 任务参数
      */
-    void execute();
+    void task(T target);
 
 }

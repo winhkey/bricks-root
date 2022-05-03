@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package org.bricks.async.work.task;
+package org.bricks.async.work.service;
 
 /**
- * 任务
+ * 任务接口
  *
  * @author fuzy
  *
- * @param <T> 任务参数
  */
-public interface BrickTask<T>
+public interface BricksJobService
 {
 
     /**
-     * 业务
-     *
-     * @param target 任务参数
+     * 执行
      */
-    void task(T target);
+    void execute();
 
 }
