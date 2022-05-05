@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.bricks.bean.Bean;
+
 /**
  * 根据对象进行accept操作，抽象类
  *
@@ -53,6 +55,7 @@ public abstract class AbstractConsumerService<T>
         consumerMap.put(Object[].class, o -> arrayConsumer(t, o));
         consumerMap.put(Collection.class, o -> collectionConsumer(t, o));
         consumerMap.put(Map.class, o -> mapConsumer(t, o));
+        consumerMap.put(Bean.class, o -> customConsumer(t, o));
         otherConsumers(t, consumerMap);
         accept(object, consumerMap);
         return t;
@@ -144,6 +147,18 @@ public abstract class AbstractConsumerService<T>
     protected T mapConsumer(T t, Map<?, ?> map)
     {
         map.forEach((k, v) -> entryConsumer(t, k, v));
+        return t;
+    }
+
+    /**
+     * 处理自定义类型
+     *
+     * @param t 消费对象
+     * @param value 值
+     * @return 消费对象
+     */
+    protected T customConsumer(T t, Object value)
+    {
         return t;
     }
 

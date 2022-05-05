@@ -16,6 +16,10 @@
 
 package org.bricks.listener;
 
+import static com.google.common.collect.Maps.newHashMap;
+
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import org.bricks.annotation.NoLog;
@@ -39,6 +43,11 @@ public abstract class AbstractInitFinishedListener implements ApplicationListene
      * Root WebApplicationContext
      */
     private static final String ROOT = "Root WebApplicationContext";
+
+    /**
+     * 缓存
+     */
+    private static final Map<String, String> MAP = newHashMap();
 
     /**
      * spring环境
@@ -70,9 +79,11 @@ public abstract class AbstractInitFinishedListener implements ApplicationListene
         }
         String className = ctx.getClass()
                 .getSimpleName();
-        if (ctx.getParent() == null && ROOT.equals(name) || className.startsWith("Annotation")
-                || className.equals("GenericWebApplicationContext"))
+        String beanName = getClass().getSimpleName();
+        if (!MAP.containsKey(beanName) && (ctx.getParent() == null && ROOT.equals(name)
+                || className.startsWith("Annotation") || className.equals("GenericWebApplicationContext")))
         {
+            MAP.put(beanName, "");
             doSyncInitFinished();
             executor.execute(this::doAsyncInitFinished);
         }

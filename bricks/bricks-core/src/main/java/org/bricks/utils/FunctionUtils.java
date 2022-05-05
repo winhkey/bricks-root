@@ -18,17 +18,23 @@ package org.bricks.utils;
 
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.bricks.utils.ObjectUtils.isCustomType;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.bricks.bean.Bean;
+import org.bricks.function.ThrowableBiConsumer;
 import org.bricks.function.ThrowableBiFunction;
 import org.bricks.function.ThrowableConsumer;
 import org.bricks.function.ThrowableFunction;
+import org.bricks.function.ThrowableIntFunction;
 import org.bricks.function.ThrowablePredicate;
 import org.bricks.function.ThrowableRunnable;
 import org.bricks.function.ThrowableSupplier;
@@ -60,20 +66,27 @@ public class FunctionUtils
             {
                 ofNullable(consumerMap.get(Void.class)).ifPresent(consumer -> consumer.accept(null));
             }
-            else if (object.getClass()
-                    .isArray())
-            {
-                ofNullable(consumerMap.get(Object[].class)).ifPresent(consumer -> consumer.accept(object));
-            }
             else
             {
-                consumerMap.entrySet()
-                        .stream()
-                        .filter(entry -> entry.getKey()
-                                .isInstance(object))
-                        .findFirst()
-                        .ifPresent(entry -> entry.getValue()
-                                .accept(object));
+                Class<?> clazz = object.getClass();
+                if (clazz.isArray())
+                {
+                    ofNullable(consumerMap.get(Object[].class)).ifPresent(consumer -> consumer.accept(object));
+                }
+                else if (isCustomType(clazz))
+                {
+                    ofNullable(consumerMap.get(Bean.class)).ifPresent(consumer -> consumer.accept(object));
+                }
+                else
+                {
+                    consumerMap.entrySet()
+                            .stream()
+                            .filter(entry -> entry.getKey()
+                                    .isInstance(object))
+                            .findFirst()
+                            .ifPresent(entry -> entry.getValue()
+                                    .accept(object));
+                }
             }
         }
     }
@@ -101,6 +114,40 @@ public class FunctionUtils
             catch (Throwable e)
             {
                 ofNullable(catchConsumer).ifPresent(c -> c.accept(t));
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
+            }
+        };
+    }
+
+    /**
+     * 处理异常的BiConsumer
+     *
+     * @param throwableConsumer 抛异常的consumer
+     * @param catchConsumer 出现异常后执行的consumer
+     * @param finallyRunnable finally执行
+     * @param log 日志对象
+     * @param exceptionFunction 异常转换
+     * @param <T> 入参
+     * @param <R> 入参
+     * @return consumer
+     */
+    public static <T, R> BiConsumer<T, R> accept(ThrowableBiConsumer<T, R, Throwable> throwableConsumer,
+            BiConsumer<T, R> catchConsumer, Runnable finallyRunnable, Logger log,
+            Function<Throwable, RuntimeException> exceptionFunction)
+    {
+        return (t, r) ->
+        {
+            try
+            {
+                throwableConsumer.accept(t, r);
+            }
+            catch (Throwable e)
+            {
+                ofNullable(catchConsumer).ifPresent(c -> c.accept(t, r));
                 handle(e, log, exceptionFunction);
             }
             finally
@@ -171,6 +218,42 @@ public class FunctionUtils
                 handle(finallyRunnable);
             }
             return result;
+        };
+    }
+
+    /**
+     * 处理异常的IntFunction
+     *
+     * @param throwableIntFunction 抛异常的Function
+     * @param catchFunction 出现异常后执行的function
+     * @param finallyRunnable finally执行
+     * @param log 日志对象
+     * @param exceptionFunction 异常转换
+     * @param <R> 结果
+     * @return Function
+     */
+    public static <R> IntFunction<R> applyInt(ThrowableIntFunction<R, Throwable> throwableIntFunction,
+            Function<Throwable, R> catchFunction, Runnable finallyRunnable, Logger log,
+            Function<Throwable, RuntimeException> exceptionFunction)
+    {
+        return t ->
+        {
+            R r;
+            try
+            {
+                r = throwableIntFunction.apply(t);
+            }
+            catch (Throwable e)
+            {
+                r = ofNullable(catchFunction).map(f -> f.apply(e))
+                        .orElse(null);
+                handle(e, log, exceptionFunction);
+            }
+            finally
+            {
+                handle(finallyRunnable);
+            }
+            return r;
         };
     }
 

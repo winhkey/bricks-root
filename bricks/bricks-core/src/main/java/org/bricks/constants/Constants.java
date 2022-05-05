@@ -80,6 +80,21 @@ public class Constants
         public static final int NUMBER_3 = 3;
 
         /**
+         * 6
+         */
+        public static final int NUMBER_6 = 6;
+
+        /**
+         * 8
+         */
+        public static final int NUMBER_8 = 8;
+
+        /**
+         * 20
+         */
+        public static final int NUMBER_20 = 20;
+
+        /**
          * 48
          */
         public static final int NUMBER_48 = 48;
@@ -194,8 +209,8 @@ public class Constants
         /**
          * IP头列表
          */
-        public static final String[] IP_HEADERS = {"x-forwarded-for", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP",
-                "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
+        public static final String[] IP_HEADERS = {"x-forwarded-for", "X-Real-IP", "Proxy-Client-IP",
+                "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
 
     }
 
@@ -204,6 +219,11 @@ public class Constants
      */
     public static final class StringConstants
     {
+
+        /**
+         * 路径分割符
+         */
+        public static final String PATH_SEPARATOR = "/";
 
         /**
          * 数字字符串
@@ -433,6 +453,11 @@ public class Constants
         public static final Pattern ADD_PATTERN = Pattern.compile(".*(create|add|save|import).*");
 
         /**
+         * 逻辑删
+         */
+        public static final Pattern LOGIC_DELETE_PATTERN = Pattern.compile(".*logic/(delete|remove).*");
+
+        /**
          * 删
          */
         public static final Pattern DELETE_PATTERN = Pattern.compile(".*(delete|remove).*");
@@ -440,12 +465,18 @@ public class Constants
         /**
          * 改
          */
-        public static final Pattern UPDATE_PATTERN = Pattern.compile(".*(edit|update).*");
+        public static final Pattern UPDATE_PATTERN = Pattern.compile(".*(edit|update|reply).*");
 
         /**
          * 查
          */
-        public static final Pattern RETRIEVE_PATTERN = Pattern.compile(".*(list|detail|export|page|find|get|query).*");
+        public static final Pattern RETRIEVE_PATTERN = Pattern
+                .compile(".*(tree|list|detail|export|page|find|get|query|summary).*");
+
+        /**
+         * 操作
+         */
+        public static final Pattern OPERATE_PATTERN = Pattern.compile(".*(connect|collect).*");
 
     }
 

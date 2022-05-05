@@ -68,7 +68,7 @@ public class ReflectionUtils
             Class<?>... parameterTypes)
     {
         return ofNullable(clazz).filter(c -> c != Object.class)
-                .map(apply(c -> c.getMethod(methodName, parameterTypes),
+                .map(apply(c -> c.getDeclaredMethod(methodName, parameterTypes),
                         (c, e) -> includeParent
                                 ? getDeclaredMethod(c.getSuperclass(), methodName, includeParent, parameterTypes)
                                 : null,
@@ -92,7 +92,10 @@ public class ReflectionUtils
         return ofNullable(object).map(o -> getDeclaredMethod(o.getClass(), methodName, includeParent, parameterTypes))
                 .map(apply(method ->
                 {
-                    method.setAccessible(true);
+                    if (!method.isAccessible())
+                    {
+                        makeAccessible(method);
+                    }
                     return method.invoke(object, parameters);
                 }, null, null, log, null))
                 .orElse(null);
@@ -136,7 +139,7 @@ public class ReflectionUtils
                                     .collect(toList()));
                     if (includeParent)
                     {
-                        addDeclaredFields(c.getSuperclass(), list, includeParent, containsStatic, includeClass);
+                        addDeclaredFields(c.getSuperclass(), list, true, containsStatic, includeClass);
                     }
                 });
     }
@@ -160,7 +163,7 @@ public class ReflectionUtils
                             .collect(toList()));
                     if (includeParent)
                     {
-                        addDeclaredMethods(c.getSuperclass(), list, includeParent, containsStatic);
+                        addDeclaredMethods(c.getSuperclass(), list, true, containsStatic);
                     }
                 });
     }

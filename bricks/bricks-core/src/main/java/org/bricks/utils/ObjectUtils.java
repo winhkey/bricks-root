@@ -34,6 +34,7 @@ import static org.bricks.utils.StringUtils.humpToLine;
 import static org.springframework.aop.support.AopUtils.isAopProxy;
 import static org.springframework.aop.support.AopUtils.isJdkDynamicProxy;
 import static org.springframework.beans.BeanUtils.instantiateClass;
+import static org.springframework.util.ReflectionUtils.makeAccessible;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,6 +50,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.bricks.bean.AbstractSnakeCaseBean;
 import org.bricks.enums.ValueEnum;
 import org.bricks.exception.BaseException;
 import org.bricks.service.AbstractConsumerService;
@@ -119,7 +121,10 @@ public class ObjectUtils
     {
         return ofNullable(getDeclaredField(object.getClass(), fieldName, true)).map(apply(field ->
         {
-            field.setAccessible(true);
+            if (!field.isAccessible())
+            {
+                makeAccessible(field);
+            }
             return (T) field.get(object);
         }, null, null, null, null))
                 .orElse(null);
@@ -137,7 +142,10 @@ public class ObjectUtils
         ofNullable(object).map(o -> getDeclaredField(o.getClass(), fieldName, true))
                 .ifPresent(accept(field ->
                 {
-                    field.setAccessible(true);
+                    if (!field.isAccessible())
+                    {
+                        makeAccessible(field);
+                    }
                     field.set(object, value);
                 }, null, null, log, null));
     }
@@ -234,7 +242,7 @@ public class ObjectUtils
      */
     public static Map<String, Object> dataToMap(Object object, String... excludes)
     {
-        return dataToMap(object, false, o -> o, excludes);
+        return dataToMap(object, object instanceof AbstractSnakeCaseBean, o -> o, excludes);
     }
 
     private static <R> Map<String, R> dataToMap(Object object, boolean humpToLine, Function<Object, R> function,
@@ -249,7 +257,10 @@ public class ObjectUtils
                     .filter(field -> isEmpty(excludes) || !contains(excludes, field.getName()))
                     .forEach(accept(field ->
                     {
-                        field.setAccessible(true);
+                        if (!field.isAccessible())
+                        {
+                            makeAccessible(field);
+                        }
                         ofNullable(field.get(o))
                                 .ifPresent(value -> map.put(humpToLine ? humpToLine(field.getName()) : field.getName(),
                                         function.apply(value)));
@@ -351,6 +362,12 @@ public class ObjectUtils
             }
 
             @Override
+            protected StringBuilder customConsumer(StringBuilder builder, Object value)
+            {
+                return builder.append(value);
+            }
+
+            @Override
             protected void otherConsumers(StringBuilder builder, Map<Class<?>, Consumer<Object>> consumerMap)
             {
                 consumerMap.put(Object.class, builder::append);
@@ -437,11 +454,17 @@ public class ObjectUtils
         {
             Field h = proxy.getClass()
                     .getDeclaredField(proxyField);
-            h.setAccessible(true);
+            if (!h.isAccessible())
+            {
+                makeAccessible(h);
+            }
             Object obj = h.get(proxy);
             Field advised = obj.getClass()
                     .getDeclaredField("advised");
-            advised.setAccessible(true);
+            if (!advised.isAccessible())
+            {
+                makeAccessible(advised);
+            }
             target = ((AdvisedSupport) advised.get(obj)).getTargetSource()
                     .getTarget();
         }
