@@ -25,6 +25,7 @@ import static java.util.Optional.ofNullable;
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
 import static org.bricks.constants.Constants.NumberConstants.NUMBER_1;
+import static org.bricks.constants.Constants.StringConstants.ENGLISH_CHARS;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -134,6 +135,17 @@ public class SecurityUtils
          * 解密
          *
          * @param src 密文
+         * @return 明文
+         */
+        public static String decode(String src)
+        {
+            return decode(src, ENGLISH_CHARS);
+        }
+
+        /**
+         * 解密
+         *
+         * @param src 密文
          * @param key key
          * @return 明文
          */
@@ -150,6 +162,17 @@ public class SecurityUtils
             }
             return ofNullable(bytes).map(String::new)
                     .orElse("");
+        }
+
+        /**
+         * 加密
+         *
+         * @param src 明文
+         * @return 密文
+         */
+        public static String encode(String src)
+        {
+            return encode(src, ENGLISH_CHARS);
         }
 
         /**

@@ -21,16 +21,18 @@ import static java.util.stream.Collectors.toList;
 import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
 import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
 import org.bricks.annotation.NoLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lombok.Getter;
 
 /**
  * 对象转换抽象类
@@ -39,9 +41,9 @@ import org.slf4j.LoggerFactory;
  *
  * @param <M> 源对象
  * @param <N> 目标对象
- * @param <P> 参数
  */
-public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
+@NoLog
+public abstract class AbstractConverter<M, N> implements Converter<M, N>
 {
 
     /**
@@ -52,17 +54,14 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
     /**
      * 源类型
      */
-    protected Class<M> source;
+    @Getter
+    protected Class<M> sourceClass;
 
     /**
      * 目标类型
      */
-    protected Class<N> target;
-
-    /**
-     * 参数类型
-     */
-    protected Class<P> param;
+    @Getter
+    protected Class<N> targetClass;
 
     /**
      * 构造方法
@@ -71,112 +70,92 @@ public abstract class AbstractConverter<M, N, P> implements Converter<M, N, P>
     protected AbstractConverter()
     {
         List<Class<?>> classList = getComponentClassList(getClass(), Converter.class);
-        source = (Class<M>) classList.get(0);
-        target = (Class<N>) classList.get(1);
-        param = (Class<P>) classList.get(2);
+        sourceClass = (Class<M>) classList.get(0);
+        targetClass = (Class<N>) classList.get(1);
     }
 
-    @NoLog
     @Override
-    public Class<M> getSource()
+    public N convert(@NotNull M m)
     {
-        return source;
+        return check(m) ? from(m) : null;
     }
 
-    @NoLog
     @Override
-    public Class<N> getTarget()
+    public List<N> convertList(List<M> mList)
     {
-        return target;
+        return ofNullable(mList).map(list -> convertStream(list.stream()))
+                .orElseGet(Collections::emptyList);
     }
 
-    @NoLog
     @Override
-    public N convert(@NotNull M m, @NotNull P p)
+    public List<N> convertStream(Stream<M> stream)
     {
-        return check(m, p) ? from(m, p) : null;
-    }
-
-    @NoLog
-    @Override
-    public List<N> convertList(Collection<M> mList)
-    {
-        return convertList(mList, null);
-    }
-
-    @NoLog
-    @Override
-    public List<N> convertList(Collection<M> mList, P p)
-    {
-        return ofNullable(mList).map(list -> list.stream()
-                .filter(m -> check(m, p))
-                .map(m -> convert(m, p))
+        return ofNullable(stream).map(s -> s.filter(this::check)
+                .map(this::convert)
                 .filter(Objects::nonNull)
                 .collect(toList()))
                 .orElseGet(Collections::emptyList);
     }
 
-    @NoLog
     @Override
-    public M reverseConvert(N n, P p)
+    public M reverseConvert(N n)
     {
-        return reverseCheck(n, p) ? reverseFrom(n, p) : null;
+        return reverseCheck(n) ? reverseFrom(n) : null;
     }
 
-    @NoLog
     @Override
-    public List<M> reverseConvertList(Collection<N> nList, P p)
+    public List<M> reverseConvertList(List<N> nList)
     {
-        return nList.stream()
-                .filter(n -> reverseCheck(n, p))
-                .map(n -> reverseFrom(n, p))
+        return ofNullable(nList).map(list -> reverseConvertStream(list.stream()))
+                .orElseGet(Collections::emptyList);
+    }
+
+    @Override
+    public List<M> reverseConvertStream(Stream<N> stream)
+    {
+        return ofNullable(stream).map(s -> s.filter(this::reverseCheck)
+                .map(this::reverseConvert)
                 .filter(Objects::nonNull)
-                .collect(toList());
+                .collect(toList()))
+                .orElseGet(Collections::emptyList);
     }
 
     /**
      * 转换条件
      *
      * @param m M对象
-     * @param p 参数
      * @return 是否转换
      */
-    protected boolean check(M m, P p)
+    protected boolean check(M m)
     {
-        return m != null && (p != null || param.equals(Void.class));
+        return m != null;
     }
 
     /**
      * 转换条件
      *
      * @param n N对象
-     * @param p 参数
      * @return 是否转换
      */
-    protected boolean reverseCheck(N n, P p)
+    protected boolean reverseCheck(N n)
     {
-        return n != null && (p != null || param.equals(Void.class));
+        return n != null;
     }
 
     /**
      * M转为N
      *
      * @param m M对象
-     * @param p 参数
      * @return N对象
      */
-    protected abstract N from(M m, P p);
+    protected abstract N from(M m);
 
     /**
      * N转为n
      *
      * @param n n对象
-     * @param p 参数
      * @return N对象
      */
-    protected M reverseFrom(N n, P p)
-    {
-        return null;
-    }
+    protected abstract M reverseFrom(N n);
 
 }

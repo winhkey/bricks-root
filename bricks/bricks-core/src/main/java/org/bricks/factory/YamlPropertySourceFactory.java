@@ -28,6 +28,9 @@ import org.springframework.core.io.support.PropertySourceFactory;
 
 /**
  * 加载yml文件
+ *
+ * @author fuzy
+ *
  */
 public class YamlPropertySourceFactory implements PropertySourceFactory
 {

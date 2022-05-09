@@ -43,9 +43,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bricks.io.XMLWriter;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -83,9 +83,8 @@ public class XmlUtils
      *
      * @param stream 输入流
      * @return doc
-     * @throws DocumentException DocumentException
      */
-    public static Document getDocument(InputStream stream) throws DocumentException
+    public static Document getDocument(InputStream stream)
     {
         return ofNullable(stream).map(apply(s -> new SAXReader().read(s), null, null, log, null))
                 .orElse(null);
@@ -129,10 +128,6 @@ public class XmlUtils
             catch (IOException e)
             {
                 log.error(e.getMessage(), e);
-            }
-            catch (DocumentException e)
-            {
-                log.error("Can't parse the content as XML. File is[{}]", xmlFile.getPath(), e);
             }
         }
         return doc;
@@ -252,7 +247,7 @@ public class XmlUtils
     public static String selectSingleNodeValue(Node node, String xpath, Namespace... namespaces)
     {
         return ofNullable(selectSingleNode(node, xpath, namespaces)).map(Node::getText)
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .filter(StringUtils::isNotBlank)
                 .orElse("");
     }
 
@@ -269,7 +264,7 @@ public class XmlUtils
         return ofNullable(node).filter(n -> isNotBlank(attrName))
                 .map(n -> selectSingleNode(n, "@" + attrName, namespaces))
                 .map(Node::getText)
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .filter(StringUtils::isNotBlank)
                 .orElse("");
     }
 
@@ -286,7 +281,7 @@ public class XmlUtils
         return ofNullable(node).filter(n -> isNotBlank(nodeName))
                 .map(n -> selectSingleNode(n, nodeName, namespaces))
                 .map(Node::getText)
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank)
+                .filter(StringUtils::isNotBlank)
                 .orElse("");
     }
 

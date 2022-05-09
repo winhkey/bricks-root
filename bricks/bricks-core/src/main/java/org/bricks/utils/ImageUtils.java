@@ -18,6 +18,9 @@ package org.bricks.utils;
 
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
+import static java.util.Base64.getDecoder;
+import static java.util.Base64.getEncoder;
+import static org.apache.commons.io.IOUtils.readFully;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bricks.utils.RegexUtils.regularGroupMap;
 
@@ -26,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -59,10 +61,8 @@ public class ImageUtils
     {
         try (InputStream in = newInputStream(Paths.get(path)))
         {
-            byte[] bytes = new byte[in.available()];
-            in.read(bytes);
-            return Base64.getEncoder()
-                    .encodeToString(bytes);
+            byte[] bytes = readFully(in, in.available());
+            return getEncoder().encodeToString(bytes);
         }
         catch (IOException e)
         {
@@ -97,8 +97,7 @@ public class ImageUtils
             }
             try (OutputStream out = newOutputStream(Paths.get(filePath)))
             {
-                byte[] bytes = Base64.getDecoder()
-                        .decode(base);
+                byte[] bytes = getDecoder().decode(base);
                 for (int i = 0; i < bytes.length; ++i)
                 {
                     if (bytes[i] < 0)

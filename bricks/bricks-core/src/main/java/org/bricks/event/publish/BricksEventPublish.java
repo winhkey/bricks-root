@@ -17,6 +17,7 @@
 package org.bricks.event.publish;
 
 import static java.util.Optional.ofNullable;
+import static org.bricks.utils.ValidationUtils.validate;
 
 import javax.annotation.Resource;
 
@@ -51,7 +52,11 @@ public class BricksEventPublish
      */
     public <E extends BricksEvent<?>> void publish(E event)
     {
-        ofNullable(event).ifPresent(e -> applicationEventPublisher.publishEvent(e));
+        ofNullable(event).ifPresent(e ->
+        {
+            validate(e);
+            applicationEventPublisher.publishEvent(e);
+        });
     }
 
 }

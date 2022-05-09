@@ -33,10 +33,14 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.ZipInputStream;
 
 import org.bricks.exception.BaseException;
+import org.springframework.web.multipart.MultipartFile;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 文件处理
@@ -44,6 +48,7 @@ import lombok.experimental.UtilityClass;
  * @author fuzy
  *
  */
+@Slf4j
 @UtilityClass
 public class FileUtils
 {
@@ -153,10 +158,10 @@ public class FileUtils
      */
     public static String getFileType(File file)
     {
-        byte[] b = new byte[10];
+        byte[] bytes = new byte[10];
         try (InputStream is = newInputStream(file.toPath()))
         {
-            return is.read(b, 0, b.length) > -1 ? getFileTypeByByte(b) : null;
+            return is.read(bytes, 0, bytes.length) > -1 ? getFileTypeByByte(bytes) : null;
         }
         catch (IOException e)
         {
@@ -238,6 +243,67 @@ public class FileUtils
             {
                 throw new BaseException(format(MESSAGE, dir), e);
             }
+        }
+    }
+
+    /**
+     * zip文件流解压缩后大小
+     *
+     * @param inputStream 文件流
+     * @return 合法zip
+     */
+    @SneakyThrows
+    public static boolean checkZip(InputStream inputStream)
+    {
+        long size = inputStream.available();
+        ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+        byte[] buffer = new byte[8 * 1024 * 1024];
+        long uncompressedSize = 0;
+        while (zipInputStream.getNextEntry() != null)
+        {
+            int len;
+            while ((len = zipInputStream.read(buffer, 0, buffer.length)) != -1)
+            {
+                uncompressedSize += len;
+            }
+            zipInputStream.closeEntry();
+        }
+        return uncompressedSize / size <= 20;
+    }
+
+    /**
+     * 压缩文件解压缩后大小
+     *
+     * @param file 压缩文件
+     * @return 合法zip
+     */
+    public static boolean checkZip(File file)
+    {
+        try (InputStream stream = newInputStream(file.toPath()))
+        {
+            return checkZip(stream);
+        }
+        catch (Exception e)
+        {
+            throw new BaseException(e);
+        }
+    }
+
+    /**
+     * 压缩文件流解压缩后大小
+     *
+     * @param file 压缩文件
+     * @return 合法zip
+     */
+    public static boolean checkZip(MultipartFile file)
+    {
+        try (InputStream stream = file.getInputStream())
+        {
+            return checkZip(stream);
+        }
+        catch (Exception e)
+        {
+            throw new BaseException(e);
         }
     }
 

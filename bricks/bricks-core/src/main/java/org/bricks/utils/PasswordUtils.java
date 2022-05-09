@@ -19,8 +19,13 @@ package org.bricks.utils;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.bricks.constants.Constants.NumberConstants.NUMBER_3;
 import static org.bricks.constants.Constants.NumberConstants.NUMBER_48;
+import static org.bricks.utils.ContextHolder.getBean;
 import static org.bricks.utils.MD5Utils.getMD5String;
 import static org.bricks.utils.RandomUtils.randomString;
+import static org.bricks.utils.RegexUtils.matches;
+
+import org.bricks.exception.BaseException;
+import org.bricks.pattern.PatternService;
 
 import lombok.experimental.UtilityClass;
 
@@ -54,6 +59,11 @@ public class PasswordUtils
      */
     public static String encodePassword(String password, String salt)
     {
+        PatternService patternService = getBean(PatternService.class);
+        if (patternService != null && !matches(patternService.loadPatternById("password"), password))
+        {
+            throw new BaseException("error.password.format");
+        }
         String md5 = getMD5String(password.concat(salt), false);
         char[] cs = new char[48];
         for (int i = 0; i < NUMBER_48; i += NUMBER_3)

@@ -418,7 +418,7 @@ public class StringUtils
      * @param bytes 字节数组
      * @return 字符串
      */
-    public static String byteToHexString(byte[] bytes)
+    public static String bytesToHex(byte[] bytes)
     {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++)
@@ -436,7 +436,7 @@ public class StringUtils
      * @param hex 十六进制字符串
      * @return 字节数组
      */
-    public static byte[] hexStringToByte(String hex)
+    public static byte[] hexToBytes(String hex)
     {
         int len = hex.length() / 2;
         byte[] result = new byte[len];

@@ -63,7 +63,7 @@ public class CommandUtils
             exec.setStreamHandler(pumpStreamHandler);
             int code = exec.execute(commandLine);
             String result = outputStream.toString(resultCharset);
-            wrapper = build(String.valueOf(code), result, code == 0);
+            wrapper = build(String.valueOf(code), result, code == 0, null);
         }
         catch (Throwable e)
         {

@@ -25,6 +25,7 @@ import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bricks.utils.FunctionUtils.accept;
 import static org.bricks.utils.ReflectionUtils.addDeclaredFields;
+import static org.springframework.util.ReflectionUtils.makeAccessible;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -41,7 +42,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String, Object>>
+public class EntityMapConverter extends AbstractConverter<Object, Map<String, Object>>
 {
 
     @Override
@@ -50,6 +51,12 @@ public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String
         Map<String, Object> conditionMap = newHashMap();
         buildCondition(m, "", conditionMap);
         return conditionMap;
+    }
+
+    @Override
+    protected Object reverseFrom(Map<String, Object> map)
+    {
+        return null;
     }
 
     /**
@@ -67,7 +74,7 @@ public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String
             addDeclaredFields(object.getClass(), fieldList, true, false);
             fieldList.forEach(accept(field ->
             {
-                field.setAccessible(true);
+                makeAccessible(field);
                 String name = field.getName();
                 boolean isBetween = name.endsWith("BetweenQuery");
                 if (isBetween)
@@ -95,7 +102,7 @@ public class EntityMapConverter extends AbstractVoidConverter<Object, Map<String
                             {
                                 conditionMap.put(n.concat("@GE"), arr[0]);
                             }
-                            else if (arr[0] != null && arr[1] != null)
+                            else if (arr[0] != null)
                             {
                                 if (arr[0].equals(arr[1]))
                                 {

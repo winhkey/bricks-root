@@ -21,9 +21,8 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static java.util.Arrays.stream;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+import static org.bricks.utils.FunctionUtils.accept;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -187,14 +186,14 @@ public class RegexUtils
      */
     public static List<Map<String, String>> regularGroupsMap(Pattern pattern, CharSequence input, String... names)
     {
-        List<Map<String, String>> list = new ArrayList<>();
+        List<Map<String, String>> list = newArrayList();
         if (isNotEmpty(names))
         {
             Matcher matcher = pattern.matcher(input);
             while (matcher.find())
             {
-                Map<String, String> map = new HashMap<>();
-                stream(names).forEach(i -> map.put(i, matcher.group(i)));
+                Map<String, String> map = newHashMap();
+                stream(names).forEach(accept(n -> map.put(n, matcher.group(n)), n -> map.put(n, ""), null, null, null));
                 list.add(map);
             }
         }

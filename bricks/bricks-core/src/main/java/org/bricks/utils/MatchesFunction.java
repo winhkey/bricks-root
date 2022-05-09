@@ -16,6 +16,7 @@
 
 package org.bricks.utils;
 
+import static org.bricks.constants.Constants.GenericConstants.RAWTYPES;
 import static org.bricks.constants.Constants.NumberConstants.NUMBER_2;
 
 import java.util.List;
@@ -35,6 +36,7 @@ import org.jaxen.function.StringFunction;
 public class MatchesFunction implements Function
 {
 
+    @SuppressWarnings(RAWTYPES)
     @Override
     public Object call(Context context, List list) throws FunctionCallException
     {

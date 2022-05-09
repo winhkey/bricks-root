@@ -28,6 +28,7 @@ import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
 import static org.bricks.utils.FunctionUtils.apply;
 import static org.springframework.core.ResolvableType.forClass;
+import static org.springframework.util.ReflectionUtils.makeAccessible;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;

@@ -166,7 +166,7 @@ public class DateUtils
      * @param formatStr formatStr
      * @return Date.
      */
-    public static LocalDateTime parse(String dateStr, String formatStr)
+    public static LocalDateTime parseDateTime(String dateStr, String formatStr)
     {
         if (isBlank(dateStr))
         {
@@ -174,6 +174,40 @@ public class DateUtils
         }
         DateTimeFormatter formatter = getDateTimeFormatter(formatStr);
         return LocalDateTime.parse(dateStr, formatter);
+    }
+
+    /**
+     * 把字符串格式化日期
+     *
+     * @param dateStr date
+     * @param formatStr formatStr
+     * @return Date.
+     */
+    public static LocalDate parseDate(String dateStr, String formatStr)
+    {
+        if (isBlank(dateStr))
+        {
+            return null;
+        }
+        DateTimeFormatter formatter = getDateTimeFormatter(formatStr);
+        return LocalDate.parse(dateStr, formatter);
+    }
+
+    /**
+     * 把字符串格式化时间
+     *
+     * @param dateStr date
+     * @param formatStr formatStr
+     * @return Date.
+     */
+    public static LocalTime parseTime(String dateStr, String formatStr)
+    {
+        if (isBlank(dateStr))
+        {
+            return null;
+        }
+        DateTimeFormatter formatter = getDateTimeFormatter(formatStr);
+        return LocalTime.parse(dateStr, formatter);
     }
 
     /**
@@ -189,7 +223,7 @@ public class DateUtils
             return null;
         }
         String parse = changeDate(dateStr);
-        return parse(dateStr, parse);
+        return parseDateTime(dateStr, parse);
     }
 
     /**

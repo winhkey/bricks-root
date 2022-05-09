@@ -91,4 +91,12 @@ public abstract class AbstractCacheMapService<T>
         return isBlank(key) ? null : cacheMap.remove(key);
     }
 
+    /**
+     * @return 全部缓存
+     */
+    public Map<String, T> getAll()
+    {
+        return cacheMap;
+    }
+
 }

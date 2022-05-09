@@ -16,12 +16,12 @@
 
 package org.bricks.converter;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.stream.Stream;
 
-import org.bricks.annotation.NoLog;
+import org.mapstruct.InheritConfiguration;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.MapperConfig;
 
 /**
  * 对象转换
@@ -30,134 +30,60 @@ import org.bricks.annotation.NoLog;
  *
  * @param <M> 源对象
  * @param <N> 目标对象
- * @param <P> 参数
  */
-public interface Converter<M, N, P>
+@MapperConfig
+public interface Converter<M, N>
 {
 
     /**
      * M转为N
      *
      * @param m M对象
-     * @param p 参数
      * @return N对象
      */
-    N convert(M m, P p);
-
-    /**
-     * 转换
-     *
-     * @param m 源对象
-     * @return 目标对象
-     */
-    @NoLog
-    default N convert(M m)
-    {
-        return convert(m, null);
-    }
-
-    /**
-     * 转换
-     *
-     * @param m 源对象
-     * @param function 转换lambda
-     * @param <M> 源类型
-     * @param <N> 目标类型
-     * @return 目标对象
-     */
-    static <M, N> N convertFunction(M m, Function<M, N> function)
-    {
-        return function.apply(m);
-    }
-
-    /**
-     * 转换
-     *
-     * @param m 源对象
-     * @param p 参数
-     * @param function 转换lambda
-     * @param <M> 源类型
-     * @param <N> 目标类型
-     * @param <P> 参数类型
-     * @return 目标对象
-     */
-    static <M, N, P> N convertFunction(M m, P p, BiFunction<M, P, N> function)
-    {
-        return function.apply(m, p);
-    }
+    N convert(M m);
 
     /**
      * M列表转为N列表
      *
      * @param mList M列表
-     * @param p 参数
      * @return N列表
      */
-    List<N> convertList(Collection<M> mList, P p);
+    @InheritConfiguration(name = "convert")
+    List<N> convertList(List<M> mList);
 
     /**
-     * 列表转换
+     * M流转为N列表
      *
-     * @param mList m列表
-     * @return n列表
+     * @param stream M流
+     * @return N列表
      */
-    default List<N> convertList(Collection<M> mList)
-    {
-        return convertList(mList, null);
-    }
+    List<N> convertStream(Stream<M> stream);
 
     /**
      * N转为M
      *
      * @param n N对象
-     * @param p 参数
      * @return M对象
      */
-    M reverseConvert(N n, P p);
-
-    /**
-     * 反转
-     *
-     * @param n n对象
-     * @return m对象
-     */
-    default M reverseConvert(N n)
-    {
-        return reverseConvert(n, null);
-    }
+    @InheritInverseConfiguration(name = "convert")
+    M reverseConvert(N n);
 
     /**
      * N列表转为M列表
      *
      * @param nList M列表
-     * @param p 参数
      * @return M列表
      */
-    List<M> reverseConvertList(Collection<N> nList, P p);
+    @InheritConfiguration(name = "reverseConvert")
+    List<M> reverseConvertList(List<N> nList);
 
     /**
-     * 列表反转
+     * N流转为M列表
      *
-     * @param nList n列表
-     * @return m列表
+     * @param stream N流
+     * @return M列表
      */
-    default List<M> reverseConvertList(Collection<N> nList)
-    {
-        return reverseConvertList(nList, null);
-    }
-
-    /**
-     * M类型
-     *
-     * @return M类型
-     */
-    Class<M> getSource();
-
-    /**
-     * N类型
-     *
-     * @return N类型
-     */
-    Class<N> getTarget();
+    List<M> reverseConvertStream(Stream<N> stream);
 
 }

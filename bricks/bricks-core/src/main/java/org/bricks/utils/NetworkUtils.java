@@ -17,6 +17,7 @@
 package org.bricks.utils;
 
 import static java.net.NetworkInterface.getNetworkInterfaces;
+import static java.text.MessageFormat.format;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -33,11 +34,13 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +54,29 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 public class NetworkUtils
 {
+
+    /**
+     * 基本链接
+     * 
+     * @param uri uri
+     * @return 基本链接
+     */
+    public static String base(URI uri)
+    {
+        return format("{0}://{1}", uri.getScheme(), uri.getAuthority());
+    }
+
+    /**
+     * 基本链接
+     *
+     * @param url 链接
+     * @return 基本链接
+     */
+    @SneakyThrows
+    public static String base(String url)
+    {
+        return base(new URI(url));
+    }
 
     /**
      * 字节数组ip

@@ -24,6 +24,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 import static org.bricks.utils.ObjectUtils.buildString;
 import static org.bricks.utils.ObjectUtils.getFieldValue;
+import static org.springframework.core.annotation.AnnotationUtils.findAnnotation;
 
 import java.util.List;
 import java.util.Map;
@@ -63,8 +64,8 @@ public class LogAroundHandler extends AbstractAroundHandler<Map<String, LogConte
     protected void before(ProceedingJoinPoint pjp)
     {
         Object obj = pjp.getTarget();
-        Class<?> clazz = obj.getClass();
         Signature signature = pjp.getSignature();
+        Class<?> clazz = signature.getDeclaringType();
         String methodName = signature.getName();
         Logger logger = LOGGER_MAP.computeIfAbsent(clazz, k ->
         {
@@ -72,7 +73,7 @@ public class LogAroundHandler extends AbstractAroundHandler<Map<String, LogConte
             return (Logger) ofNullable(object).filter(o -> o instanceof Logger)
                     .orElse(null);
         });
-        boolean doLog = ofNullable(logger).filter(log -> clazz.getAnnotation(NoLog.class) == null)
+        boolean doLog = ofNullable(logger).filter(log -> findAnnotation(clazz, NoLog.class) == null)
                 .map(log -> ofNullable(((MethodSignature) signature).getMethod())
                         .filter(method -> method.getAnnotation(NoLog.class) == null)
                         .isPresent())
@@ -117,9 +118,8 @@ public class LogAroundHandler extends AbstractAroundHandler<Map<String, LogConte
     protected void after(ProceedingJoinPoint pjp, Object result)
     {
         long end = System.currentTimeMillis();
-        Object obj = pjp.getTarget();
-        Class<?> clazz = obj.getClass();
         Signature signature = pjp.getSignature();
+        Class<?> clazz = signature.getDeclaringType();
         String methodName = signature.getName();
         String key = format("{0}.{1}", clazz.getName(), methodName);
         ofNullable(threadLocal.get()

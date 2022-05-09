@@ -21,6 +21,7 @@ import static org.bricks.constants.Constants.StringConstants.ALL_CHARS;
 import static org.bricks.constants.Constants.StringConstants.ALL_NUMBERS;
 import static org.bricks.constants.Constants.StringConstants.ENGLISH_CHARS;
 
+import java.security.SecureRandom;
 import java.util.Random;
 
 import lombok.experimental.UtilityClass;
@@ -38,7 +39,7 @@ public class RandomUtils
     /**
      * 随机种子
      */
-    private static final Random DEFAULT_RANDOM = new Random();
+    private static final Random DEFAULT_RANDOM = new SecureRandom();
 
     /**
      * 数字随机串

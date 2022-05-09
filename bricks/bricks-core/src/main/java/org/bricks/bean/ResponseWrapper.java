@@ -29,13 +29,12 @@ import lombok.experimental.Accessors;
  *
  * @author fuzy
  *
- * @param <T> 数据
- *
+ * @param <D> 数据
  */
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ResponseWrapper<T> extends AbstractBean
+public class ResponseWrapper<D> extends AbstractBean
 {
 
     /**
@@ -52,7 +51,7 @@ public class ResponseWrapper<T> extends AbstractBean
     /**
      * 业务数据
      */
-    private T data;
+    private D data;
 
     /**
      * 列表总数
@@ -62,7 +61,7 @@ public class ResponseWrapper<T> extends AbstractBean
     /**
      * 是否成功
      */
-    private Boolean success;
+    private boolean success;
 
     /**
      * 默认构造方法
@@ -85,45 +84,69 @@ public class ResponseWrapper<T> extends AbstractBean
         this.message = message;
     }
 
+    /**
+     * @return message
+     */
+    public String getMsg()
+    {
+        return message;
+    }
 
     /**
-     * @return 无数据的成功结果
+     * message
+     *
+     * @param message message
      */
-    public static ResponseWrapper<Void> ok()
+    public void setMsg(String message)
     {
-        return ok(Void.class);
+        this.message = message;
     }
 
     /**
      * 包含数据的成功结果
      *
-     * @param clazz 数据类型
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> ok(Class<T> clazz)
+    public static <T> ResponseWrapper<T> ok()
     {
-        return build("200", "success", true, clazz);
+        return build("200", "success", true, null);
     }
 
     /**
-     * @return 无数据的错误结果
+     * 包含数据的成功结果
+     *
+     * @param data 数据
+     * @param <T> 数据类型
+     * @return 结果
      */
-    public static ResponseWrapper<Void> error()
+    public static <T> ResponseWrapper<T> ok(T data)
     {
-        return error(Void.class);
+        return build("200", "success", true, data);
     }
 
     /**
      * 包含数据的错误结果
      *
-     * @param clazz 数据类型
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> error(Class<T> clazz)
+    public static <T> ResponseWrapper<T> error()
     {
-        return build("-1", "error", false, clazz);
+        return error("-1", "error");
+    }
+
+    /**
+     * 包含数据的错误结果
+     * 
+     * @param <T> 数据类型
+     * @param code 返回码
+     * @param message 返回消息
+     * @return 结果
+     */
+    public static <T> ResponseWrapper<T> error(String code, String message)
+    {
+        return build(code, message, false, null);
     }
 
     /**
@@ -132,50 +155,26 @@ public class ResponseWrapper<T> extends AbstractBean
      * @param code 返回码
      * @param message 返回消息
      * @param success 是否成功
-     * @return 结果
-     */
-    public static ResponseWrapper<Void> build(String code, String message, Boolean success)
-    {
-        return build(code, message, success, Void.class);
-    }
-
-    /**
-     * 构建
-     *
-     * @param code 返回码
-     * @param message 返回消息
-     * @param success 是否成功
-     * @param clazz 数据类型
+     * @param data 数据
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> build(String code, String message, Boolean success, Class<T> clazz)
+    public static <T> ResponseWrapper<T> build(String code, String message, Boolean success, T data)
     {
-        return new ResponseWrapper<T>(code, message).setSuccess(success);
+        return new ResponseWrapper<T>(code, message).setSuccess(success)
+                .setData(data);
     }
 
     /**
      * 构建
      *
      * @param messageEnum 消息枚举
-     * @return 结果
-     */
-    public static ResponseWrapper<Void> build(MessageEnum messageEnum)
-    {
-        return build(messageEnum, Void.class);
-    }
-
-    /**
-     * 构建
-     *
-     * @param messageEnum 消息枚举
-     * @param clazz 数据类型
      * @param <T> 数据类型
      * @return 结果
      */
-    public static <T> ResponseWrapper<T> build(MessageEnum messageEnum, Class<T> clazz)
+    public static <T> ResponseWrapper<T> build(MessageEnum messageEnum)
     {
-        return build(messageEnum.getCode(), messageEnum.getMessage(), false, clazz);
+        return build(messageEnum.getCode(), messageEnum.getMessage(), false, null);
     }
 
 }
