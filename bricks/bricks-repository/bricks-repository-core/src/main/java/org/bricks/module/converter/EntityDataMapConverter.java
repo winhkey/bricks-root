@@ -1,40 +1,54 @@
+/*
+ * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.bricks.module.converter;
 
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.bricks.constants.Constants.FormatConstants.DATETIME_FORMAT;
 import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
 import static org.bricks.module.constants.Constants.PoiConstants.ERR_COL;
-import static org.bricks.utils.DateUtils.format;
-import static org.bricks.utils.DateUtils.parse;
+import static org.bricks.module.enums.DataType.STRING;
 import static org.bricks.utils.FunctionUtils.accept;
 import static org.bricks.utils.ObjectUtils.getEnumValue;
 import static org.bricks.utils.ObjectUtils.getFieldValue;
 import static org.bricks.utils.ObjectUtils.setFieldValue;
 import static org.bricks.utils.ReflectionUtils.getDeclaredField;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bricks.converter.AbstractConverter;
-import org.bricks.enums.ValueEnum;
+import org.springframework.stereotype.Component;
+
+import org.bricks.converter.AbstractParameterConverter;
 import org.bricks.exception.BaseException;
 import org.bricks.module.bean.ColumnConfig;
 import org.bricks.module.enums.DataType;
-import org.springframework.stereotype.Component;
 
 /**
  * 对象转数据
  *
- * @author fuzy
- *
+ * @author fuzhiying
+ * 
  */
 @Component
-public class EntityDataMapConverter extends AbstractConverter<Object, Map<Integer, String>, Object[]>
+public class EntityDataMapConverter extends AbstractParameterConverter<Object, Map<Integer, String>, Object[]>
 {
 
     @Override
@@ -44,25 +58,22 @@ public class EntityDataMapConverter extends AbstractConverter<Object, Map<Intege
         Map<Integer, String> map = newLinkedHashMap();
         int i = 0;
         List<String> fieldList = (List<String>) objects[0];
+        Map<Integer, ColumnConfig> columnMap = (Map<Integer, ColumnConfig>) objects[1];
+        Map<String, ColumnConfig> fieldMap = columnMap.values()
+                .stream()
+                .collect(toMap(ColumnConfig::getField, c -> c, (o, n) -> n));
         for (String field : fieldList)
         {
             Object value = getFieldValue(m, field);
+            ColumnConfig configParam = fieldMap.get(field);
             String v = "";
             if (value != null)
             {
-                Class<?> clazz = value.getClass();
-                if (clazz.isEnum() && ValueEnum.class.isAssignableFrom(clazz))
-                {
-                    value = ((ValueEnum<?>) value).getValue();
-                }
-                if (value instanceof LocalDateTime)
-                {
-                    v = format((LocalDateTime) value, DATETIME_FORMAT);
-                }
-                else
-                {
-                    v = String.valueOf(value);
-                }
+                String format = ofNullable(configParam).map(ColumnConfig::getFormat)
+                        .orElse(null);
+                v = ofNullable(configParam).map(ColumnConfig::getDataType)
+                        .orElse(STRING)
+                        .format(value, format);
             }
             map.put(i++, v);
         }
@@ -122,59 +133,36 @@ public class EntityDataMapConverter extends AbstractConverter<Object, Map<Intege
     private void setEntryValues(Object obj, Entry<Integer, String> entry, Map<Integer, ColumnConfig> configMap)
     {
         Integer key = entry.getKey();
-        String strValue = entry.getValue();
         ColumnConfig configParam = configMap.get(key);
-        String field = configParam.getField();
-        Class<?> clazz;
-        try
+        if (configParam != null)
         {
-            clazz = getDeclaredField(obj.getClass(), field, true).getType();
-            Object value = clazz.isEnum() ? getEnumValue(clazz, strValue)
-                    : getValue(configParam.getDataType(), strValue);
-            setFieldValue(obj, field, value);
-        }
-        catch (Exception e)
-        {
-            throw new BaseException(e);
+            String strValue = entry.getValue();
+            String field = configParam.getField();
+            try
+            {
+                Class<?> clazz = getDeclaredField(obj.getClass(), field, true).getType();
+                Object value = clazz.isEnum() ? getEnumValue(clazz, strValue) : getValue(configParam, strValue);
+                setFieldValue(obj, field, value);
+            }
+            catch (Exception e)
+            {
+                throw new BaseException(e);
+            }
         }
     }
 
     /**
      * 根据字段类型转换值
      *
-     * @param dataType 数据类型
+     * @param configParam 配置
      * @param value 值
      * @return 对象
      */
-    private static Object getValue(DataType dataType, String value)
+    private static Object getValue(ColumnConfig configParam, String value)
     {
-        Object cellValue = null;
-        if (isNotBlank(value))
-        {
-            switch (dataType)
-            {
-                case INTEGER:
-                    cellValue = Integer.parseInt(value);
-                    break;
-                case DOUBLE:
-                    cellValue = Double.parseDouble(value);
-                    break;
-                case BIGDECIMAL:
-                    cellValue = new BigDecimal(value);
-                    break;
-                case DATE:
-                    cellValue = parse(value, DATETIME_FORMAT);
-                    break;
-                case BOOLEAN:
-                    // TODO: boolean类型
-                    // break;
-                case STRING:
-                default:
-                    cellValue = value;
-                    break;
-            }
-        }
-        return cellValue;
+        DataType dataType = configParam.getDataType();
+        String format = configParam.getFormat();
+        return dataType.parse(value, format);
     }
 
 }

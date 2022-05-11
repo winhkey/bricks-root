@@ -1,23 +1,4 @@
-/*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.bricks.module.service;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,15 +6,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.bricks.module.bean.ResultData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Order;
 
+import org.bricks.module.bean.ResultData;
+
 /**
  * 实体类crud操作service
  *
- * @author fuzy
+ * @author fuzhiying
  *
  * @param <I> ID类型
  * @param <T> 实体类型

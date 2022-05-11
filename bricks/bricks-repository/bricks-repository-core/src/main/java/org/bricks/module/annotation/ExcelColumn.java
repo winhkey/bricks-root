@@ -16,9 +16,11 @@
 
 package org.bricks.module.annotation;
 
-import java.lang.annotation.ElementType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Map;
 
@@ -29,11 +31,10 @@ import org.bricks.module.validate.filter.RowValidateFilter;
 /**
  * excel列注解
  *
- * @author fuzy
- *
+ * @author fuzhiying
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({FIELD, METHOD})
+@Retention(RUNTIME)
 public @interface ExcelColumn
 {
 
@@ -56,6 +57,11 @@ public @interface ExcelColumn
      * @return 数据类型
      */
     DataType dataType() default DataType.STRING;
+
+    /**
+     * @return 格式化
+     */
+    String format() default "";
 
     /**
      * @return 必填
@@ -90,7 +96,7 @@ public @interface ExcelColumn
     /**
      * 默认无用filter
      *
-     * @author fuzy
+     * @author fuzhiying
      */
     final class UselessRowFilter implements RowValidateFilter
     {

@@ -1,22 +1,9 @@
-/*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.bricks.module.service;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
+import static org.bricks.utils.ContextHolder.getBean;
+import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.ofNullable;
@@ -24,9 +11,6 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.bricks.constants.Constants.GenericConstants.UNCHECKED;
-import static org.bricks.utils.ContextHolder.getBean;
-import static org.bricks.utils.ReflectionUtils.getComponentClassList;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,12 +21,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.bricks.annotation.NoLog;
-import org.bricks.exception.BaseException;
-import org.bricks.listener.AbstractInitFinishedListener;
-import org.bricks.module.bean.ResultData;
-import org.bricks.module.converter.EntityMapConverter;
-import org.bricks.service.LimitCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,14 +29,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.bricks.annotation.NoLog;
+import org.bricks.converter.EntityMapConverter;
+import org.bricks.exception.BaseException;
+import org.bricks.listener.AbstractInitFinishedListener;
+import org.bricks.module.bean.ResultData;
+import org.bricks.service.LimitCallback;
+
 /**
  * 实体类crud操作service
  *
- * @author fuzy
+ * @author fuzhiying
  *
  * @param <I> ID类型
  * @param <T> 实体类型
  */
+@Transactional(readOnly = true)
 public abstract class AbstractEntityService<I, T> extends AbstractInitFinishedListener implements EntityService<I, T>
 {
 
@@ -118,92 +104,7 @@ public abstract class AbstractEntityService<I, T> extends AbstractInitFinishedLi
         entityName = entityClass.getSimpleName();
     }
 
-    /**
-     * 导入后处理
-     *
-     * @param list 导入列表
-     */
-    protected void afterImport(List<T> list)
-    {
-        //
-    }
-
-    /**
-     * 拼接条件sql
-     *
-     * @param builder builder
-     * @param condition 条件
-     * @param key 字段名
-     * @param argument 参数
-     * @param appendSql sql
-     */
-    protected void appendCondition(StringBuilder builder, Map<String, Object> condition, String key, Object argument,
-            String appendSql)
-    {
-        ofNullable(argument).ifPresent(arg ->
-        {
-            condition.put(key, arg);
-            ofNullable(appendSql).ifPresent(builder::append);
-        });
-    }
-
-    /**
-     * 拼接条件sql
-     *
-     * @param builder builder
-     * @param condition 条件
-     * @param key 字段名
-     * @param argument 参数
-     * @param appendSql sql
-     */
-    protected void appendCondition(StringBuilder builder, Map<String, Object> condition, String key, String argument,
-            String appendSql)
-    {
-        if (isNotBlank(argument))
-        {
-            condition.put(key, argument);
-            ofNullable(appendSql).ifPresent(builder::append);
-        }
-    }
-
-    /**
-     * 导入之前的数据处理,如校验，设置创建时间等一些默认值
-     *
-     * @param t 实体对象
-     * @return 校验结果
-     */
-    protected boolean beforeImport(T t)
-    {
-        return true;
-    }
-
-    /**
-     * 导入前数据处理和校验过滤（可混合session内容校验）
-     *
-     * @param t 实体对象
-     * @return 校验结果
-     */
-    protected String beforeImportValidate(T t)
-    {
-        return "";
-    }
-
-    /**
-     * 清除条件
-     *
-     * @param condition 条件map
-     * @param clear 是否清除
-     */
-    protected void clearCondition(Map<String, Object> condition, boolean clear)
-    {
-        if (clear && isNotEmpty(condition))
-        {
-            condition.clear();
-        }
-    }
-
     @Override
-    @Transactional(readOnly = true)
     public long count(Map<String, Object> condition, boolean clear)
     {
         return 0;
@@ -277,70 +178,60 @@ public abstract class AbstractEntityService<I, T> extends AbstractInitFinishedLi
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<T> findAll(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders)
     {
         return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<T> findAll(Map<String, Object> condition, boolean clear, Order... orders)
     {
         return findAll(condition, clear, emptyList(), orders);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<T> findAll(Order... orders)
     {
         return findAll(emptyMap(), false, emptyList(), orders);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<T> findByIds(Collection<I> ids)
     {
         return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public T findOne(I id)
     {
         return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public T findOne(Map<String, Object> condition, boolean clear, List<String> fieldList, Order... orders)
     {
         return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public T findOne(Map<String, Object> condition, boolean clear, Order... orders)
     {
         return findOne(condition, clear, emptyList(), orders);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<T> findPage(Map<String, Object> condition, boolean clear, List<String> fieldList, Pageable pageable)
     {
         return null;
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<T> findPage(Map<String, Object> condition, boolean clear, Pageable pageable)
     {
         return findPage(condition, clear, emptyList(), pageable);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<T> findPage(Pageable pageable)
     {
         return findPage(emptyMap(), false, emptyList(), pageable);
@@ -360,6 +251,7 @@ public abstract class AbstractEntityService<I, T> extends AbstractInitFinishedLi
         ResultData data = new ResultData();
         List<Map<Integer, String>> errorList = newArrayList();
         List<T> excelList = excelService.importExcel(inputStream, 0, errorList, entityClass);
+        excelList = beforeImport(excelList);
         if (isNotEmpty(excelList))
         {
             List<T> list = excelList.stream()
@@ -438,6 +330,90 @@ public abstract class AbstractEntityService<I, T> extends AbstractInitFinishedLi
     public void logicDeleteIds(Collection<I> ids)
     {
         //
+    }
+
+    /**
+     * 导入后处理
+     *
+     * @param list 导入列表
+     */
+    protected void afterImport(List<T> list)
+    {
+        //
+    }
+
+    /**
+     * 拼接条件sql
+     *
+     * @param builder builder
+     * @param condition 条件
+     * @param key 字段名
+     * @param argument 参数
+     * @param appendSql sql
+     */
+    protected void appendCondition(StringBuilder builder, Map<String, Object> condition, String key, Object argument,
+            String appendSql)
+    {
+        ofNullable(argument).ifPresent(arg ->
+        {
+            condition.put(key, arg);
+            ofNullable(appendSql).ifPresent(builder::append);
+        });
+    }
+
+    /**
+     * 拼接条件sql
+     *
+     * @param builder builder
+     * @param condition 条件
+     * @param key 字段名
+     * @param argument 参数
+     * @param appendSql sql
+     */
+    protected void appendCondition(StringBuilder builder, Map<String, Object> condition, String key, String argument,
+            String appendSql)
+    {
+        if (isNotBlank(argument))
+        {
+            condition.put(key, argument);
+            ofNullable(appendSql).ifPresent(builder::append);
+        }
+    }
+
+    /**
+     * 导入前处理
+     *
+     * @param list 实体列表
+     * @return 实体列表
+     */
+    protected List<T> beforeImport(List<T> list)
+    {
+        return list;
+    }
+
+    /**
+     * 导入之前的数据处理,如校验，设置创建时间等一些默认值
+     *
+     * @param t 实体对象
+     * @return 校验结果
+     */
+    protected boolean beforeImport(T t)
+    {
+        return true;
+    }
+
+    /**
+     * 清除条件
+     *
+     * @param condition 条件map
+     * @param clear 是否清除
+     */
+    protected void clearCondition(Map<String, Object> condition, boolean clear)
+    {
+        if (clear && isNotEmpty(condition))
+        {
+            condition.clear();
+        }
     }
 
     @SuppressWarnings(UNCHECKED)

@@ -11,7 +11,7 @@ import org.bricks.module.bean.BatchData;
 /**
  * 批量接口
  *
- * @author fuzy
+ * @author fuzhiying
  */
 public interface BatchService
 {

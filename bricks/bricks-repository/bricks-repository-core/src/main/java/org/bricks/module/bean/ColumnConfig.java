@@ -27,8 +27,7 @@ import lombok.experimental.Accessors;
 /**
  * 列配置
  *
- * @author fuzy
- *
+ * @author fuzhiying
  */
 @Setter
 @Getter
@@ -55,6 +54,11 @@ public class ColumnConfig extends AbstractBean
      * 字段类型
      */
     private DataType dataType;
+
+    /**
+     * 格式化
+     */
+    private String format;
 
     /**
      * 必填

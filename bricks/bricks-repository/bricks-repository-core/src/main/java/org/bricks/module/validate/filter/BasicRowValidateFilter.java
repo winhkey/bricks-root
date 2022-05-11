@@ -1,26 +1,7 @@
-/*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.bricks.module.validate.filter;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static java.text.MessageFormat.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bricks.module.constants.Constants.PoiConstants.EXCEL_ERR_FOMAT;
 import static org.bricks.module.constants.Constants.PoiConstants.EXCEL_ERR_VALUE;
 import static org.bricks.module.constants.Constants.PoiConstants.EXCEL_IS_NULL;
@@ -28,20 +9,24 @@ import static org.bricks.module.constants.Constants.PoiConstants.EXCEL_TOO_LONG;
 import static org.bricks.utils.ObjectUtils.getEnumValue;
 import static org.bricks.utils.ReflectionUtils.addDeclaredFields;
 import static org.bricks.utils.RegexUtils.matches;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.context.i18n.LocaleContextHolder.getLocale;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.springframework.stereotype.Service;
+
 import org.bricks.module.bean.ColumnConfig;
 import org.bricks.module.enums.DataType;
-import org.springframework.stereotype.Service;
 
 /**
  * 基本行级校验
  *
- * @author fuzy
+ * @author fuzhiying
  */
 @Service("basicRowValidateFilter")
 public class BasicRowValidateFilter extends AbstractRowValidateFilter
@@ -84,7 +69,8 @@ public class BasicRowValidateFilter extends AbstractRowValidateFilter
         String value = dataMap.get(column);
         if (columnConfig.isMandatory() && isBlank(value))
         {
-            setErrorMessage(dataMap, format(EXCEL_IS_NULL, row + 1, column + 1));
+            setErrorMessage(dataMap, messageSourceAccessorMap.get(getLocale().toString())
+                    .getMessage(EXCEL_IS_NULL, new Object[] {row + 1, column + 1}));
             return false;
         }
         return true;
@@ -105,7 +91,8 @@ public class BasicRowValidateFilter extends AbstractRowValidateFilter
         int maxLength = columnConfig.getMaxLength();
         if (maxLength > 0 && value.length() > maxLength)
         {
-            setErrorMessage(dataMap, format(EXCEL_TOO_LONG, row + 1, column + 1));
+            setErrorMessage(dataMap, messageSourceAccessorMap.get(getLocale().toString())
+                    .getMessage(EXCEL_TOO_LONG, new Object[] {row + 1, column + 1}));
             return false;
         }
         return true;
@@ -134,7 +121,8 @@ public class BasicRowValidateFilter extends AbstractRowValidateFilter
             }
             if (isNotBlank(value) && !matches(pattern, value))
             {
-                setErrorMessage(dataMap, format(EXCEL_ERR_FOMAT, row + 1, column + 1));
+                setErrorMessage(dataMap, messageSourceAccessorMap.get(getLocale().toString())
+                        .getMessage(EXCEL_ERR_FOMAT, new Object[] {row + 1, column + 1}));
                 return false;
             }
         }
@@ -172,7 +160,8 @@ public class BasicRowValidateFilter extends AbstractRowValidateFilter
             }
             if (!result)
             {
-                setErrorMessage(dataMap, format(EXCEL_ERR_VALUE, row + 1, column + 1));
+                setErrorMessage(dataMap, messageSourceAccessorMap.get(getLocale().toString())
+                        .getMessage(EXCEL_ERR_VALUE, new Object[] {row + 1, column + 1}));
             }
         }
         else

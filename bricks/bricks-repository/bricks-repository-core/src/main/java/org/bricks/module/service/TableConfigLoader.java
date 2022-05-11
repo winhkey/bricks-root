@@ -1,49 +1,50 @@
-/*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.bricks.module.service;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
+import static org.bricks.utils.ReflectionUtils.addDeclaredFields;
+import static org.bricks.utils.ReflectionUtils.addDeclaredMethods;
+import static org.bricks.utils.RegexUtils.matches;
+import static org.bricks.utils.RegexUtils.regularGroup;
+import static org.bricks.utils.StringUtils.firstToLowercase;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.MapUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.bricks.utils.ReflectionUtils.addDeclaredFields;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.stereotype.Service;
+
+import org.bricks.exception.BaseException;
 import org.bricks.module.annotation.Excel;
 import org.bricks.module.annotation.ExcelColumn;
 import org.bricks.module.annotation.Unique;
 import org.bricks.module.bean.ColumnConfig;
 import org.bricks.module.bean.TableConfig;
 import org.bricks.module.enums.DataType;
-import org.springframework.stereotype.Service;
+import org.bricks.pattern.PatternService;
 
 /**
  * 加载表配置
  *
- * @author fuzy
+ * @author fuzhiying
  *
  */
 @Service
@@ -54,6 +55,26 @@ public class TableConfigLoader
      * 缓存
      */
     private static final Map<String, TableConfig> CACHE = newHashMap();
+
+    /**
+     * getter setter正则
+     */
+    private Pattern getSetterPattern;
+
+    /**
+     * 正则配置
+     */
+    @Resource
+    private PatternService patternService;
+
+    /**
+     * 初始化
+     */
+    @PostConstruct
+    public void init()
+    {
+        getSetterPattern = patternService.loadPatternById("get-setter");
+    }
 
     /**
      * 根据类加载表配置
@@ -69,7 +90,31 @@ public class TableConfigLoader
         }
         List<Field> fieldList = newArrayList();
         addDeclaredFields(clazz, fieldList, true, false);
-        if (isEmpty(fieldList))
+        List<Method> methodList = newArrayList();
+        addDeclaredMethods(clazz, methodList, true, false);
+        Map<String, Field> map = fieldList.stream()
+                .collect(toMap(Field::getName, o -> o));
+        Stream<Method> methodStream = methodList.stream()
+                .filter(m -> m.getDeclaredAnnotation(ExcelColumn.class) != null)
+                .filter(m ->
+                {
+                    String name = m.getName();
+                    if (!matches(getSetterPattern, name))
+                    {
+                        throw new BaseException("@ExcelColumn only add with Field or Getter/Setter");
+                    }
+                    if (map.get(firstToLowercase(regularGroup(getSetterPattern, name, 2))) == null)
+                    {
+                        throw new BaseException("@ExcelColumn only add with Field or Getter/Setter");
+                    }
+                    return true;
+                })
+                .distinct();
+        Map<Member, ExcelColumn> excelColumnMap = concat(fieldList.stream()
+                .filter(f -> f.getDeclaredAnnotation(ExcelColumn.class) != null), methodStream)
+                        .collect(toMap(o -> o, o -> o.getDeclaredAnnotation(ExcelColumn.class)));
+        map.clear();
+        if (isEmpty(excelColumnMap))
         {
             return null;
         }
@@ -83,35 +128,8 @@ public class TableConfigLoader
                 .setFieldList(fList)
                 .setFieldTitleMap(fieldTitleMap)
                 .setFieldDataTypeMap(fieldDataTypeMap);
-        fieldList.stream()
-                .filter(field -> field.getAnnotation(ExcelColumn.class) != null)
-                .forEach(field ->
-                {
-                    ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
-                    ColumnConfig cfg = new ColumnConfig();
-                    if (excelColumn.column() > -1)
-                    {
-                        cfg.setColumn(excelColumn.column());
-                        columnMap.put(cfg.getColumn(), cfg);
-                    }
-                    String name = field.getName();
-                    cfg.setField(isNotBlank(excelColumn.field()) ? excelColumn.field() : name)
-                            .setTitle(isNotBlank(excelColumn.title()) ? excelColumn.title() : name)
-                            .setDataType(excelColumn.dataType())
-                            .setFilterName(excelColumn.filterName())
-                            .setFilterClass(excelColumn.filterClass())
-                            .setMandatory(excelColumn.mandatory())
-                            .setMaxLength(excelColumn.maxLength())
-                            .setRegex(excelColumn.regex())
-                            .setUnique(excelColumn.unique());
-                    fList.add(cfg.getField());
-                    fieldTitleMap.put(cfg.getField(), cfg.getTitle());
-                    fieldDataTypeMap.put(cfg.getField(), cfg.getDataType());
-                    if (cfg.isUnique())
-                    {
-                        tableConfig.setUnique(true);
-                    }
-                });
+        excelColumnMap.entrySet()
+                .forEach(entry -> dealField(fList, columnMap, fieldTitleMap, fieldDataTypeMap, tableConfig, entry));
         ofNullable(clazz.getAnnotation(Excel.class)).ifPresent(excel -> tableConfig.setStartRow(excel.startRow())
                 .setUniques(of(excel.uniques()).map(Unique::columns)
                         .filter(ArrayUtils::isNotEmpty)
@@ -124,6 +142,41 @@ public class TableConfigLoader
         }
         CACHE.put(clazz.getName(), tableConfig);
         return tableConfig;
+    }
+
+    private void dealField(List<String> fList, Map<Integer, ColumnConfig> columnMap, Map<String, String> fieldTitleMap,
+            Map<String, DataType> fieldDataTypeMap, TableConfig tableConfig, Entry<Member, ExcelColumn> entry)
+    {
+        ExcelColumn excelColumn = entry.getValue();
+        ColumnConfig cfg = new ColumnConfig();
+        if (excelColumn.column() > -1)
+        {
+            cfg.setColumn(excelColumn.column());
+            columnMap.put(cfg.getColumn(), cfg);
+        }
+        String name = entry.getKey()
+                .getName();
+        if (matches(getSetterPattern, name))
+        {
+            name = firstToLowercase(regularGroup(getSetterPattern, name, 2));
+        }
+        cfg.setField(isNotBlank(excelColumn.field()) ? excelColumn.field() : name)
+                .setTitle(isNotBlank(excelColumn.title()) ? excelColumn.title() : name)
+                .setDataType(excelColumn.dataType())
+                .setFormat(excelColumn.format())
+                .setFilterName(excelColumn.filterName())
+                .setFilterClass(excelColumn.filterClass())
+                .setMandatory(excelColumn.mandatory())
+                .setMaxLength(excelColumn.maxLength())
+                .setRegex(excelColumn.regex())
+                .setUnique(excelColumn.unique());
+        fList.add(cfg.getField());
+        fieldTitleMap.put(cfg.getField(), cfg.getTitle());
+        fieldDataTypeMap.put(cfg.getField(), cfg.getDataType());
+        if (cfg.isUnique())
+        {
+            tableConfig.setUnique(true);
+        }
     }
 
 }

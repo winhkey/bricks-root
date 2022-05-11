@@ -19,59 +19,34 @@ package org.bricks.module.annotation;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.List;
-import java.util.Map;
 
-import org.bricks.module.bean.TableConfig;
-import org.bricks.module.validate.filter.TableValidateFilter;
+import javax.validation.constraints.NotBlank;
 
 /**
- * excel表注解
+ * 表注释
  *
  * @author fuzhiying
  *
  */
 @Target(TYPE)
 @Retention(RUNTIME)
-public @interface Excel
+@Inherited
+public @interface TableComment
 {
 
     /**
-     * @return 起始行
+     * @return 表名
      */
-    int startRow() default 1;
+    @NotBlank
+    String name();
 
     /**
-     * @return 唯一列
+     * @return 表注释
      */
-    Unique[] uniques() default {};
-
-    /**
-     * @return 自定义过滤器
-     */
-    String filterName() default "";
-
-    /**
-     * @return 自定义过滤器
-     */
-    Class<? extends TableValidateFilter> filterClass() default Excel.UselessTableFilter.class;
-
-    /**
-     * 默认无用filter
-     *
-     * @author fuzhiying
-     */
-    final class UselessTableFilter implements TableValidateFilter
-    {
-
-        @Override
-        public boolean validate(List<Map<Integer, String>> data, TableConfig config)
-        {
-            return false;
-        }
-
-    }
+    @NotBlank
+    String comment();
 
 }

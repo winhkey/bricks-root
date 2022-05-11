@@ -14,39 +14,44 @@
  * limitations under the License.
  */
 
-package org.bricks.module.bean;
+package org.bricks.module.entity;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.List;
-import java.util.Map;
-
-import org.bricks.bean.AbstractBean;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import java.time.LocalDateTime;
 
 /**
- * 批量数据
- * 
+ * 创建时间
+ *
  * @author fuzhiying
  *
+ * @param <T> 子类
  */
-@Setter
-@Getter
-@Accessors(chain = true)
-public class BatchData extends AbstractBean
+public interface TimeEntity<T>
 {
 
     /**
-     * 数据列表
+     * @return 创建时间
      */
-    private List<Map<Integer, String>> dataMap = newArrayList();
+    LocalDateTime getCreateTime();
 
     /**
-     * 数据行数
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     * @return 对象
      */
-    private int total;
+    T setCreateTime(LocalDateTime createTime);
+
+    /**
+     * @return 修改时间
+     */
+    LocalDateTime getUpdateTime();
+
+    /**
+     * 设置修改时间
+     *
+     * @param updateTime 修改时间
+     * @return 对象
+     */
+    T setUpdateTime(LocalDateTime updateTime);
 
 }

@@ -1,29 +1,15 @@
-/*
- * Copyright 2020 fuzy(winhkey) (https://github.com/winhkey/bricks-root)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.bricks.module.validate.factory;
 
 import static com.google.common.collect.Sets.newLinkedHashSet;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.bricks.utils.ContextHolder.getBean;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
 
 import org.bricks.module.annotation.Excel;
 import org.bricks.module.annotation.ExcelColumn;
@@ -35,12 +21,11 @@ import org.bricks.module.validate.filter.RowValidateFilter;
 import org.bricks.module.validate.filter.TableValidateFilter;
 import org.bricks.module.validate.filter.ValidateFilter;
 import org.bricks.module.validate.manager.ValidateFilterManager;
-import org.springframework.stereotype.Component;
 
 /**
  * 过滤管理器工厂
  *
- * @author fuzy
+ * @author fuzhiying
  *
  */
 @Component

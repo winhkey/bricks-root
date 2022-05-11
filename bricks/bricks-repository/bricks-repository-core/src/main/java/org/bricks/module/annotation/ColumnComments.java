@@ -14,39 +14,33 @@
  * limitations under the License.
  */
 
-package org.bricks.module.bean;
+package org.bricks.module.annotation;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.util.List;
-import java.util.Map;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import org.bricks.bean.AbstractBean;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import javax.validation.constraints.NotEmpty;
 
 /**
- * 批量数据
- * 
+ * 多个列注释
+ *
  * @author fuzhiying
  *
  */
-@Setter
-@Getter
-@Accessors(chain = true)
-public class BatchData extends AbstractBean
+@Target(FIELD)
+@Retention(RUNTIME)
+@Inherited
+public @interface ColumnComments
 {
 
     /**
-     * 数据列表
+     * @return 列注释数组
      */
-    private List<Map<Integer, String>> dataMap = newArrayList();
-
-    /**
-     * 数据行数
-     */
-    private int total;
+    @NotEmpty
+    ColumnComment[] comments();
 
 }

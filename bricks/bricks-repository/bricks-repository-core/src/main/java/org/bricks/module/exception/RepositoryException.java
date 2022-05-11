@@ -5,7 +5,7 @@ import org.bricks.exception.BaseException;
 /**
  * dao层异常基类
  *
- * @author fuzy
+ * @author fuzhiying
  *
  */
 public class RepositoryException extends BaseException
@@ -24,6 +24,16 @@ public class RepositoryException extends BaseException
     public RepositoryException(Throwable t)
     {
         super(t);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param message 描述
+     */
+    public RepositoryException(String message)
+    {
+        super(message);
     }
 
     /**
