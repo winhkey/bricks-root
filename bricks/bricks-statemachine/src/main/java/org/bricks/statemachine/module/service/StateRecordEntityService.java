@@ -37,8 +37,9 @@ public interface StateRecordEntityService<I, S, T extends StateRecordEntity<S>> 
      * @param id 主键
      * @param source 开始状态
      * @param target 结束状态
+     * @param fault 故障
      * @return 记录
      */
-    T saveRecord(I id, S source, S target);
+    T saveRecord(I id, S source, S target, String fault);
 
 }

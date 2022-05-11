@@ -19,6 +19,12 @@ package org.bricks.statemachine.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableWithStateMachine;
 
+/**
+ * 状态机配置
+ *
+ * @author fuzy
+ *
+ */
 @Configuration
 @EnableWithStateMachine
 public class StateMachineConfig

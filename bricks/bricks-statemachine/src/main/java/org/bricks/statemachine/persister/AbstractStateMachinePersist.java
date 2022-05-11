@@ -25,7 +25,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
+import org.bricks.event.BricksEvent;
+import org.bricks.event.publish.BricksEventPublish;
 import org.bricks.exception.BaseException;
 import org.bricks.statemachine.module.entity.StateEntity;
 import org.bricks.statemachine.module.entity.StateRecordEntity;
@@ -89,6 +92,12 @@ public abstract class AbstractStateMachinePersist<S, E, I, T extends StateEntity
     protected StateRecordEntityService<I, S, R> recordEntityService;
 
     /**
+     * 发布事件
+     */
+    @Resource
+    protected BricksEventPublish bricksEventPublish;
+
+    /**
      * 初始化获取状态机id
      */
     @PostConstruct
@@ -115,10 +124,12 @@ public abstract class AbstractStateMachinePersist<S, E, I, T extends StateEntity
                 if (entityService.updateState(id, state) <= 0)
                 {
                     log.warn("未更新数据库");
+                    bricksEventPublish.publish(notChangedEvent(id, stored, state));
                 }
                 else
                 {
                     saveRecord(id, stored, state);
+                    bricksEventPublish.publish(changedEvent(id, stored, state));
                 }
             }
             setExtendedState(stateMachineContext.getExtendedState(), state);
@@ -153,7 +164,7 @@ public abstract class AbstractStateMachinePersist<S, E, I, T extends StateEntity
      */
     protected void saveRecord(I id, S source, S target)
     {
-        recordEntityService.saveRecord(id, source, target);
+        recordEntityService.saveRecord(id, source, target, null);
     }
 
     /**
@@ -192,5 +203,25 @@ public abstract class AbstractStateMachinePersist<S, E, I, T extends StateEntity
         return stateMachineContext.getExtendedState()
                 .get("state", stateClass);
     }
+
+    /**
+     * 状态变更事件
+     *
+     * @param id 业务id
+     * @param source 变更前记录
+     * @param target 变更后记录
+     * @return 状态变更事件
+     */
+    protected abstract BricksEvent<?> changedEvent(I id, S source, S target);
+
+    /**
+     * 状态未变更事件
+     *
+     * @param id 业务id
+     * @param source 变更前记录
+     * @param target 变更后记录
+     * @return 状态未变更事件
+     */
+    protected abstract BricksEvent<?> notChangedEvent(I id, S source, S target);
 
 }
