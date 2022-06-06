@@ -17,5 +17,6 @@
         <module>bricks-poi</module>
         <module>bricks-repository</module>
         <module>bricks-statemachine</module>
+        <module>bricks-cache</module>
     </modules>
 </project>

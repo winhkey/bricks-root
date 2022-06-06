@@ -87,6 +87,16 @@ public abstract class AbstractAspect
     }
 
     /**
+     * 返回
+     *
+     * @param joinPoint joinPoint
+     */
+    public void afterReturning(JoinPoint joinPoint)
+    {
+        afterReturningHandler.afterReturning(joinPoint, null);
+    }
+
+    /**
      * 抛异常
      *
      * @param joinPoint joinPoint
