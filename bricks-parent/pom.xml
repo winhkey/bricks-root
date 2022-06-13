@@ -40,7 +40,8 @@
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <tika.version>2.4.0</tika.version>
         <oshi.version>6.1.6</oshi.version>
-        <java.version>1.8</java.version>
+        <jaxb.version>4.0.0</jaxb.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <checkstyle.version>9.2.1</checkstyle.version>
         <pmd.version>6.41.0</pmd.version>
@@ -186,8 +187,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgs>
                         <arg>-parameters</arg>
