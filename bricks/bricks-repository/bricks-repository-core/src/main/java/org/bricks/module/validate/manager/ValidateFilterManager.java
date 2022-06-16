@@ -10,7 +10,7 @@ import org.bricks.module.validate.filter.TableValidateFilter;
 /**
  * 验证过滤管理器
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public interface ValidateFilterManager extends ValidateManager<List<Map<Integer, String>>>

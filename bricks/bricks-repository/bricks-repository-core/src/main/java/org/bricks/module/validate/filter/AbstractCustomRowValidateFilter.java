@@ -11,7 +11,7 @@ import org.bricks.module.bean.ColumnConfig;
 /**
  * 自定义行级过滤器
  * 
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public abstract class AbstractCustomRowValidateFilter extends AbstractRowValidateFilter

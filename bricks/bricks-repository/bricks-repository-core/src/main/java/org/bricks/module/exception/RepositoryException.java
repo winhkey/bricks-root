@@ -5,7 +5,7 @@ import org.bricks.exception.BaseException;
 /**
  * dao层异常基类
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public class RepositoryException extends BaseException

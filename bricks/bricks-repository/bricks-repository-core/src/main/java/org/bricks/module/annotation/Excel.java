@@ -30,7 +30,7 @@ import org.bricks.module.validate.filter.TableValidateFilter;
 /**
  * excel表注解
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Target(TYPE)
@@ -61,7 +61,7 @@ public @interface Excel
     /**
      * 默认无用filter
      *
-     * @author fuzhiying
+     * @author fuzy
      */
     final class UselessTableFilter implements TableValidateFilter
     {

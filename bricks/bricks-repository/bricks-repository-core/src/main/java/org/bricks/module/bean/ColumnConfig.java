@@ -27,7 +27,7 @@ import lombok.experimental.Accessors;
 /**
  * 列配置
  *
- * @author fuzhiying
+ * @author fuzy
  */
 @Setter
 @Getter

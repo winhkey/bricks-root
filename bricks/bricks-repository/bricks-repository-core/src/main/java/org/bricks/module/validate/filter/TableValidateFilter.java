@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * 表级校验过滤器
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public interface TableValidateFilter extends ValidateFilter<List<Map<Integer, String>>>

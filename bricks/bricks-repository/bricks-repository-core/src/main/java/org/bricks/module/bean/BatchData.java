@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 /**
  * 批量数据
  * 
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Setter

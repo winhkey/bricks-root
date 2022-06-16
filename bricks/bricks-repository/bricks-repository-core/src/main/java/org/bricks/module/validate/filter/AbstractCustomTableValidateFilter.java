@@ -8,7 +8,7 @@ import org.bricks.module.bean.TableConfig;
 /**
  * 自定义表级过滤器
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public abstract class AbstractCustomTableValidateFilter extends AbstractTableValidateFilter

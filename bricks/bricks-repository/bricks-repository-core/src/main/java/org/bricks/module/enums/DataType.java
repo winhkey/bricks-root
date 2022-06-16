@@ -14,7 +14,7 @@ import org.bricks.utils.DateUtils;
 /**
  * 数据类型
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public enum DataType

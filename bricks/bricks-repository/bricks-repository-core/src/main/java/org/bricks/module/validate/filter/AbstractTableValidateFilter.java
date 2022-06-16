@@ -12,7 +12,7 @@ import org.bricks.module.bean.TableConfig;
 /**
  * 抽象表级校验过滤器
  *
- * @author fuzhiying
+ * @author fuzy
  */
 public abstract class AbstractTableValidateFilter extends AbstractValidateFilter<List<Map<Integer, String>>>
         implements TableValidateFilter

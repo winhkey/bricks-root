@@ -39,7 +39,7 @@ import org.bricks.service.LimitCallback;
 /**
  * 实体类crud操作service
  *
- * @author fuzhiying
+ * @author fuzy
  *
  * @param <I> ID类型
  * @param <T> 实体类型

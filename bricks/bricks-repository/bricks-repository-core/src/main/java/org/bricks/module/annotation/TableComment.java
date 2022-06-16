@@ -28,7 +28,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 表注释
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Target(TYPE)

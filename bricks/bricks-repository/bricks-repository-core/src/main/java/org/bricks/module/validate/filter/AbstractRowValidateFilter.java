@@ -11,7 +11,7 @@ import org.bricks.module.bean.TableConfig;
 /**
  * 抽象行级校验过滤器
  *
- * @author fuzhiying
+ * @author fuzy
  */
 public abstract class AbstractRowValidateFilter extends AbstractValidateFilter<Map<Integer, String>>
         implements RowValidateFilter

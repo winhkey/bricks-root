@@ -12,7 +12,7 @@ import org.springframework.context.support.MessageSourceAccessor;
 /**
  * 抽象校验过滤器
  *
- * @author fuzhiying
+ * @author fuzy
  *
  * @param <D> 数据
  */

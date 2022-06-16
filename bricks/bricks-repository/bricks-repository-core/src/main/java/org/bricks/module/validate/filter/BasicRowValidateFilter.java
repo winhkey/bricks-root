@@ -26,7 +26,7 @@ import org.bricks.module.enums.DataType;
 /**
  * 基本行级校验
  *
- * @author fuzhiying
+ * @author fuzy
  */
 @Service("basicRowValidateFilter")
 public class BasicRowValidateFilter extends AbstractRowValidateFilter

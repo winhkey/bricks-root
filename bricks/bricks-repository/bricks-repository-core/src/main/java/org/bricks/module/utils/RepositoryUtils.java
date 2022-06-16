@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 /**
  * 数据库工具类
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @UtilityClass

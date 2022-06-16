@@ -36,7 +36,7 @@ import lombok.SneakyThrows;
 /**
  * 文件类型
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Getter

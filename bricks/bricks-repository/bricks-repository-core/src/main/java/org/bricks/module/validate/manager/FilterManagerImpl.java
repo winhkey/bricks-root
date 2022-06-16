@@ -16,7 +16,7 @@ import org.bricks.module.validate.filter.TableValidateFilter;
 /**
  * 验证过滤管理器实现类
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Scope("prototype")

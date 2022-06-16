@@ -5,7 +5,7 @@ import org.bricks.module.bean.TableConfig;
 /**
  * 验证管理器
  *
- * @author fuzhiying
+ * @author fuzy
  *
  * @param <D> 数据
  */

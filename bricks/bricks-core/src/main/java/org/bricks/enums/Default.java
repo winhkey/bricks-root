@@ -3,7 +3,7 @@ package org.bricks.enums;
 /**
  * 默认值
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public enum Default

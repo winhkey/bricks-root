@@ -28,7 +28,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 列注释
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Target(FIELD)

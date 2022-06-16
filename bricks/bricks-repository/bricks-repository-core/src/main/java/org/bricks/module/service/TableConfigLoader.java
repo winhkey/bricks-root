@@ -44,7 +44,7 @@ import org.bricks.pattern.PatternService;
 /**
  * 加载表配置
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Service

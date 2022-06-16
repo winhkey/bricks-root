@@ -31,7 +31,7 @@ import org.bricks.module.validate.filter.RowValidateFilter;
 /**
  * excel列注解
  *
- * @author fuzhiying
+ * @author fuzy
  */
 @Target({FIELD, METHOD})
 @Retention(RUNTIME)
@@ -96,7 +96,7 @@ public @interface ExcelColumn
     /**
      * 默认无用filter
      *
-     * @author fuzhiying
+     * @author fuzy
      */
     final class UselessRowFilter implements RowValidateFilter
     {

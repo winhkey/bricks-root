@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * 行级校验过滤器
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 public interface RowValidateFilter extends ValidateFilter<Map<Integer, String>>

@@ -44,7 +44,7 @@ import org.bricks.module.enums.DataType;
 /**
  * 对象转数据
  *
- * @author fuzhiying
+ * @author fuzy
  * 
  */
 @Component

@@ -25,7 +25,7 @@ import org.bricks.module.validate.manager.ValidateFilterManager;
 /**
  * 过滤管理器工厂
  *
- * @author fuzhiying
+ * @author fuzy
  *
  */
 @Component
